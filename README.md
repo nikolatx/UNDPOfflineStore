@@ -35,4 +35,4 @@ MySql za rad u bazi podataka.
 
 ## Licenca
 
-Open Source. Za više informacija pogledati LICENCE.md
+Open Source.
