@@ -18,7 +18,7 @@ Potreban je Netbeans 8.2.
 
 Verzija Jave 1.8.
 
-MySql za rad u bazi podataka.
+MySql za rad sa bazom podataka.
 
 
 #### Linkovi za download:
@@ -32,7 +32,7 @@ MySql za rad u bazi podataka.
 
 ## Učesnici u projektu
 
-Članovi GRUPE 1, po projektnoj ideji firme Inovatec i UNDP kao organizatora.
+Članovi GRUPE 1, po projektnoj ideji Inovateca i UNDP kao organizatora.
 
 
 ## Licenca
