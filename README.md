@@ -11,11 +11,13 @@ Klonirajte projekat putem HTTPS metoda:
 https://github.com/nikolatx/UNDPOfflineStore.git
 ```
 
-## Radno Okruzenje
+## Radno Okruzenje 
 
 
 Potreban je Netbeans 8.2.
+
 Verzija Jave 1.8.
+
 MySql za rad u bazi podataka.
 
 
