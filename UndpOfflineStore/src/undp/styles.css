@@ -1,0 +1,70 @@
+#headerBackground{
+    -fx-background-image: url("../resources/logo.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center;
+    -fx-background-size: 200px 150px;
+    -fx-background-color: #0068d8;
+    
+}
+
+#headerLabel{
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+}
+
+#centerPicture{
+    -fx-background-image: url("../resources/komputers.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center;
+    -fx-background-size: 700px 300px;
+    -fx-background-color: #FFFFFF;
+}
+
+#bottomStyle{
+    -fx-background-color: #FFFFFF;
+}
+
+#buttonStyle{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 2px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.5em;
+    -fx-background-radius: 0.5em;
+    -fx-margin-bottom: 50px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
+}
+
+#buttonStyle:hover{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 60px;
+    -fx-pref-width: 110px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
+}
+
+.label{
+    -fx-text-fill: #0068d8;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+}
+
+
+
+
+
