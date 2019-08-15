@@ -58,13 +58,111 @@
     
 }
 
-.label{
+#buttonStyle:hover:pressed{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
+}
+
+#labelIndex{
     -fx-text-fill: #0068d8;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
 }
 
+#serchLabel{
+    -fx-text-fill: #0068d8;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-text-align: right;
+    -fx-background-color: #FFFFFF;
+    
+}
 
+#rezultatLabel{
+    -fx-text-fill: #0068d8;
+    -fx-font-weight: bold;
+    -fx-text-align: right;
+    -fx-background-color: #FFFFFF;
+    -fx-vertical-align: top;
+    
+    
+}
+
+#buttonNabavka{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 2px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.5em;
+    -fx-background-radius: 0.5em;
+    -fx-margin-bottom: 50px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+}
+
+#buttonNabavka:hover{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 60px;
+    -fx-pref-width: 110px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
+}
+
+#buttonNabavka:hover:pressed{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
+}
+
+#nabavkaBack{
+    -fx-background-image: url("../resources/nabavka.jpg");
+    -fx-background-position: left;
+    -fx-background-size: 270px 300px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-color: #ffffff;
+}
+
+
+#nabavkaLabel{
+    -fx-text-fill: #0068d8;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-text-align: right;
+   
+}
 
 
 

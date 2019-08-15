@@ -3,26 +3,23 @@ package undp;
 
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javax.swing.JOptionPane;
 
 public class UndpOfflineStore extends Application {
         //dugmici za realizaciju pojedinih funkcija
-        Button btn1 = new Button("Prodaja");
+        Button btn1 = new Button("Pretraga");
         Button btn2 = new Button("Nabavka");
-        Button btn3 = new Button("Izvestaji");
-        Button btn4 = new Button("Azuriranje");
+        Button btn3 = new Button("Prodaja");
+        Button btn4 = new Button("Izvestaji");
+        Button btn5 = new Button("Azuriranje");
         
         //Kreiranje HBox panela za popunjvenje scene
         HBox hb1 = new HBox();
@@ -39,8 +36,8 @@ public class UndpOfflineStore extends Application {
         
         //Podesavanje velicine , izgleda i dodavanje nodova na Hbox
         hb1.setMinSize(800, 120);
-        lab1.setId("headerLabel");
-        hb1.setId("headerBackground");
+        lab1.setId("headerLabel");       
+        hb1.setId("headerBackground");    //Css - Style: podesavanje izgleda
         hb1.setAlignment(Pos.CENTER);
         lab1.setFont(fotn);
         hb1.getChildren().add(lab1);
@@ -56,24 +53,57 @@ public class UndpOfflineStore extends Application {
         fade.play();
         hb2.setMinSize(800, 350);
         hb2.setAlignment(Pos.CENTER);
-        hb2.setId("centerPicture");
+        hb2.setId("centerPicture");      //Css - Style: podesavanje izgleda
         
         //Podesavanje velicine , izgleda i dodavanje nodova na Hbox
         hb3.setMinSize(800, 130);
         hb3.setAlignment(Pos.CENTER);
         btn1.setId("buttonStyle");
         btn2.setId("buttonStyle");
-        btn3.setId("buttonStyle");
+        btn3.setId("buttonStyle");       //Css - Style: podesavanje izgleda
         btn4.setId("buttonStyle");
-        hb3.getChildren().addAll(btn1,btn2,btn3,btn4);
+        btn5.setId("buttonStyle");
+        hb3.getChildren().addAll(btn1,btn2,btn3,btn4,btn5);
         hb3.setSpacing(30);
-        hb3.setId("bottomStyle");
+        hb3.setId("bottomStyle");       //Css - Style: podesavanje izgleda
         
         //Kreiranje BorderPane-a za rasporedjivanje HBoc panela na sceni
         BorderPane root = new BorderPane();
         root.setTop(hb1);
         root.setCenter(hb2);
         root.setBottom(hb3);
+        
+        
+        //taster btn1 sa funkcijom (prelazak na Pretragu)
+        btn1.setOnAction(e ->{
+            primaryStage.close();
+            new Pretraga().start(primaryStage);
+        });
+        
+        
+        //Taster btn2 sa akcijom (prelazak na nabavku)
+        btn2.setOnAction(e ->{
+            primaryStage.close();
+            new Nabavka().start(primaryStage);
+        });
+        
+        
+        //Taster btn3 sa akcijom (prelazak na stage Prodaja)
+        btn3.setOnAction(e ->{
+            
+        });
+        
+        
+        //taster btn4 sa akcijom (prelak na stage Izvestaji)
+        btn4.setOnAction(e ->{
+            
+        });
+        
+        
+        //taster btn4 sa akcijom (prelak na stage Azuriranje)
+        btn5.setOnAction(e ->{
+            
+        });
         
         
 
