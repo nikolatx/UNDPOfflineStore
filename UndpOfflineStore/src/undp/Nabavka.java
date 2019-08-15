@@ -74,44 +74,15 @@ public class Nabavka extends Application {
         
         
         hb2.setMinSize(800, 390);
-        GridPane grid = new GridPane();
-        GridPane.setHalignment(lab2, HPos.RIGHT);
-        GridPane.setHalignment(lab3, HPos.RIGHT);
-        GridPane.setHalignment(lab4, HPos.RIGHT);
-        GridPane.setHalignment(lab5, HPos.RIGHT);
-        GridPane.setHalignment(lab6, HPos.RIGHT);
-        lab2.setId("nabavkaLabel");
-        lab3.setId("nabavkaLabel");
-        lab4.setId("nabavkaLabel");
-        lab5.setId("nabavkaLabel");
-        lab6.setId("nabavkaLabel");
-        grid.setId("nabavkaLabel");
-        tf1.setAlignment(Pos.BASELINE_RIGHT);
-        tf2.setAlignment(Pos.BASELINE_RIGHT);
-        tf3.setAlignment(Pos.BASELINE_RIGHT);
-        tf4.setAlignment(Pos.BASELINE_RIGHT);
-        grid.setHgap(5);
-        grid.setVgap(15);
-        grid.add(lab2, 0, 5);
-        grid.add(lab3, 0, 6);
-        grid.add(lab4, 0, 7);
-        grid.add(lab5, 0, 8);
-        grid.add(lab6, 0, 9);
-        grid.add(tf1, 1, 5);
-        grid.add(tf2, 1, 6);
-        grid.add(tf3, 1, 7);
-        grid.add(tf4, 1, 8);
-        grid.add(dp, 1, 9);
-        hb2.setId("nabavkaBack");
         hb2.setAlignment(Pos.CENTER);
-        hb2.getChildren().add(grid);
+       
         
         
         
         //podesavanje velicine,pozicije i izgleda hb3 - panela
         hb3.setAlignment(Pos.BASELINE_RIGHT);
         hb3.setMinSize(800, 70);
-        hb3.setId("bottomStyle");
+        hb3.setId("bottomBack");
         btn1.setId("buttonNabavka");
         btn2.setId("buttonNabavka");
         btn3.setId("buttonNabavka");

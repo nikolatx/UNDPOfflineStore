@@ -147,10 +147,10 @@
     
 }
 
-#nabavkaBack{
+#nabavkaBTMBack{
     -fx-background-image: url("../resources/nabavka.jpg");
     -fx-background-position: left;
-    -fx-background-size: 270px 300px;
+    -fx-background-size: 100px 60px;
     -fx-background-repeat: no-repeat;
     -fx-background-color: #ffffff;
 }
