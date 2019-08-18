@@ -125,11 +125,6 @@ Connection conn;
         TableColumn<Komponente, Double> kolona5 = new TableColumn("Cena");
         kolona5.setMinWidth(80);
         kolona5.setCellValueFactory(new PropertyValueFactory<>("cena"));
-
-        //dodavanje komponenti u tabelu
-        
-       // ObservableList<ObservableList> podaci = null;
-        
        
         try {
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/undpofflinestore", "root", "");
@@ -178,5 +173,11 @@ Connection conn;
                        rs.getDouble("cena")));
            }
         return podaci;
+    }
+    
+    public ObservableList<Komponente> podaciZaCB() throws SQLException {
+        ObservableList<Komponente> podaci = FXCollections.observableArrayList();
+        ResultSet rs = conn.createStatement().executeQuery("SELECT naziv FROM tip");
+        return
     }
 }
