@@ -4,6 +4,8 @@ import com.grupa1.dbconnection.DBUtil;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -81,7 +83,11 @@ public class UndpOfflineStore extends Application {
         //taster btn1 sa funkcijom (prelazak na Pretragu)
         btn1.setOnAction(e ->{
             primaryStage.close();
-            new Pretraga().start(primaryStage);
+            try {
+                new Pretraga().start(primaryStage);
+            } catch (SQLException ex) {
+                Logger.getLogger(UndpOfflineStore.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
         
         

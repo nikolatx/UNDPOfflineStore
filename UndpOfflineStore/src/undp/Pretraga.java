@@ -25,9 +25,12 @@ import com.grupa1.model.*;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -37,10 +40,19 @@ import javafx.util.Callback;
 
 public class Pretraga extends Application {
 
+    Connection conn;
+    
+    //Liste za pracenje combobox-a
+    ObservableList opcijeCombo1 = FXCollections.observableArrayList();
+    ObservableList opcijeCombo2 = FXCollections.observableArrayList();
+    ObservableList opcijeCombo3 = FXCollections.observableArrayList();
+    
+    ObservableList<ObservableList> podaci;
+
     //Kreiranje 3 ComboBox -a 
-    ComboBox tipCB = new ComboBox();
-    ComboBox nazivCB = new ComboBox();
-    ComboBox proizvodjacCB = new ComboBox();
+    ComboBox tipCB = new ComboBox(opcijeCombo1);
+    ComboBox nazivCB = new ComboBox(opcijeCombo2);
+    ComboBox proizvodjacCB = new ComboBox(opcijeCombo3);
 
     //Kreiranje dugmica
     Button pretragaDugme = new Button("Pretrazi");
@@ -49,13 +61,13 @@ public class Pretraga extends Application {
     Button prihvatiIObrazacDugme = new Button("Prihvati i napravi obrazac");
 
     //Kreiranje opisa koji ce da stoji iznad combobox-eva
-    Label tipOpis = new Label("Tip");
-    Label nazivOpis = new Label("Naziv");
-    Label proizvodjacOpis = new Label("Proizvodjac");
+    Label dobrodosli = new Label("Dobrodosli u pretragu komponenti");
+//    Label nazivOpis = new Label("Naziv");
+//    Label proizvodjacOpis = new Label("Proizvodjac");
 
     //kreiranje 2 tabele koje ce da pokazuju podatke iz baze
     //prva tabela za prikaz artikala
-    TableView prikazKomponenti = new TableView();
+    TableView prikazKomponenti;
 
     //druga tabela za prikaz odabranih artikala
     TableView odabraneStrane = new TableView();
@@ -68,13 +80,25 @@ public class Pretraga extends Application {
     VBox desniVB = new VBox();
     VBox headerHB = new VBox();
     VBox prikaziTabele = new VBox();
-    
-Connection conn;
-    @Override
-    public void start(Stage primaryStage) {
 
+    @Override
+    public void start(Stage primaryStage) throws SQLException {
+
+        try {
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/undpofflinestore", "root", "");
+            System.out.println("Uspesna konekcija");
+        } catch (SQLException e) {
+            System.out.println("Neuspesna konekcija");
+        }
+
+        prikazKomponenti = new TableView();
+        
+        tipCB.setPromptText("Izaberi tip");
+        nazivCB.setPromptText("Izaberi naziv");
+        proizvodjacCB.setPromptText("Izaberi proizvodjaca");
+        
         //podesavanje velicine,pozicije i izgleda panela sa opisima combobox-eva
-        opisiCB.getChildren().addAll(tipOpis, nazivOpis, proizvodjacOpis);
+        opisiCB.getChildren().addAll(dobrodosli);
         opisiCB.setAlignment(Pos.CENTER_LEFT);
         opisiCB.setPadding(new Insets(10));
         opisiCB.setSpacing(30);
@@ -105,42 +129,18 @@ Connection conn;
         desniVB.setPadding(new Insets(10));
         desniVB.setSpacing(30);
 
-        //Pravljenje kolona za prvu tabelu
-        TableColumn<Komponente, Integer> kolona1 = new TableColumn("Id");
-        kolona1.setMinWidth(80);
-        kolona1.setCellValueFactory(new PropertyValueFactory<>("id"));
-
-        TableColumn<Komponente, String> kolona2 = new TableColumn("Naziv");
-        kolona2.setMinWidth(80);
-        kolona2.setCellValueFactory(new PropertyValueFactory<>("naziv"));
-
-        TableColumn<Komponente, Integer> kolona3 = new TableColumn("Tip");
-        kolona3.setMinWidth(80);
-        kolona3.setCellValueFactory(new PropertyValueFactory<>("tip"));
-
-        TableColumn <Komponente, Integer>kolona4 = new TableColumn("Kolicina");
-        kolona4.setMinWidth(80);
-        kolona4.setCellValueFactory(new PropertyValueFactory<>("kolicina"));
-
-        TableColumn<Komponente, Double> kolona5 = new TableColumn("Cena");
-        kolona5.setMinWidth(80);
-        kolona5.setCellValueFactory(new PropertyValueFactory<>("cena"));
-       
-        try {
-            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/undpofflinestore", "root", "");
-            System.out.println("Uspesna konekcija");
-        } catch (SQLException e) {
-            System.out.println("Neuspesna konekcija");
-        }
+  
         
-        try {
-            prikazKomponenti.setItems(povuciPodatke());
-            prikazKomponenti.getColumns().addAll(kolona1, kolona2, kolona3, kolona4, kolona5);
-            System.out.println("Uspesno povlacenje iz baze");
-        } catch (SQLException e) {
-            System.out.println("Neuspesno povlacenje iz baze");
-        }
+        //combobox metode
+        ispuniComboBoxZaTip();
+        ispuniComboBoxZaNaziv();
+        ispuniComboBoxZaProizvodjaca();
         
+        //dugme za slanje na Nabavku komponenti
+        dodavanjeDugme.setOnAction(e ->{
+            primaryStage.close();
+            new Nabavka().start(primaryStage);
+        });
 
         //Kreiranje BorderPane-a za raspored HBox i VBox panela
         BorderPane root = new BorderPane();
@@ -149,6 +149,8 @@ Connection conn;
         root.setBottom(footerHB);
         root.setRight(desniVB);
 
+         povuciPodatke();
+         
         //Kreiranje scene ,velicine,naziva povezivanje sa Css-om
         Scene scene = new Scene(root, 1000, 800);
         primaryStage.setTitle("Pretraga - UNDP OfflineStore");
@@ -160,24 +162,83 @@ Connection conn;
     public static void main(String[] args) {
         launch(args);
     }
-    
-    public ObservableList<Komponente> povuciPodatke() throws SQLException{
-        ObservableList<Komponente> podaci = FXCollections.observableArrayList();
-        ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM komponenta"); 
-        while (rs.next()) {
-               podaci.add(new Komponente(
-                       rs.getInt("komponenta_id"),
-                       rs.getString("naziv"),
-                       rs.getInt("tip_id"),
-                       rs.getInt("kolicina"),
-                       rs.getDouble("cena")));
-           }
-        return podaci;
+
+    public void povuciPodatke() throws SQLException {
+      
+        try {
+            podaci = FXCollections.observableArrayList();
+            String SQL = "SELECT komponenta_id,naziv,proizvodjac_id,tip_id,kolicina,cena FROM komponenta";
+            PreparedStatement ps = conn.prepareStatement(SQL);
+            ResultSet rs = ps.executeQuery();
+            
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                
+                final int j = i;
+                TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i + 1));
+                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
+                public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {
+                return new SimpleStringProperty(param.getValue().get(j).toString());
+                    }
+                });
+                prikazKomponenti.getColumns().addAll(col);
+            }
+            
+            while (rs.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                    //Iterate Column
+                    row.add(rs.getString(i));
+                }
+                
+                podaci.add(row);
+            }
+            prikazKomponenti.setItems(podaci);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    
-    public ObservableList<Komponente> podaciZaCB() throws SQLException {
-        ObservableList<Komponente> podaci = FXCollections.observableArrayList();
-        ResultSet rs = conn.createStatement().executeQuery("SELECT naziv FROM tip");
-        return
+
+    public void ispuniComboBoxZaTip() {
+
+        try {
+            String upit = "SELECT naziv FROM tip";
+            ResultSet rs = conn.createStatement().executeQuery(upit);
+            while (rs.next()) {
+                opcijeCombo1.add(rs.getString("naziv"));
+            }
+            rs.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Pretraga.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
+
+    public void ispuniComboBoxZaNaziv() {
+
+        try {
+            String upit = "SELECT naziv FROM komponenta";
+            ResultSet rs = conn.createStatement().executeQuery(upit);
+            while (rs.next()) {
+                opcijeCombo2.add(rs.getString("naziv"));
+            }
+            rs.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Pretraga.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void ispuniComboBoxZaProizvodjaca() {
+
+        try {
+            String upit = "SELECT naziv FROM proizvodjac";
+            ResultSet rs = conn.createStatement().executeQuery(upit);
+            while (rs.next()) {
+                opcijeCombo3.add(rs.getString("naziv"));
+            }
+            rs.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Pretraga.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
 }
