@@ -1,6 +1,9 @@
-
 package undp;
 
+import com.grupa1.dbconnection.DBUtil;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -29,11 +32,12 @@ public class UndpOfflineStore extends Application {
         //Kreiranje tekstualnih labela i fonta
         Label lab1 = new Label("UNDP OfflineStore");
         Font fotn = new Font(25);
+       
         
-    
     @Override
     public void start(Stage primaryStage) {
         
+              
         //Podesavanje velicine , izgleda i dodavanje nodova na Hbox
         hb1.setMinSize(800, 120);
         lab1.setId("headerLabel");       
