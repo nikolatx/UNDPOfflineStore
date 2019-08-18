@@ -122,7 +122,8 @@ public class UndpOfflineStore extends Application {
         
         
         //Kreiranje scene,velicine,naziva i povezivanje sa css-om
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 1000, 650);
+        primaryStage.setResizable(false);
         primaryStage.setTitle("UNDP Offline Store");
         scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
         primaryStage.setScene(scene);

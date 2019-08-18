@@ -83,10 +83,10 @@ public class Nabavka extends Application {
         hb3.setAlignment(Pos.BASELINE_RIGHT);
         hb3.setMinSize(800, 70);
         hb3.setId("bottomBack");
-        btn1.setId("buttonNabavka");
-        btn2.setId("buttonNabavka");
-        btn3.setId("buttonNabavka");
-        btn4.setId("buttonNabavka");
+        btn1.setId("buttonStyle");
+        btn2.setId("buttonStyle");
+        btn3.setId("buttonStyle");
+        btn4.setId("buttonStyle");
         hb3.setSpacing(20);
         hb3.getChildren().addAll(btn4,btn1,btn3,btn2);
         
@@ -122,7 +122,8 @@ public class Nabavka extends Application {
        
         
         //Kreiranje scene ,velicine,naziva povezivanje sa Css-om
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 1000, 650);
+        primaryStage.setResizable(false);
         primaryStage.setTitle("Nabavka - UNDP OfflineStore");
         scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
         primaryStage.setScene(scene);

@@ -56,14 +56,15 @@ public class Pretraga extends Application {
 
     //Kreiranje dugmica
     Button pretragaDugme = new Button("Pretrazi");
-    Button dodavanjeDugme = new Button("Dodaj");
+    Button dodavanjeDugme = new Button("Dodaj Komponentu");
     Button prihvatiDugme = new Button("Prihvati");
-    Button prihvatiIObrazacDugme = new Button("Prihvati i napravi obrazac");
+    Button prihvatiIObrazacDugme = new Button("PDF");
+    Button nazad = new Button("Nazad");
 
     //Kreiranje opisa koji ce da stoji iznad combobox-eva
-    Label dobrodosli = new Label("Dobrodosli u pretragu komponenti");
-//    Label nazivOpis = new Label("Naziv");
-//    Label proizvodjacOpis = new Label("Proizvodjac");
+    Label dobrodosli = new Label("Pretraga");
+    Label komponente = new Label("Dostupne komponente");
+    Label komponenteZaIzvestaj = new Label("Komponente za izvestaj");
 
     //kreiranje 2 tabele koje ce da pokazuju podatke iz baze
     //prva tabela za prikaz artikala
@@ -80,6 +81,9 @@ public class Pretraga extends Application {
     VBox desniVB = new VBox();
     VBox headerHB = new VBox();
     VBox prikaziTabele = new VBox();
+    
+    //Kreiranje Fonta
+    Font font = new Font(25);
 
     @Override
     public void start(Stage primaryStage) throws SQLException {
@@ -94,36 +98,53 @@ public class Pretraga extends Application {
         prikazKomponenti = new TableView();
         
         tipCB.setPromptText("Izaberi tip");
+        tipCB.setMinSize(150, 25);
         nazivCB.setPromptText("Izaberi naziv");
+        nazivCB.setMinSize(150, 25);
         proizvodjacCB.setPromptText("Izaberi proizvodjaca");
+        proizvodjacCB.setMinSize(150, 25);
+        pretragaDugme.setMinSize(100, 25);
+        pretragaDugme.setId("pretragaButton");
         
-        //podesavanje velicine,pozicije i izgleda panela sa opisima combobox-eva
-        opisiCB.getChildren().addAll(dobrodosli);
-        opisiCB.setAlignment(Pos.CENTER_LEFT);
-        opisiCB.setPadding(new Insets(10));
-        opisiCB.setSpacing(30);
+
 
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        comboboxHB.setAlignment(Pos.CENTER_LEFT);
+        comboboxHB.setAlignment(Pos.BOTTOM_LEFT);
+        comboboxHB.setId("headerBackground");
         comboboxHB.setPadding(new Insets(10));
         comboboxHB.setSpacing(30);
-        comboboxHB.getChildren().addAll(tipCB, nazivCB, proizvodjacCB, pretragaDugme);
+        comboboxHB.setMinSize(1000, 100);
+        dobrodosli.setTranslateY(-50);
+        dobrodosli.setTranslateX(-300);
+        dobrodosli.setFont(font);
+        dobrodosli.setId("headerLabel");
+        comboboxHB.getChildren().addAll(tipCB, nazivCB, proizvodjacCB, pretragaDugme,dobrodosli);
 
         //podesavanje velicine,pozicije i izgleda panela sa opisima i combobox-evima
         headerHB.getChildren().addAll(opisiCB, comboboxHB);
 
         //podesavanje velicine,pozicije i izgleda panela sa 2 tableView prozora
+        prikazKomponenti.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        prikazKomponenti.setMaxSize(800, 250);
         prikaziTabele.setPadding(new Insets(10));
-        prikaziTabele.setSpacing(30);
-        prikaziTabele.getChildren().addAll(prikazKomponenti, odabraneStrane);
+        //prikaziTabele.setSpacing(30);
+        odabraneStrane.setMaxSize(800, 250);
+        prikaziTabele.getChildren().addAll(komponente,prikazKomponenti,komponenteZaIzvestaj, odabraneStrane);
 
         //podesavanje velicine,pozicije i izgleda panela sa dugmicima
         footerHB.setAlignment(Pos.CENTER);
         footerHB.setPadding(new Insets(10));
         footerHB.setSpacing(30);
-        footerHB.getChildren().addAll(prihvatiDugme, prihvatiIObrazacDugme);
+        prihvatiDugme.setId("buttonStyle");
+        prihvatiIObrazacDugme.setId("buttonStyle");
+        nazad.setId("buttonStyle");
+        footerHB.setMargin(nazad, new Insets(0, 0, 0, 320));
+        footerHB.setMargin(prihvatiDugme, new Insets(0, 0, 0, 250));
+        footerHB.setMargin(prihvatiIObrazacDugme, new Insets(0, 0, 0, 20));
+        footerHB.getChildren().addAll(prihvatiDugme, prihvatiIObrazacDugme,nazad);
 
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
+        dodavanjeDugme.setId("dodavanjeDugme");
         desniVB.getChildren().add(dodavanjeDugme);
         desniVB.setAlignment(Pos.TOP_CENTER);
         desniVB.setPadding(new Insets(10));
@@ -141,6 +162,11 @@ public class Pretraga extends Application {
             primaryStage.close();
             new Nabavka().start(primaryStage);
         });
+        
+        nazad.setOnAction(e ->{
+            primaryStage.close();
+            new UndpOfflineStore().start(primaryStage);
+        });
 
         //Kreiranje BorderPane-a za raspored HBox i VBox panela
         BorderPane root = new BorderPane();
@@ -152,7 +178,8 @@ public class Pretraga extends Application {
          povuciPodatke();
          
         //Kreiranje scene ,velicine,naziva povezivanje sa Css-om
-        Scene scene = new Scene(root, 1000, 800);
+        Scene scene = new Scene(root, 1000, 650);
+        primaryStage.setResizable(false);
         primaryStage.setTitle("Pretraga - UNDP OfflineStore");
         scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
         primaryStage.setScene(scene);
