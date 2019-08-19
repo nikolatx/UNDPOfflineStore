@@ -116,11 +116,6 @@ public class UndpOfflineStore extends Application {
         });
         
         
-
-        
-                
-        
-        
         //Kreiranje scene,velicine,naziva i povezivanje sa css-om
         Scene scene = new Scene(root, 1000, 650);
         primaryStage.setResizable(false);

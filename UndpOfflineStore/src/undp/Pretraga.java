@@ -48,6 +48,8 @@ public class Pretraga extends Application {
     ObservableList opcijeCombo3 = FXCollections.observableArrayList();
     
     ObservableList<ObservableList> podaci;
+    
+    ObservableList<ObservableList> comboAkcije;
 
     //Kreiranje 3 ComboBox -a 
     ComboBox tipCB = new ComboBox(opcijeCombo1);
@@ -159,14 +161,14 @@ public class Pretraga extends Application {
         
         //dugme za slanje na Nabavku komponenti
         dodavanjeDugme.setOnAction(e ->{
-            primaryStage.close();
-            new Nabavka().start(primaryStage);
+            
         });
         
         nazad.setOnAction(e ->{
             primaryStage.close();
             new UndpOfflineStore().start(primaryStage);
         });
+
 
         //Kreiranje BorderPane-a za raspored HBox i VBox panela
         BorderPane root = new BorderPane();
@@ -266,6 +268,10 @@ public class Pretraga extends Application {
         } catch (SQLException ex) {
             Logger.getLogger(Pretraga.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public void comboAction() {
+        System.out.println(tipCB.getValue());
     }
 
 }
