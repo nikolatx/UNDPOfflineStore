@@ -13,13 +13,15 @@ public class Komponente {
     //id komponente property
     public static IntegerProperty id;
     public static StringProperty naziv;
+    public static IntegerProperty proizvodjac;
     public static IntegerProperty tip;
     public static IntegerProperty kolicina;
     public static DoubleProperty cena;
 
-    public Komponente(int name, String naziv, int tip, int kolicina, double cena) {
+    public Komponente(int name, String naziv, int proizvodjac, int tip, int kolicina, double cena) {
         this.id = new SimpleIntegerProperty();
         this.naziv = new SimpleStringProperty();
+        this.proizvodjac = new SimpleIntegerProperty();
         this.tip = new SimpleIntegerProperty();
         this.kolicina = new SimpleIntegerProperty();
         this.cena = new SimpleDoubleProperty();
@@ -50,6 +52,19 @@ public class Komponente {
         return naziv;
     }
 
+    //proizvodjac property
+    public static int getProizvodjac() {
+        return proizvodjac.get();
+    }
+
+    public static void setProizvodjac(int value) {
+        proizvodjac.set(value);
+    }
+
+    public IntegerProperty proizvodjacProperty() {
+        return proizvodjac;
+    }
+    
     //tip property
     public static int getTip() {
         return tip.get();

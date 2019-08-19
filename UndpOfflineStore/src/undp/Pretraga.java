@@ -8,34 +8,32 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import com.grupa1.dbconnection.*;
 import com.grupa1.model.*;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.ResultSet;      
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.scene.control.TableRow;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 public class Pretraga extends Application {
@@ -49,12 +47,14 @@ public class Pretraga extends Application {
     
     ObservableList<ObservableList> podaci;
     
-    ObservableList<ObservableList> comboAkcije;
 
-    //Kreiranje 3 ComboBox -a 
+
+    //Kreiranje 2 ComboBox polja 
     ComboBox tipCB = new ComboBox(opcijeCombo1);
-    ComboBox nazivCB = new ComboBox(opcijeCombo2);
     ComboBox proizvodjacCB = new ComboBox(opcijeCombo3);
+    
+    //Kreiranje jednog TextField polja
+    TextField unosPretrage = new TextField();
 
     //Kreiranje dugmica
     Button pretragaDugme = new Button("Pretrazi");
@@ -74,7 +74,10 @@ public class Pretraga extends Application {
 
     //druga tabela za prikaz odabranih artikala
     TableView odabraneStrane = new TableView();
-
+    
+    //TEST TABELA
+    TableView <Komponente> testTabela;
+    
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
     HBox opisiCB = new HBox();
     HBox comboboxHB = new HBox();
@@ -96,19 +99,23 @@ public class Pretraga extends Application {
         } catch (SQLException e) {
             System.out.println("Neuspesna konekcija");
         }
-
+        
+        //definisanje tabele
         prikazKomponenti = new TableView();
+        
+        //testTabela = new TableView();
         
         tipCB.setPromptText("Izaberi tip");
         tipCB.setMinSize(150, 25);
-        nazivCB.setPromptText("Izaberi naziv");
-        nazivCB.setMinSize(150, 25);
         proizvodjacCB.setPromptText("Izaberi proizvodjaca");
         proizvodjacCB.setMinSize(150, 25);
+        
+        
+        //SREDI GA MALO, NEBOJSA
+        //podesavanja za dugme za pretragu
         pretragaDugme.setMinSize(100, 25);
         pretragaDugme.setId("pretragaButton");
         
-
 
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
         comboboxHB.setAlignment(Pos.BOTTOM_LEFT);
@@ -116,11 +123,16 @@ public class Pretraga extends Application {
         comboboxHB.setPadding(new Insets(10));
         comboboxHB.setSpacing(30);
         comboboxHB.setMinSize(1000, 100);
+        
+        unosPretrage.setPromptText("Pretraga");
+        
         dobrodosli.setTranslateY(-50);
         dobrodosli.setTranslateX(-300);
         dobrodosli.setFont(font);
         dobrodosli.setId("headerLabel");
-        comboboxHB.getChildren().addAll(tipCB, nazivCB, proizvodjacCB, pretragaDugme,dobrodosli);
+        
+        //dodavanje nodova u HBox
+        comboboxHB.getChildren().addAll(tipCB, proizvodjacCB, unosPretrage, pretragaDugme,dobrodosli);
 
         //podesavanje velicine,pozicije i izgleda panela sa opisima i combobox-evima
         headerHB.getChildren().addAll(opisiCB, comboboxHB);
@@ -129,10 +141,11 @@ public class Pretraga extends Application {
         prikazKomponenti.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         prikazKomponenti.setMaxSize(800, 250);
         prikaziTabele.setPadding(new Insets(10));
+        
         //prikaziTabele.setSpacing(30);
         odabraneStrane.setMaxSize(800, 250);
         prikaziTabele.getChildren().addAll(komponente,prikazKomponenti,komponenteZaIzvestaj, odabraneStrane);
-
+         
         //podesavanje velicine,pozicije i izgleda panela sa dugmicima
         footerHB.setAlignment(Pos.CENTER);
         footerHB.setPadding(new Insets(10));
@@ -152,15 +165,55 @@ public class Pretraga extends Application {
         desniVB.setPadding(new Insets(10));
         desniVB.setSpacing(30);
 
-  
         
         //combobox metode
         ispuniComboBoxZaTip();
         ispuniComboBoxZaNaziv();
         ispuniComboBoxZaProizvodjaca();
         
+        //akcije za combobox 
+        tipCB.setOnAction(e -> {
+            try {
+                resetujTabelu(prikazKomponenti);   
+                povuciPodatke(comboAkcija((String)tipCB.getValue()), "tip");
+            } catch (SQLException ex) {
+                System.out.println("Problem sa combobox tipCB");
+            }
+        });
+        
+        proizvodjacCB.setOnAction(e -> {
+           try {
+                resetujTabelu(prikazKomponenti);   
+                povuciPodatke(comboAkcija((String)proizvodjacCB.getValue()), "proizvodjac");
+            } catch (SQLException ex) {
+                System.out.println("Problem sa combobox tipCB");
+            }    
+        });
+        
+        pretragaDugme.setOnAction(e -> {
+            try {
+                resetujTabelu(prikazKomponenti);
+                povuciPodatke(unosPretrage.textProperty().getValue());
+                unosPretrage.clear();
+            } catch (SQLException ex) {
+                System.out.println("Greska sa TextField poljem");
+            }
+        
+        });
+        
+        prikazKomponenti.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2){
+                    System.out.println(prikazKomponenti.getSelectionModel().getSelectedItem());
+                }
+            }
+        });
+    
+        
         //dugme za slanje na Nabavku komponenti
         dodavanjeDugme.setOnAction(e ->{
+            
             
         });
         
@@ -190,42 +243,6 @@ public class Pretraga extends Application {
 
     public static void main(String[] args) {
         launch(args);
-    }
-
-    public void povuciPodatke() throws SQLException {
-      
-        try {
-            podaci = FXCollections.observableArrayList();
-            String SQL = "SELECT komponenta_id,naziv,proizvodjac_id,tip_id,kolicina,cena FROM komponenta";
-            PreparedStatement ps = conn.prepareStatement(SQL);
-            ResultSet rs = ps.executeQuery();
-            
-            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
-                
-                final int j = i;
-                TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i + 1));
-                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
-                public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {
-                return new SimpleStringProperty(param.getValue().get(j).toString());
-                    }
-                });
-                prikazKomponenti.getColumns().addAll(col);
-            }
-            
-            while (rs.next()) {
-                ObservableList<String> row = FXCollections.observableArrayList();
-                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-                    //Iterate Column
-                    row.add(rs.getString(i));
-                }
-                
-                podaci.add(row);
-            }
-            prikazKomponenti.setItems(podaci);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void ispuniComboBoxZaTip() {
@@ -270,8 +287,131 @@ public class Pretraga extends Application {
         }
     }
     
-    public void comboAction() {
-        System.out.println(tipCB.getValue());
+    public String comboAkcija(String upit) {
+            return upit;
+    }
+    
+    public void povuciPodatke() throws SQLException {
+      
+        try {
+            podaci = FXCollections.observableArrayList();
+            String SQL = "SELECT komponenta_id,naziv,proizvodjac_id,tip_id,kolicina,cena FROM komponenta";
+            PreparedStatement ps = conn.prepareStatement(SQL);
+            ResultSet rs = ps.executeQuery();
+            
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                
+                final int j = i;
+                TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i + 1));
+                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
+                public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {
+                return new SimpleStringProperty(param.getValue().get(j).toString());
+                    }
+                });
+                prikazKomponenti.getColumns().addAll(col);
+            }
+            
+            while (rs.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                    //Iterate Column
+                    row.add(rs.getString(i));
+                }
+                
+                podaci.add(row);
+            }
+            prikazKomponenti.setItems(podaci);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+     
+    public void povuciPodatke(String recKojaSeTrazi, String tabelaKojaSeTrazi) throws SQLException {
+        
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            podaci = FXCollections.observableArrayList();
+            String SQL = "SELECT komponenta_id, komponenta.naziv, komponenta.proizvodjac_id, komponenta.tip_id, kolicina, cena "
+                    + "FROM komponenta JOIN " + tabelaKojaSeTrazi + " ON " + tabelaKojaSeTrazi + "."  + tabelaKojaSeTrazi + "_id = komponenta."  + tabelaKojaSeTrazi + "_id "
+                    + "WHERE " + tabelaKojaSeTrazi + ".naziv='" + recKojaSeTrazi + "'";
+            ps = conn.prepareStatement(SQL);
+            rs = ps.executeQuery();
+            
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                
+                final int j = i;
+                TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i + 1));
+                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
+                public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {
+                return new SimpleStringProperty(param.getValue().get(j).toString());
+                    }
+                });
+                prikazKomponenti.getColumns().addAll(col);
+            }
+            
+            while (rs.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                    row.add(rs.getString(i));
+                }
+                
+                podaci.add(row);
+            }
+            prikazKomponenti.setItems(podaci);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            ps.close();
+            rs.close();
+        }
+    }
+    
+    public void povuciPodatke(String recKojaSeTrazi) throws SQLException {
+      
+        try {
+            podaci = FXCollections.observableArrayList();
+            String SQL = "SELECT komponenta_id,naziv,proizvodjac_id,tip_id,kolicina,cena "
+                    + "FROM komponenta "
+                    + "WHERE naziv LIKE '%" + recKojaSeTrazi + "%' OR naziv LIKE '"+ recKojaSeTrazi + "%' OR naziv LIKE '%"+ recKojaSeTrazi + "'";
+            PreparedStatement ps = conn.prepareStatement(SQL);
+            ResultSet rs = ps.executeQuery();
+            
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                
+                final int j = i;
+                TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i + 1));
+                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
+                public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {
+                return new SimpleStringProperty(param.getValue().get(j).toString());
+                    }
+                });
+                prikazKomponenti.getColumns().addAll(col);
+            }
+            
+            while (rs.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                    //Iterate Column
+                    row.add(rs.getString(i));
+                }
+                
+                podaci.add(row);
+            }
+            prikazKomponenti.setItems(podaci);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void resetujTabelu(TableView tb) {
+        tb.getItems().clear();
+        tb.getColumns().clear();
     }
 
+   
 }
