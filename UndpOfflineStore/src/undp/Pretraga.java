@@ -23,6 +23,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;      
 import java.sql.SQLException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
@@ -45,9 +46,11 @@ public class Pretraga extends Application {
     ObservableList opcijeCombo2 = FXCollections.observableArrayList();
     ObservableList opcijeCombo3 = FXCollections.observableArrayList();
     
+    //Lista za pracenje informacija u tabeli
     ObservableList<ObservableList> podaci;
     
-
+    //Scanner za izvlacenje podataka iz Stringa
+    Scanner scanner;
 
     //Kreiranje 2 ComboBox polja 
     ComboBox tipCB = new ComboBox(opcijeCombo1);
@@ -73,10 +76,7 @@ public class Pretraga extends Application {
     TableView prikazKomponenti;
 
     //druga tabela za prikaz odabranih artikala
-    TableView odabraneStrane = new TableView();
-    
-    //TEST TABELA
-    TableView <Komponente> testTabela;
+    TableView odabraneStrane;
     
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
     HBox opisiCB = new HBox();
@@ -102,6 +102,7 @@ public class Pretraga extends Application {
         
         //definisanje tabele
         prikazKomponenti = new TableView();
+        odabraneStrane = new TableView();
         
         //testTabela = new TableView();
         
@@ -143,6 +144,7 @@ public class Pretraga extends Application {
         prikaziTabele.setPadding(new Insets(10));
         
         //prikaziTabele.setSpacing(30);
+        odabraneStrane.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         odabraneStrane.setMaxSize(800, 250);
         prikaziTabele.getChildren().addAll(komponente,prikazKomponenti,komponenteZaIzvestaj, odabraneStrane);
          
@@ -205,7 +207,17 @@ public class Pretraga extends Application {
             @Override
             public void handle(MouseEvent event) {
                 if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2){
-                    System.out.println(prikazKomponenti.getSelectionModel().getSelectedItem());
+                    try {
+                        String s = prikazKomponenti.getSelectionModel().getSelectedItem().toString();
+                        scanner = new Scanner(s);
+                        s = scanner.next();
+                        povuciPodatkeTabelaDva(s.substring(1, 2));
+                    } catch (SQLException ex) {
+                        Logger.getLogger(Pretraga.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    finally {
+                        scanner.close();
+                    }
                 }
             }
         });
@@ -408,10 +420,44 @@ public class Pretraga extends Application {
         }
     }
     
+    public void povuciPodatkeTabelaDva(String id) throws SQLException {
+      
+        try {
+            podaci = FXCollections.observableArrayList();
+            String SQL = "SELECT komponenta_id,naziv,proizvodjac_id,tip_id,kolicina,cena FROM komponenta WHERE komponenta_id=" + id ;
+            PreparedStatement ps = conn.prepareStatement(SQL);
+            ResultSet rs = ps.executeQuery();
+            
+            for (int i = 0; i < rs.getMetaData().getColumnCount(); i++) {
+                
+                final int j = i;
+                TableColumn col = new TableColumn(rs.getMetaData().getColumnName(i + 1));
+                col.setCellValueFactory(new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
+                public ObservableValue<String> call(CellDataFeatures<ObservableList, String> param) {
+                return new SimpleStringProperty(param.getValue().get(j).toString());
+                    }
+                });
+                odabraneStrane.getColumns().addAll(col);
+            }
+            
+            while (rs.next()) {
+                ObservableList<String> row = FXCollections.observableArrayList();
+                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                   
+                    row.add(rs.getString(i));
+                }
+                
+                podaci.add(row);
+            }
+            odabraneStrane.setItems(podaci);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     public void resetujTabelu(TableView tb) {
         tb.getItems().clear();
         tb.getColumns().clear();
     }
-
-   
 }
