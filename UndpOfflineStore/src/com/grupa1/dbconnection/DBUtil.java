@@ -2,47 +2,128 @@ package com.grupa1.dbconnection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DBUtil {
 
-    private static Connection connection;
-    private static Statement statement;
-    private static final String dbUrl = "jdbc:mysql://localhost:3306/";
+    private static final String dbUrl = "jdbc:mysql://localhost/";
     private static final String dbName = "undpofflinestore";
-    private static final String username = "root";
+    private static final String userName = "root";
     private static final String password = "";
 
-    //metod za poovezivanje sa bazom
-    public static Connection poveziDB() throws SQLException, ClassNotFoundException {
-        Class.forName("com.mysql.jdbc.Driver");
-         DriverManager.getConnection(dbUrl + dbName, dbUrl, password);
-         return connection;
-    }
-
-    //metod za iskljucivanje konekcije sa bazom
-    public static void iskljuciDBkonekciju() throws SQLException {
-
+    public static Connection napraviKonekciju() {
+        Connection conn=null;
         try {
-            connection.close();
-            System.out.println("Uspesno iskljucivanje konekcije");
-        } catch (SQLException e) {
-            System.out.println("Greska u iskljucivanju konekcije");
+            conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
+            System.out.println("Uspesna konekcija");
+        } catch (SQLException ex) {
+            System.out.println("Neuspesna konekcija");
+            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return conn;
     }
-
-    //metod za izvrsavanje upita
-    public static void izvrsiUpit(String query) throws SQLException {
-
+    
+    //prikupljanje podataka iz baze pomocu upita
+    public static ResultSet prikupiPodatke(Connection conn, String upit) {
+        ResultSet rs = null;
+        List<String> lista=new ArrayList<>();
         try {
-            statement = connection.createStatement();
-            statement.executeUpdate(query);
-        } catch (SQLException e) {
-            System.out.println("Greska");
-        } finally {
-            statement.close();
+            rs = conn.createStatement().executeQuery(upit);
+        } catch (SQLException ex) {
+            System.out.println("Neuspesna konekcija");
+            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        return rs;
     }
+    
+    //prikupljanje podataka iz baze pomocu upita sa tri parametra tipa String
+    public static List<String> prikupiPodatkeParam(String upit, String param1) {
+        Connection conn=null;
+        ResultSet rs = null;
+        Statement statement=null;
+        List<String> lista=new ArrayList<>();
+        try {
+            conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
+            System.out.println("Uspesna konekcija");
+            statement=conn.createStatement();
+            PreparedStatement ps=conn.prepareStatement(upit);
+            ps.setString(1,param1);
+            rs = conn.createStatement().executeQuery(upit);
+            while (rs.next()) {
+                lista.add(rs.getString("naziv"));
+            }
+        } catch (SQLException ex) {
+            System.out.println("Neuspesna konekcija");
+            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally {
+            try {
+                if (conn!=null) conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return lista;
+    }
+    
+    //promena podataka u bazi pomocu upita
+    public static int izvrsiUpdateUpit(String upit) {
+        Connection conn=null;
+        int promenjeno=0;
+        try {
+            conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
+            System.out.println("Uspesna konekcija");
+            promenjeno = conn.createStatement().executeUpdate(upit);
+        } catch (SQLException ex) {
+            System.out.println("Neuspesna konekcija");
+            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally {
+            try {
+                if (conn!=null) conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return promenjeno;
+    }
+    
+    //preuzima aktuelno stanje komponente ciji se id prosledjuje kao parametar
+    public static int preuzmiAktuelnoStanje(int id) {
+        Connection conn=null;
+        ResultSet rs = null;
+        Statement statement=null;
+        int result=-1;
+        try {
+            conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
+            System.out.println("Uspesna konekcija");
+            String upit="SELECT kolicina FROM komponenta WHERE komponenta_id=?";
+            PreparedStatement ps=conn.prepareStatement(upit);
+            ps.setInt(1,id);
+            rs = ps.executeQuery();
+            if (rs.next())
+                result=rs.getInt(1);
+        } catch (SQLException ex) {
+            System.out.println("Neuspesna konekcija");
+            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally {
+            try {
+                if (conn!=null) conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return result;
+    }
+    
+    
+    
 }
