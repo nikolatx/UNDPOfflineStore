@@ -79,7 +79,7 @@ public class Prodaja extends Application {
     Button dobavljacDugme = new Button("Dodaj dobavljaca");
     
     //Kreiranje opisa koji ce da stoje na formi
-    Label naslovForme = new Label("Pretraga");
+    Label naslovForme = new Label("Prodaja");
     Label labelFiltriraneKomponente = new Label("Rezultat pretrage");
     Label labelOdabraneKomponente = new Label("Odabrane komponente");
     
@@ -132,8 +132,8 @@ public class Prodaja extends Application {
         deoNaziva.setPromptText("Prodaja");
         
         //podesavanje naslova forme
-        naslovForme.setTranslateY(-50);
-        naslovForme.setTranslateX(-300);
+        naslovForme.setTranslateY(-30);
+        naslovForme.setTranslateX(-230);
         naslovForme.setFont(font);
         naslovForme.setId("headerLabel");
         

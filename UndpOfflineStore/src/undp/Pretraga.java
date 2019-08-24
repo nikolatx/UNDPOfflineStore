@@ -16,7 +16,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import com.grupa1.dbconnection.*;
-import com.grupa1.model.DetaljiDokumenta;
 import com.grupa1.model.Dokument;
 import com.grupa1.model.Komponenta;
 import java.sql.Connection;
@@ -45,42 +44,40 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 
 public class Pretraga extends Application {
+
     //objekat za konekciju sa bazom podataka
     Connection conn;
     
-    
-    //Liste za pracenje combobox-a
+    //Liste sa opcijama ComboBox-ova
     ObservableList opcijeTip = FXCollections.observableArrayList();
     ObservableList opcijeProizvodjac = FXCollections.observableArrayList();
     ObservableList opcijeDobavljac = FXCollections.observableArrayList();
+    
     //Kreiranje 3 ComboBox-a na formi
     ComboBox tipCB = new ComboBox(opcijeTip);
     ComboBox proizvodjacCB = new ComboBox(opcijeProizvodjac);
-    ComboBox dobavljacCB = new ComboBox(opcijeDobavljac);
+    //ComboBox dobavljacCB = new ComboBox(opcijeDobavljac);
     
-    //Liste za pracenje informacija u tabeli
+    //Liste za pracenje informacija u tabelama
     ObservableList<Komponenta> podaciFiltrirano=FXCollections.observableArrayList();;
     ObservableList<Komponenta> podaciOdabrano=FXCollections.observableArrayList();;
-    //tabela za prikaz komponenata koje zadovoljavaju zadate kriterijume (filtraciju)
+    
+    //tabela za prikaz komponenata koje zadovoljavaju zadate kriterijume pretrage
     TableView tabelaFiltrirano = new TableView();
-    //tabela za prikaz odabranih komponenata
-    TableView tabelaOdabrano = new TableView();;
+
     
     //polje za unos dela naziva komponente kao kriterijuma za pretragu
     TextField deoNaziva = new TextField();
 
     //Kreiranje dugmica
     Button pretragaDugme = new Button("Pretrazi");
-    Button dodavanjeDugme = new Button("Dodaj komponentu");
-    Button prihvatiDugme = new Button("Prihvati");
-    Button prihvatiIObrazacDugme = new Button("Prihvati i eksportuj");
     Button nazadDugme = new Button("Nazad");
-    Button dobavljacDugme = new Button("Dodaj dobavljaca");
+    
     
     //Kreiranje opisa koji ce da stoje na formi
     Label naslovForme = new Label("Pretraga");
-    Label labelFiltriraneKomponente = new Label("Filtrirane komponente");
-    Label labelOdabraneKomponente = new Label("Odabrane komponente");
+    Label labelFiltriraneKomponente = new Label("Rezultat pretrage");
+
     
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
     HBox opisiCB = new HBox();
@@ -94,14 +91,15 @@ public class Pretraga extends Application {
     //Kreiranje Fonta
     Font font = new Font(25);
     
+    //kreiranje pomocnih promenljivih koje ce da se koriste u lambda izrazima
     private Statement st=null;
     private int prijemnicaId;
     
     @Override
     public void init() throws Exception {
-        super.init(); //To change body of generated methods, choose Tools | Templates.
+        super.init();
         kreirajTabelu(tabelaFiltrirano);
-        kreirajTabelu(tabelaOdabrano);
+       // kreirajTabelu(tabelaOdabrano);
     }
     
     @Override
@@ -112,13 +110,11 @@ public class Pretraga extends Application {
         tipCB.setMinSize(150, 25);
         proizvodjacCB.setPromptText("Izaberi proizvodjaca");
         proizvodjacCB.setMinSize(150, 25);
-        dobavljacCB.setPromptText("Izaberi dobavljaca");
-        dobavljacCB.setMinSize(150, 25);
+
         
-        //podesavanja za dugme za pretragu
+        //podesavanja dugmeta za pretragu
         pretragaDugme.setMinSize(100, 25);
         pretragaDugme.setId("pretragaButton");
-        
 
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
         comboboxHB.setAlignment(Pos.BOTTOM_LEFT);
@@ -127,17 +123,18 @@ public class Pretraga extends Application {
         comboboxHB.setSpacing(30);
         comboboxHB.setMinSize(1000, 100);
         
+        //podesavanje polja za unos dela naziva komponente za pretragu
         deoNaziva.setPromptText("Pretraga");
         
-        naslovForme.setTranslateY(-50);
-        naslovForme.setTranslateX(-300);
+        //podesavanje naslova forme
+        naslovForme.setTranslateY(-30);
+        naslovForme.setTranslateX(-230);
         naslovForme.setFont(font);
         naslovForme.setId("headerLabel");
         
         //dodavanje nodova u HBox
         comboboxHB.getChildren().addAll(tipCB, proizvodjacCB, deoNaziva, pretragaDugme,naslovForme);
         
-        //###izbaciti opisiCB i comboboxHB i ostaviti samo headerHB
         //podesavanje velicine,pozicije i izgleda panela sa opisima i combobox-evima
         headerHB.getChildren().addAll(opisiCB, comboboxHB);
 
@@ -146,33 +143,27 @@ public class Pretraga extends Application {
         tabelaFiltrirano.setMaxSize(800, 250);
         boxZaTabele.setPadding(new Insets(10));
         
-        //boxZaTabele.setSpacing(30);
-        tabelaOdabrano.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tabelaOdabrano.setMaxSize(800, 250);
-        boxZaTabele.getChildren().addAll(labelFiltriraneKomponente,tabelaFiltrirano,labelOdabraneKomponente, tabelaOdabrano);
+
+        tabelaFiltrirano.setMinSize(800, 500);
+        boxZaTabele.setId("bottomStyle");
+        boxZaTabele.setMaxSize(800, 530);
+        boxZaTabele.setAlignment(Pos.CENTER_LEFT);
+        boxZaTabele.getChildren().addAll(labelFiltriraneKomponente,tabelaFiltrirano);
         
-        
-        //###podesi velicinu Prihvati i stampaj dugmeta
-        //podesavanje velicine,pozicije i izgleda panela sa dugmicima
+        //podesavanje velicine, pozicije i izgleda panela sa dugmicima
         footerHB.setAlignment(Pos.CENTER);
         footerHB.setPadding(new Insets(10));
         footerHB.setSpacing(30);
-        prihvatiDugme.setId("buttonStyle");
-        prihvatiIObrazacDugme.setId("buttonStyle");
         nazadDugme.setId("buttonStyle");
-        footerHB.setMargin(nazadDugme, new Insets(0, 0, 0, 320));
-        footerHB.setMargin(prihvatiDugme, new Insets(0, 0, 0, 250));
-        footerHB.setMargin(prihvatiIObrazacDugme, new Insets(0, 0, 0, 20));
-        footerHB.getChildren().addAll(prihvatiDugme, prihvatiIObrazacDugme,nazadDugme);
+        footerHB.setMargin(nazadDugme, new Insets(0, 0, 0, 860));
+        footerHB.getChildren().addAll(nazadDugme);
 
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        dodavanjeDugme.setId("dodavanjeDugme");
-        desniVB.getChildren().add(dodavanjeDugme);
-        desniVB.setAlignment(Pos.TOP_CENTER);
-        desniVB.setPadding(new Insets(10));
-        desniVB.setSpacing(30);
-        //### Nebojsa sredi ove kontrole
-        desniVB.getChildren().addAll(dobavljacCB, dobavljacDugme);
+        desniVB.setAlignment(Pos.CENTER);
+        desniVB.setMinSize(200, 530);
+        desniVB.setId("bottomStyle");
+        VBox.setMargin(nazadDugme, new Insets(500, 0, 0, 50));
+        desniVB.getChildren().addAll(nazadDugme);
         
         //popunjavanje combobox-eva podacima
         ispuniComboBoxZaTip();
@@ -191,201 +182,8 @@ public class Pretraga extends Application {
             }
         });
         
-        //dvostruki klik na gornju tabelu - dodavanje komponente u donju tabelu
-        tabelaFiltrirano.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                //detektovanje dvostrukog klika levim dugmetom
-                if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2){
-                    //ocitavanje odabrane komponente
-                    Komponenta komponenta = (Komponenta) tabelaFiltrirano.getSelectionModel().getSelectedItem();
-                    if (komponenta!=null) {
-                        //kreiranje kolona tabele ukoliko vec nisu kreirane
-                        if (tabelaOdabrano.getColumns().size()==0)
-                            kreirajTabelu(tabelaOdabrano);
-
-                        //ukoliko komponenta ne postoji u tabeli sa odabranim komponentama - dodavanje
-                        if (!podaciOdabrano.contains(komponenta)) {
-
-                            Button dugmePotvrdi = new Button("Potvrdi");
-                            Button dugmeOdustani = new Button("Odustani");
-                            //boxovi za smestaj kontrola na sceni
-                            VBox rootBox = new VBox();
-                            HBox gornjiHBox=new HBox();
-                            HBox donjiHBox=new HBox();
-
-                            Label labela1=new Label("Unesi zeljenu kolicinu:");
-                            //spinner-om se vrsi odabir kolicine komponente koja se dodaje
-                            Spinner spinner=new Spinner();         
-
-                            //ocitaj raspolozivu kolicinu komponente
-                            komponenta.setKolicina(DBUtil.preuzmiAktuelnoStanje(komponenta.getId()));
-
-                            //podesavanje granicnih vrednosti spinnera i podesene vrednosti
-                            spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0,komponenta.getKolicina(),1));
-
-                            //dodavanje u gornji red labele i spinnera
-                            gornjiHBox.getChildren().addAll(labela1, spinner);
-                            //dodavanje u donji red dugmica
-                            donjiHBox.getChildren().addAll(dugmePotvrdi, dugmeOdustani);
-                            //ubacivanje komponenti u glavni VBox a zatim i u novu scenu
-                            rootBox.getChildren().addAll(gornjiHBox, donjiHBox);
-                            Scene scena = new Scene(rootBox, 350, 150);
-
-                            //podesavanje novog prozora
-                            Stage noviProzor=new Stage();
-                            noviProzor.setTitle("Odabir kolicine");
-                            noviProzor.setScene(scena);
-                            noviProzor.initModality(Modality.WINDOW_MODAL);
-                            noviProzor.initOwner(primaryStage);
-                            //aktiviranje i prikaz novog prozora
-                            noviProzor.show();
-
-                            //dugme potvrdi - promena kolicine komponente i ubacivanje u listu odabranih
-                            dugmePotvrdi.setOnAction( e -> {
-                                int kolicina=(Integer)spinner.getValue();
-                                if (kolicina>0) {
-                                    komponenta.setKolicina(kolicina);
-                                    podaciOdabrano.add(komponenta);
-                                    tabelaOdabrano.setItems(podaciOdabrano);
-                                }
-                                noviProzor.close();
-                            });
-
-                            //zatvranje novog prozora ukoliko je odabrano dugme odustani
-                            dugmeOdustani.setOnAction( e -> noviProzor.close() );
-                        }
-                    }
-                }
-            }
-        });
-    
-        //dvostruki klik na donju tabelu - azuriranje kolicine komponente u donjoj tabeli
-        tabelaOdabrano.setOnMouseClicked(new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent event) {
-            //detektovanje dvostrukog klika levim dugmetom
-            if (event.getButton().equals(MouseButton.PRIMARY) && event.getClickCount() == 2){
-
-                //ukoliko ima upisanih podataka u tabeli tabelaOdabrano
-                if (tabelaOdabrano.getColumns().size()>0) {
-                    //ocitavanje odabrane komponente
-                    Komponenta komponenta = (Komponenta) tabelaOdabrano.getSelectionModel().getSelectedItem();
-                    if (komponenta!=null) {
-                        //preuzimanje aktuelne kolicine odabrane komponente
-                        int maksKolicina=DBUtil.preuzmiAktuelnoStanje(komponenta.getId());
-                        if (maksKolicina>0) {
-                            //otvaranje novog prozora za izmenu kolicine odabrane komponente
-                            Button dugmePotvrdi = new Button("Potvrdi");
-                            Button dugmeOdustani = new Button("Odustani");
-                            //boxovi za smestaj kontrola na sceni
-                            VBox rootBox = new VBox();
-                            HBox gornjiHBox=new HBox();
-                            HBox donjiHBox=new HBox();
-
-                            Label labela1=new Label("Unesi zeljenu kolicinu:");
-                            //spinner-om se vrsi odabir kolicine komponente
-                            Spinner spinner=new Spinner();         
-                            //podesavanje granicnih vrednosti spinnera i podesene vrednosti
-                            spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0,maksKolicina,komponenta.getKolicina()));
-
-                            //dodavanje u gornji red labele i spinnera
-                            gornjiHBox.getChildren().addAll(labela1, spinner);
-                            //dodavanje u donji red dugmica
-                            donjiHBox.getChildren().addAll(dugmePotvrdi, dugmeOdustani);
-                            //ubacivanje komponenti u glavni VBox a zatim i u novu scenu
-                            rootBox.getChildren().addAll(gornjiHBox, donjiHBox);
-                            Scene scena = new Scene(rootBox, 350, 150);
-
-                            //podesavanje novog prozora
-                            Stage noviProzor=new Stage();
-                            noviProzor.setTitle("Korekcija kolicine");
-                            noviProzor.setScene(scena);
-                            noviProzor.initModality(Modality.WINDOW_MODAL);
-                            noviProzor.initOwner(primaryStage);
-                            //aktiviranje i prikaz novog prozora
-                            noviProzor.show();
-
-                            //dugme potvrdi - promena kolicine komponente i ubacivanje u listu odabranih
-                            dugmePotvrdi.setOnAction( e -> {
-                                int kolicina=(Integer)spinner.getValue();
-                                if (kolicina>0) {
-                                    int indeks=podaciOdabrano.indexOf(komponenta);
-                                    komponenta.setKolicina(kolicina);
-                                    podaciOdabrano.set(indeks,komponenta);
-                                }
-                                else 
-                                    podaciOdabrano.remove(komponenta);
-                                noviProzor.close();
-                            });
-
-                            //zatvranje novog prozora ukoliko je odabrano dugme odustani
-                            dugmeOdustani.setOnAction( e -> noviProzor.close() );
-                        }
-                        else
-                            podaciOdabrano.remove(komponenta);
-                        }
-                    }
-                }
-            }
-        });
-        
-        //dugme za azuriranje baze i stampanje dopremnice/fakture
-        prihvatiDugme.setOnAction(e->{
-            if (podaciOdabrano.size()!=0) {
-                if (dobavljacCB.getSelectionModel().getSelectedIndex()>-1) {
-                    Alert alert = new Alert(AlertType.CONFIRMATION);
-                    alert.setTitle("Prijem robe");
-                    alert.setHeaderText("Azuriranje stanja u bazi podataka i stampanje prijemnice");
-                    alert.setContentText("Izaberi opciju");
-
-                    ButtonType dugmeAzuriraj = new ButtonType("Odobri prijem robe");
-                    ButtonType dugmeAzurirajStampaj = new ButtonType("Odobri i stampaj");
-                    ButtonType dugmeOdustani = new ButtonType("Odustani", ButtonData.CANCEL_CLOSE);
-
-                    alert.getButtonTypes().setAll(dugmeAzuriraj, dugmeAzurirajStampaj, dugmeOdustani);
-                    Platform.runLater(()->{
-                        Optional<ButtonType> result = alert.showAndWait();
-                        int a=1;
-                        if (result.get() != dugmeOdustani){
-                            //pokusaj azuriranja kolicina
-                            boolean uspesno=azuriraj();
-                            Alert alert1 = new Alert(AlertType.INFORMATION);
-                            alert1.setTitle("Obavestenje");
-                            alert1.setHeaderText(null);
-                            if (uspesno)
-                                alert1.setContentText("Roba sa dopremnice uspesno uneta!");
-                            else
-                                alert1.setContentText("Doslo je do greske pri unosu podataka!");
-                            Platform.runLater( () -> {
-                                alert1.showAndWait();
-                                nazadDugme.fire();
-                            });
-                            if (result.get() == dugmeAzurirajStampaj) {
-
-
-
-                            }
-                        } else {
-                            alert.close();
-                        } 
-                    });
-                } else {
-                    poruka("Dobavljac mora biti odabran!");
-                }
-            } else {
-                poruka("Nijedna komponenta nije odabrana!");
-            }
-            
-        });
         
         
-        
-        //dugme za slanje na Nabavku komponenti
-        dodavanjeDugme.setOnAction(e ->{
-            
-            
-        });
         
         nazadDugme.setOnAction(e ->{
             primaryStage.close();
@@ -421,100 +219,7 @@ public class Pretraga extends Application {
         Platform.runLater( ()-> alert.showAndWait() );
     }
 
-    private boolean azuriraj() {
-        
-        boolean uspesno=false;
-        conn=DBUtil.napraviKonekciju();
-        if (conn!=null) {
-            try {
-                PreparedStatement stmt0=conn.prepareStatement("SELECT dobavljac_id FROM dobavljac WHERE naziv=?");
-                String str1=(String) dobavljacCB.getSelectionModel().getSelectedItem();
-                //String nadjiIdDobavljaca="SELECT dobavljac_id FROM dobavljac WHERE naziv='" + str1+"'";
-                //int dobavljacId=DBUtil.prikupiPodatke(conn, nadjiIdDobavljaca).getInt(1);
-                conn.setAutoCommit(false);
-
-                stmt0.setString(1, str1);
-                ResultSet rs=stmt0.executeQuery();
-                int dobavljacId=-1;
-                if (rs.next())
-                    dobavljacId=rs.getInt(1);
-                
-                //kreiranje nove prijemnice
-                Dokument prijemnica=new Dokument();
-                //upit za nalazenje dobavljac_id vrednosti za zadat naziv dobavljaca
-                Date datum= new java.sql.Date(Calendar.getInstance().getTime().getTime());
-                
-                //PreparedStatement objekat za drugi upit
-                String columnNames[] = new String[] { "prijemnica_id" };
-                PreparedStatement stmt1=conn.prepareStatement("INSERT INTO prijemnica (dobavljac_id, datum) VALUES (?,?)", columnNames);
-                stmt1.setInt(1, dobavljacId);
-                stmt1.setDate(2, datum);
-                prijemnicaId=0;
-                if (stmt1.executeUpdate()>0) {
-                    java.sql.ResultSet generatedKeys=stmt1.getGeneratedKeys();
-                    if (generatedKeys.next()) {
-                        prijemnicaId=generatedKeys.getInt(1);
-                    }
-                }
-                
-                PreparedStatement stmt2=conn.prepareStatement("UPDATE komponenta SET kolicina=kolicina-? WHERE komponenta_id=?");
-                PreparedStatement stmt3=conn.prepareStatement("INSERT INTO detaljiprijemnice (prijemnica_id, komponenta_id, cena, kolicina) VALUES (?,?,?,?)");
-                
-                podaciOdabrano.forEach(e->{
-                    try {
-                        //String kolicina=String.valueOf(e.getKolicina());
-                        //String id=String.valueOf(e.getId());
-                        //String upit="UPDATE komponenta SET kolicina=kolicina-" + kolicina + " WHERE komponenta_id="+id;
-                        stmt2.setInt(1, e.getKolicina());
-                        stmt2.setInt(2, e.getId());
-                        stmt2.addBatch();
-                        
-                        //DetaljiDokumenta detaljiPrijemnice=new DetaljiDokumenta();
-                        stmt3.setInt(1, prijemnicaId);
-                        stmt3.setInt(2, e.getId());
-                        stmt3.setDouble(3, e.getCena());
-                        stmt3.setInt(4, e.getKolicina());
-                        stmt3.addBatch();
-                        
-                    } catch (SQLException ex) {
-                        Logger.getLogger(Pretraga.class.getName()).log(Level.SEVERE, null, ex);
-                    } 
-                });
-
-                //int[] result=st.executeBatch();
-                stmt1.executeBatch();
-                stmt2.executeBatch();
-                stmt3.executeBatch();
-                conn.commit();
-                uspesno=true;
-            //opcijeTip.addAll(DBUtil.prikupiPodatke(conn, "SELECT naziv FROM tip"));
-            } catch (SQLException ex) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex1) {
-                    Logger.getLogger(Pretraga.class.getName()).log(Level.SEVERE, null, ex1);
-                }
-                Logger.getLogger(Pretraga.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    conn.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(Pretraga.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        return uspesno;
-    }
-
-
-
-
-
-
-
-
-
-
+    
     
     //ucitavanje vrednosti u ComboBox tipa
     public void ispuniComboBoxZaTip() {
@@ -617,20 +322,15 @@ public class Pretraga extends Application {
                     //dodavanje kolona, naziva kolona i podesavanje sirine kolona tabele
                     if (tabelaFiltrirano.getColumns().size()==0)
                         kreirajTabelu(tabelaFiltrirano);
-                    //kreiranje ObservableList-e u koju se smestaju podaci za tabelu        
-                    //ObservableList<Komponenta> podaciTabele = FXCollections.observableArrayList();
                     //ubacivanje podataka u listu
                     while (rs.next()) {
-                        //kreiranje komponente na osnovu podataka ocitanih iz baze
-                        Komponenta kompon=new Komponenta(rs.getInt(1), rs.getString(2),
-                                                            rs.getString(3), rs.getString(4), 
-                                                            rs.getInt(5), rs.getDouble(6));
                         //dodavanje komponente u listu
-                        podaciFiltrirano.add(kompon);
+                        podaciFiltrirano.add(new Komponenta(rs.getInt(1), rs.getString(2),
+                                                            rs.getString(3), rs.getString(4), 
+                                                            rs.getInt(5), rs.getDouble(6)));
                     }
-                    //ucitavanje podataka u tabelu
+                    //ubacivanje podataka u tabelu
                     tabelaFiltrirano.setItems(podaciFiltrirano);
-                    
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {

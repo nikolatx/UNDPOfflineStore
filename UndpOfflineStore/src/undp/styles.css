@@ -207,7 +207,7 @@
 
 #dodavanjeDugme{
     -fx-background-color: #0068d8;
-    -fx-pref-height: 70px;
+    -fx-pref-height: 25px;
     -fx-pref-width: 150px;
     -fx-text-fill: #ffffff;
     -fx-font-weight: bold;
@@ -223,8 +223,8 @@
 
 #dodavanjeDugme:hover{
     -fx-background-color: #0068d8;
-    -fx-pref-height:80px;
-    -fx-pref-width: 160px;
+    -fx-pref-height:22px;
+    -fx-pref-width: 148px;
     -fx-text-fill: #ffffff;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
@@ -239,7 +239,7 @@
 
 #dodavanjeDugme:hover:pressed{
     -fx-background-color: #0068d8;
-    -fx-pref-height: 70px;
+    -fx-pref-height: 25px;
     -fx-pref-width: 150px;
     -fx-text-fill: #ffffff;
     -fx-font-weight: bold;

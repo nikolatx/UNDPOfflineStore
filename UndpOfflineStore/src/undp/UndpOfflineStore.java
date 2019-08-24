@@ -104,6 +104,12 @@ public class UndpOfflineStore extends Application {
         
         //Taster btn3 sa akcijom (prelazak na stage Prodaja)
         btn3.setOnAction(e ->{
+            try {
+                primaryStage.close();
+                new Prodaja().start(primaryStage);
+            } catch (SQLException ex) {
+                Logger.getLogger(UndpOfflineStore.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
         });
         

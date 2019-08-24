@@ -77,7 +77,7 @@ public class Nabavka extends Application {
     Button dobavljacDugme = new Button("Dodaj dobavljaca");
     
     //Kreiranje opisa koji ce da stoje na formi
-    Label naslovForme = new Label("Pretraga");
+    Label naslovForme = new Label("Nabavka");
     Label labelFiltriraneKomponente = new Label("Filtrirane komponente");
     Label labelOdabraneKomponente = new Label("Odabrane komponente");
     
@@ -128,8 +128,8 @@ public class Nabavka extends Application {
         
         deoNaziva.setPromptText("Pretraga");
         
-        naslovForme.setTranslateY(-50);
-        naslovForme.setTranslateX(-300);
+        naslovForme.setTranslateY(-30);
+        naslovForme.setTranslateX(-230);
         naslovForme.setFont(font);
         naslovForme.setId("headerLabel");
         
@@ -159,19 +159,22 @@ public class Nabavka extends Application {
         prihvatiDugme.setId("buttonStyle");
         //prihvatiIObrazacDugme.setId("buttonStyle");
         nazadDugme.setId("buttonStyle");
-        footerHB.setMargin(nazadDugme, new Insets(0, 0, 0, 320));
-        footerHB.setMargin(prihvatiDugme, new Insets(0, 0, 0, 250));
+        footerHB.setMargin(nazadDugme, new Insets(0, 0, 0, 410));
+        footerHB.setMargin(prihvatiDugme, new Insets(0, 0, 0, 350));
         //footerHB.setMargin(prihvatiIObrazacDugme, new Insets(0, 0, 0, 20));
         //footerHB.getChildren().addAll(prihvatiDugme, prihvatiIObrazacDugme,nazadDugme);
         footerHB.getChildren().addAll(prihvatiDugme, nazadDugme);
         
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        dodavanjeDugme.setId("dodavanjeDugme");
+        dodavanjeDugme.setId("buttonStyle");
+        dodavanjeDugme.setMinSize(150, 25);
         desniVB.getChildren().add(dodavanjeDugme);
         desniVB.setAlignment(Pos.TOP_CENTER);
         desniVB.setPadding(new Insets(10));
         desniVB.setSpacing(30);
         //### Nebojsa sredi ove kontrole
+        dobavljacDugme.setId("buttonStyle");
+        dobavljacDugme.setMinSize(150, 25);
         desniVB.getChildren().addAll(dobavljacCB, dobavljacDugme);
         
         //popunjavanje combobox-eva podacima
