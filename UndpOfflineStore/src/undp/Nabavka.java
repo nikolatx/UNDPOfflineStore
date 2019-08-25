@@ -78,7 +78,7 @@ public class Nabavka extends Application {
     
     //Kreiranje opisa koji ce da stoje na formi
     Label naslovForme = new Label("Nabavka");
-    Label labelFiltriraneKomponente = new Label("Filtrirane komponente");
+    Label labelFiltriraneKomponente = new Label("DUPLIM KLIKOM ODABERITE ZELJENU KOMPONENTU");
     Label labelOdabraneKomponente = new Label("Odabrane komponente");
     
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela

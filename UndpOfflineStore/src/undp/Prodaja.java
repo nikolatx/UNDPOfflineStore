@@ -80,7 +80,7 @@ public class Prodaja extends Application {
     
     //Kreiranje opisa koji ce da stoje na formi
     Label naslovForme = new Label("Prodaja");
-    Label labelFiltriraneKomponente = new Label("Rezultat pretrage");
+    Label labelFiltriraneKomponente = new Label("Rezultat pretrage - DUPLIM KLIKOM ODABERITE ZELJENU KOMPONENTU");
     Label labelOdabraneKomponente = new Label("Odabrane komponente");
     
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
@@ -168,10 +168,14 @@ public class Prodaja extends Application {
 
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
         dodavanjeDugme.setId("dodavanjeDugme");
+        dodavanjeDugme.setMinSize(150, 25);
         desniVB.getChildren().add(dodavanjeDugme);
         desniVB.setAlignment(Pos.TOP_CENTER);
         desniVB.setPadding(new Insets(10));
         desniVB.setSpacing(30);
+        dobavljacDugme.setMinSize(150, 25);
+        dobavljacDugme.setId("buttonStyle");
+        dodavanjeDugme.setId("buttonStyle");
         desniVB.getChildren().addAll(dobavljacCB, dobavljacDugme);
         
         //popunjavanje combobox-eva podacima
