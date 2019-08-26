@@ -403,6 +403,9 @@ public class Azuriranje extends Application {
         tabelaFiltrirano.setEditable(true);
        
         kolonaOpis.setCellFactory(TextFieldTableCell.forTableColumn());
+        kolonaProizvodjac.setCellFactory(TextFieldTableCell.forTableColumn());
+        kolonaTip.setCellFactory(TextFieldTableCell.forTableColumn());
+        
         
         
        
@@ -411,6 +414,8 @@ public class Azuriranje extends Application {
         
         Komponenta k = (Komponenta) tabelaFiltrirano.getSelectionModel().getSelectedItem();
         k.setNaziv(komponentaStringEdit.getNewValue());
+        k.setTip(komponentaStringEdit.getNewValue());
+        k.setProizvodjac(komponentaStringEdit.getNewValue());
     }
    
         

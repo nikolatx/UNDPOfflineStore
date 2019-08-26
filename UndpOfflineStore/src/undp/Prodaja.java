@@ -72,9 +72,7 @@ public class Prodaja extends Application {
 
     //Kreiranje dugmica
     Button pretragaDugme = new Button("Pretrazi");
-    Button dodavanjeDugme = new Button("Dodaj komponentu");
     Button prihvatiDugme = new Button("Prihvati");
-    //Button prihvatiIObrazacDugme = new Button("Prihvati i eksportuj");
     Button nazadDugme = new Button("Nazad");
     Button dobavljacDugme = new Button("Dodaj dobavljaca");
     
@@ -82,6 +80,7 @@ public class Prodaja extends Application {
     Label naslovForme = new Label("Prodaja");
     Label labelFiltriraneKomponente = new Label("Rezultat pretrage - DUPLIM KLIKOM ODABERITE ZELJENU KOMPONENTU");
     Label labelOdabraneKomponente = new Label("Odabrane komponente");
+    Label aktuelnaLabel = new Label("Aktuelna komponenta");
     
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
     HBox opisiCB = new HBox();
@@ -91,6 +90,8 @@ public class Prodaja extends Application {
     VBox desniVB = new VBox();
     VBox headerHB = new VBox();
     VBox boxZaTabele = new VBox();
+    
+    CheckBox aktuelnaCheckBox = new CheckBox();
     
     //Kreiranje Fonta
     Font font = new Font(25);
@@ -146,6 +147,7 @@ public class Prodaja extends Application {
         //podesavanje velicine,pozicije i izgleda panela sa 2 tableView prozora
         tabelaFiltrirano.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tabelaFiltrirano.setMaxSize(800, 250);
+        boxZaTabele.setId("bottomStyle");
         boxZaTabele.setPadding(new Insets(10));
         
         //boxZaTabele.setSpacing(30);
@@ -155,28 +157,26 @@ public class Prodaja extends Application {
         
         //podesavanje velicine, pozicije i izgleda panela sa dugmicima
         footerHB.setAlignment(Pos.CENTER);
+        footerHB.setId("bottomStyle");
         footerHB.setPadding(new Insets(10));
         footerHB.setSpacing(30);
         prihvatiDugme.setId("buttonStyle");
-        //prihvatiIObrazacDugme.setId("buttonStyle");
         nazadDugme.setId("buttonStyle");
         footerHB.setMargin(nazadDugme, new Insets(0, 0, 0, 320));
         footerHB.setMargin(prihvatiDugme, new Insets(0, 0, 0, 250));
-        //footerHB.setMargin(prihvatiIObrazacDugme, new Insets(0, 0, 0, 20));
-        //footerHB.getChildren().addAll(prihvatiDugme, prihvatiIObrazacDugme,nazadDugme);
+
         footerHB.getChildren().addAll(prihvatiDugme, nazadDugme);
 
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        dodavanjeDugme.setId("dodavanjeDugme");
-        dodavanjeDugme.setMinSize(150, 25);
-        desniVB.getChildren().add(dodavanjeDugme);
         desniVB.setAlignment(Pos.TOP_CENTER);
+        VBox.setMargin(aktuelnaLabel, new Insets(0, 40, 0, 0));
+        VBox.setMargin(aktuelnaCheckBox, new Insets(0, 40, 0, 0));
         desniVB.setPadding(new Insets(10));
         desniVB.setSpacing(30);
         dobavljacDugme.setMinSize(150, 25);
         dobavljacDugme.setId("buttonStyle");
-        dodavanjeDugme.setId("buttonStyle");
-        desniVB.getChildren().addAll(dobavljacCB, dobavljacDugme);
+        desniVB.setId("bottomStyle");
+        desniVB.getChildren().addAll(aktuelnaLabel,aktuelnaCheckBox);
         
         //popunjavanje combobox-eva podacima
         ispuniComboBoxZaTip();
