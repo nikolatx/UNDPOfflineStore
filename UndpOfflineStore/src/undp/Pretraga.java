@@ -47,6 +47,7 @@ public class Pretraga extends Application {
 
     //objekat za konekciju sa bazom podataka
     Connection conn;
+  
     
     //Liste sa opcijama ComboBox-ova
     ObservableList opcijeTip = FXCollections.observableArrayList();
@@ -70,7 +71,7 @@ public class Pretraga extends Application {
     TextField deoNaziva = new TextField();
 
     //Kreiranje dugmica
-    Button pretragaDugme = new Button("Pretrazi");
+    Button pretragaDugme = new Button("Pretraži");
     Button nazadDugme = new Button("Nazad");
     
     
@@ -99,22 +100,26 @@ public class Pretraga extends Application {
     public void init() throws Exception {
         super.init();
         kreirajTabelu(tabelaFiltrirano);
-       // kreirajTabelu(tabelaOdabrano);
+       // kreirajTabelu(tabelaOdabrano);       
     }
     
     @Override
     public void start(Stage primaryStage) throws SQLException {
         
+        
+        
         //podesavanje CB-a
         tipCB.setPromptText("Izaberi tip");
         tipCB.setMinSize(150, 25);
-        proizvodjacCB.setPromptText("Izaberi proizvodjaca");
+        proizvodjacCB.setPromptText("Izaberi proizvođača");
         proizvodjacCB.setMinSize(150, 25);
 
         
         //podesavanja dugmeta za pretragu
         pretragaDugme.setMinSize(100, 25);
         pretragaDugme.setId("pretragaButton");
+        pretragaDugme.setDefaultButton(true);
+
 
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
         comboboxHB.setAlignment(Pos.BOTTOM_LEFT);
@@ -170,6 +175,7 @@ public class Pretraga extends Application {
         ispuniComboBoxZaProizvodjaca();
         ispuniComboBoxZaDobavljaca();
         
+      
         //pretrazivanje na osnovu zadatih kriterijuma
         pretragaDugme.setOnAction(e -> {
             try {
@@ -178,11 +184,9 @@ public class Pretraga extends Application {
                 conn=DBUtil.napraviKonekciju();
                 preuzmiPodatke();
             } catch (SQLException ex) {
-                System.out.println("Problem sa ocitavanjem tabele 'komponenta'!");
+                System.out.println("Problem sa očitavanjem tabele 'komponenta'!");
             }
         });
-        
-        
         
         
         nazadDugme.setOnAction(e ->{
@@ -200,7 +204,7 @@ public class Pretraga extends Application {
         //Kreiranje scene ,velicine,naziva povezivanje sa Css-om
         Scene scene = new Scene(root, 1000, 650);
         primaryStage.setResizable(false);
-        primaryStage.setTitle("Pretraga - UNDP OfflineStore");
+        primaryStage.setTitle("Pretraga - UNDP Offline Store");
         scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -213,8 +217,8 @@ public class Pretraga extends Application {
     
     private void poruka(String msg) {
         Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Greska");
-        alert.setHeaderText("Greska");
+        alert.setTitle("Greška");
+        alert.setHeaderText("Greška");
         alert.setContentText(msg);
         Platform.runLater( ()-> alert.showAndWait() );
     }

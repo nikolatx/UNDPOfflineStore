@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package undp;
 
 import com.grupa1.model.Komponenta;
@@ -24,10 +19,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-/**
- *
- * @author Nebojsa
- */
+
+
 public class IzvestajProdaje extends Application {
     //Kreiranje HBox i VBox panela
     HBox headerBox = new HBox();
@@ -35,10 +28,10 @@ public class IzvestajProdaje extends Application {
     HBox footerBox = new HBox();
     VBox rightBox = new VBox();
     //Kreiranje tastera za odredjene funkcije
-    Button dnevniButton = new Button("Dnevni izvestaj");
-    Button nedelnjiButton = new Button("Nedeljni izvestaj");
-    Button mesecniButton = new Button("Mesecni Izvestaj");
-    Button godisnjiButton = new Button("Godisnji izvestaj");
+    Button dnevniButton = new Button("Dnevni izveštaj");
+    Button nedelnjiButton = new Button("Nedeljni izveštaj");
+    Button mesecniButton = new Button("Mesečni izveštaj");
+    Button godisnjiButton = new Button("Godišnji izveštaj");
     Button odDoButton = new Button("Odabrani datum");
     Button nazadButton = new Button("Nazad");
     Button exportButton = new Button("PDF");
@@ -53,7 +46,7 @@ public class IzvestajProdaje extends Application {
     Label mesecnoLabel = new Label("");
     Label godisnjiLabel = new Label("");
     Label odDoLabel = new Label("");
-    Label nazivLabel = new Label("Izvestaji prodaje");
+    Label nazivLabel = new Label("Izveštaji prodaje");
     
     Font font = new Font(25);
     
@@ -125,16 +118,15 @@ public class IzvestajProdaje extends Application {
         
         //Kreiranje scene ,velicine i povezivanje sa CSS-om
         Scene scene = new Scene(root, 1000, 650);
-        primaryStage.setTitle("Izvestaji prodaje - UndpOfflineStore");
+        primaryStage.setTitle("Izveštaji prodaje - UndpOfflineStore");
         scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    /**
-     * @param args the command line arguments
-     */
+    
+    
     public static void main(String[] args) {
         launch(args);
     }

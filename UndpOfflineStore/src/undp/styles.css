@@ -29,10 +29,10 @@
 #buttonStyle{
     -fx-background-color: #0068d8;
     -fx-pref-height: 50px;
-    -fx-pref-width: 100px;
+    -fx-min-width: 120px;
     -fx-text-fill: #ffffff;
     -fx-font-weight: bold;
-    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 10, 0.0, 0, 8 );
     -fx-border: 2px;
     -fx-border-color: #00ffdd;
     -fx-border-radius: 0.5em;
@@ -40,6 +40,7 @@
     -fx-margin-bottom: 50px;
     -fx-border-insets: 10px;
     -fx-background-insets: 10px;
+    -fx-border-i: 10, 10, 10, 10;
     
 }
 
@@ -81,6 +82,10 @@
     -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
 }
 
+#spinner{
+    -fx-effect: innershadow(gaussian, #039ed3, 2, 1.0, 0, 0);
+    -fx-border-color: black;
+}
 #serchLabel{
     -fx-text-fill: #0068d8;
     -fx-font-weight: bold;
@@ -114,6 +119,23 @@
     -fx-margin-bottom: 50px;
     -fx-border-insets: 10px;
     -fx-background-insets: 10px;
+}
+
+#buttonStyleNabavka{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 2px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.5em;
+    -fx-background-radius: 0.5em;
+    -fx-margin-bottom: 50px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
 }
 
 #buttonNabavka:hover{

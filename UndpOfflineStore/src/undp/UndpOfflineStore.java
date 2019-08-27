@@ -23,8 +23,8 @@ public class UndpOfflineStore extends Application {
         Button btn1 = new Button("Pretraga");
         Button btn2 = new Button("Nabavka");
         Button btn3 = new Button("Prodaja");
-        Button btn4 = new Button("Izvestaji");
-        Button btn5 = new Button("Azuriranje");
+        Button btn4 = new Button("Izveštaji");
+        Button btn5 = new Button("Ažuriranje");
         
         //Kreiranje HBox panela za popunjvenje scene
         HBox hb1 = new HBox();
@@ -32,8 +32,8 @@ public class UndpOfflineStore extends Application {
         HBox hb3 = new HBox();
         
         //Kreiranje tekstualnih labela i fonta
-        Label lab1 = new Label("UNDP OfflineStore");
-        Font fotn = new Font(25);
+        Label lab1 = new Label("UNDP Offline Store");
+        Font font = new Font(25);
        
         
     @Override
@@ -45,7 +45,7 @@ public class UndpOfflineStore extends Application {
         lab1.setId("headerLabel");       
         hb1.setId("headerBackground");    //Css - Style: podesavanje izgleda
         hb1.setAlignment(Pos.CENTER);
-        lab1.setFont(fotn);
+        lab1.setFont(font);
         hb1.getChildren().add(lab1);
         
         
@@ -70,7 +70,7 @@ public class UndpOfflineStore extends Application {
         btn4.setId("buttonStyle");
         btn5.setId("buttonStyle");
         hb3.getChildren().addAll(btn1,btn2,btn3,btn4,btn5);
-        hb3.setSpacing(30);
+        hb3.setSpacing(40);
         hb3.setId("bottomStyle");       //Css - Style: podesavanje izgleda
         
         //Kreiranje BorderPane-a za rasporedjivanje HBoc panela na sceni

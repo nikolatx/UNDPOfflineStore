@@ -44,8 +44,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 
 public class Nabavka extends Application {
     //objekat za konekciju sa bazom podataka
@@ -72,24 +75,24 @@ public class Nabavka extends Application {
     TextField deoNaziva = new TextField();
 
     //Kreiranje dugmica
-    Button pretragaDugme = new Button("Pretrazi");
+    Button pretragaDugme = new Button("Pretraži");
     Button dodavanjeDugme = new Button("Dodaj komponentu");
     Button prihvatiDugme = new Button("Prihvati");
     //Button prihvatiIObrazacDugme = new Button("Prihvati i eksportuj");
     Button nazadDugme = new Button("Nazad");
-    Button dobavljacDugme = new Button("Dodaj dobavljaca");
+    Button dobavljacDugme = new Button("Dodaj dobavljača");
     Button novaKomponentaPotvrda = new Button("Potvrdi");
-    Button novaKomonentaNazad = new Button("Nazad");
+    Button novaKomponentaNazad = new Button("Nazad");
     Button noviDobavljacPotvrda = new Button("Dodaj");
     Button noviDobavljacNazad = new Button("Nazad");
     
     
     //Kreiranje opisa koji ce da stoje na formi
     Label naslovForme = new Label("Nabavka");
-    Label labelFiltriraneKomponente = new Label("DUPLIM KLIKOM ODABERITE ZELJENU KOMPONENTU");
+    Label labelFiltriraneKomponente = new Label("DUPLIM KLIKOM ODABERITE ŽELJENU KOMPONENTU");
     Label labelOdabraneKomponente = new Label("Odabrane komponente");
     Label novaKomponentaLabel = new Label("Dodavanje komponente");
-    Label noviDobavljacNaslov = new Label("Dodavanje dobavljaca");
+    Label noviDobavljacNaslov = new Label("Dodavanje dobavljača");
     
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
     HBox opisiCB = new HBox();
@@ -136,14 +139,16 @@ public class Nabavka extends Application {
         //podesavanje CB-a
         tipCB.setPromptText("Izaberi tip");
         tipCB.setMinSize(150, 25);
-        proizvodjacCB.setPromptText("Izaberi proizvodjaca");
+        proizvodjacCB.setPromptText("Izaberi proizvođača");
         proizvodjacCB.setMinSize(150, 25);
-        dobavljacCB.setPromptText("Izaberi dobavljaca");
+        dobavljacCB.setPromptText("Izaberi dobavljača");
         dobavljacCB.setMinSize(150, 25);
         
         //podesavanja za dugme za pretragu
         pretragaDugme.setMinSize(100, 25);
         pretragaDugme.setId("pretragaButton");
+        pretragaDugme.setDefaultButton(true);
+
         
 
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
@@ -183,9 +188,9 @@ public class Nabavka extends Application {
         footerHB.setAlignment(Pos.CENTER);
         footerHB.setPadding(new Insets(10));
         footerHB.setSpacing(30);
-        prihvatiDugme.setId("buttonStyle");
+        prihvatiDugme.setId("buttonStyleNabavka");
         //prihvatiIObrazacDugme.setId("buttonStyle");
-        nazadDugme.setId("buttonStyle");
+        nazadDugme.setId("buttonStyleNabavka");
         footerHB.setMargin(nazadDugme, new Insets(0, 0, 0, 410));
         footerHB.setMargin(prihvatiDugme, new Insets(0, 0, 0, 350));
         //footerHB.setMargin(prihvatiIObrazacDugme, new Insets(0, 0, 0, 20));
@@ -193,14 +198,13 @@ public class Nabavka extends Application {
         footerHB.getChildren().addAll(prihvatiDugme, nazadDugme);
         
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        dodavanjeDugme.setId("buttonStyle");
+        dodavanjeDugme.setId("buttonStyleNabavka");
         dodavanjeDugme.setMinSize(150, 25);
         desniVB.getChildren().add(dodavanjeDugme);
-        desniVB.setAlignment(Pos.TOP_CENTER);
+        desniVB.setAlignment(Pos.TOP_LEFT);
         desniVB.setPadding(new Insets(10));
         desniVB.setSpacing(30);
-        //### Nebojsa sredi ove kontrole
-        dobavljacDugme.setId("buttonStyle");
+        dobavljacDugme.setId("buttonStyleNabavka");
         dobavljacDugme.setMinSize(150, 25);
         desniVB.getChildren().addAll(dobavljacCB, dobavljacDugme);
         
@@ -217,7 +221,7 @@ public class Nabavka extends Application {
                 conn=DBUtil.napraviKonekciju();
                 preuzmiPodatke();
             } catch (SQLException ex) {
-                System.out.println("Problem sa ocitavanjem tabele 'komponenta'!");
+                System.out.println("Problem sa očitavanjem tabele 'komponenta'!");
             }
         });
         
@@ -239,30 +243,38 @@ public class Nabavka extends Application {
                         //forma za dodavanje zeljene kolicine komponente
                         Button dugmePotvrdi = new Button("Potvrdi");
                         Button dugmeOdustani = new Button("Odustani");
+                        dugmePotvrdi.setId("buttonStyle");
+                        dugmeOdustani.setId("buttonStyle");
                         //boxovi za smestaj kontrola na sceni
                         VBox rootBox = new VBox();
                         HBox gornjiHBox=new HBox();
                         HBox donjiHBox=new HBox();
-
-                        Label labela1=new Label("Unesi zeljenu kolicinu:");
+                        Label labela1=new Label("Unesi željenu količinu:");
+                        labela1.setFont(Font.font("Verdana", FontWeight.BOLD, 17));
                         //spinner-om se vrsi odabir kolicine komponente koja se dodaje
-                        Spinner spinner=new Spinner();         
+                        Spinner spinner=new Spinner();   
+                        spinner.setId("buttonStyleNabavka");
                         
                         //podesavanje granicnih vrednosti spinnera i podesene vrednosti
                         spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 1));
                         
                         //dodavanje u gornji red labele i spinnera
                         gornjiHBox.getChildren().addAll(labela1, spinner);
+                        gornjiHBox.setAlignment(Pos.CENTER);
                         //dodavanje u donji red dugmica
                         donjiHBox.getChildren().addAll(dugmePotvrdi, dugmeOdustani);
+                        donjiHBox.setAlignment(Pos.CENTER);
                         //ubacivanje komponenti u glavni VBox a zatim i u novu scenu
                         rootBox.getChildren().addAll(gornjiHBox, donjiHBox);
-                        Scene scena = new Scene(rootBox, 350, 150);
+                        Scene scena = new Scene(rootBox, 350, 130);
                         
                         //podesavanje novog prozora
                         Stage noviProzor=new Stage();
-                        noviProzor.setTitle("Odabir kolicine");
+                        noviProzor.setTitle("Odabir količine");
                         noviProzor.setScene(scena);
+                     
+                        scena.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
+                        noviProzor.initStyle(StageStyle.UNDECORATED);
                         noviProzor.initModality(Modality.WINDOW_MODAL);
                         noviProzor.initOwner(primaryStage);
                         //aktiviranje i prikaz novog prozora
@@ -308,7 +320,7 @@ public class Nabavka extends Application {
                             HBox gornjiHBox=new HBox();
                             HBox donjiHBox=new HBox();
 
-                            Label labela1=new Label("Unesi zeljenu kolicinu:");
+                            Label labela1=new Label("Unesi željenu količinu:");
                             //spinner-om se vrsi odabir kolicine komponente
                             Spinner spinner=new Spinner();         
                             //podesavanje granicnih vrednosti spinnera i podesene vrednosti
@@ -324,7 +336,7 @@ public class Nabavka extends Application {
 
                             //podesavanje novog prozora
                             Stage noviProzor=new Stage();
-                            noviProzor.setTitle("Korekcija kolicine");
+                            noviProzor.setTitle("Korekcija količine");
                             noviProzor.setScene(scena);
                             noviProzor.initModality(Modality.WINDOW_MODAL);
                             noviProzor.initOwner(primaryStage);
@@ -359,11 +371,11 @@ public class Nabavka extends Application {
                 if (dobavljacCB.getSelectionModel().getSelectedIndex()>-1) {
                     Alert alert = new Alert(AlertType.CONFIRMATION);
                     alert.setTitle("Prijem robe");
-                    alert.setHeaderText("Azuriranje stanja u bazi podataka i stampanje prijemnice");
+                    alert.setHeaderText("Ažuriranje stanja u bazi podataka i štampanje prijemnice");
                     alert.setContentText("Izaberi opciju");
 
                     ButtonType dugmeAzuriraj = new ButtonType("Odobri prijem robe");
-                    ButtonType dugmeAzurirajStampaj = new ButtonType("Odobri i stampaj");
+                    ButtonType dugmeAzurirajStampaj = new ButtonType("Odobri i štampaj");
                     ButtonType dugmeOdustani = new ButtonType("Odustani", ButtonData.CANCEL_CLOSE);
 
                     alert.getButtonTypes().setAll(dugmeAzuriraj, dugmeAzurirajStampaj, dugmeOdustani);
@@ -377,7 +389,7 @@ public class Nabavka extends Application {
                             alert1.setTitle("Obavestenje");
                             alert1.setHeaderText(null);
                             if (uspesno) {
-                                alert1.setContentText("Roba uspesno uneta u bazu podataka!");
+                                alert1.setContentText("Roba uspešno uneta u bazu podataka!");
                                 if (result.get() == dugmeAzurirajStampaj) {
                                     
 
@@ -385,7 +397,7 @@ public class Nabavka extends Application {
                                 }
                             }
                             else
-                                alert1.setContentText("Doslo je do greske pri unosu podataka!");
+                                alert1.setContentText("Došlo je do greške pri unosu podataka!");
                             Platform.runLater( () -> {
                                 alert1.showAndWait();
                                 nazadDugme.fire();
@@ -396,7 +408,7 @@ public class Nabavka extends Application {
                         } 
                     });
                 } else {
-                    poruka("Dobavljac mora biti odabran!");
+                    poruka("Dobavljač mora biti odabran!");
                 }
             } else {
                 poruka("Nijedna komponenta nije odabrana!");
@@ -424,14 +436,14 @@ public class Nabavka extends Application {
             grid.setHgap(20);
             //Podesavanje velicine,izgleda i dodavanje nodova na scenu za Nova Komponenta
             novaKomponentaPotvrda.setId("buttonStyle");
-            novaKomonentaNazad.setId("buttonStyle");
+            novaKomponentaNazad.setId("buttonStyle");
             novaKomponentaPotvrda.setMinSize(100, 25);
-            novaKomonentaNazad.setMinSize(100, 25);
+            novaKomponentaNazad.setMinSize(100, 25);
             HBox.setMargin(grid, new Insets(40, 0, 0, 0));
             novaKomponentaNaziv.setPromptText("Naziv");
-            novaKomponentaProizvodjac.setPromptText("Novi proizvodjac");
+            novaKomponentaProizvodjac.setPromptText("Novi proizvodjač");
             novaKomponentaTip.setPromptText("Tip");
-            novaKomponentaKolicina.setPromptText("Kolicina");
+            novaKomponentaKolicina.setPromptText("Količina");
             novaKomponentaCena.setPromptText("Cena");
             novaKomponentaSlika.setPromptText("Slika");
             grid.add(novaKomponentaNaziv, 0, 0);
@@ -443,7 +455,7 @@ public class Nabavka extends Application {
             grid.add(novaKomponentaAktuelnoLabel, 0, 3);
             grid.add(novaKomponentaAktuletno, 1, 3);
             grid.add(novaKomponentaPotvrda, 2, 2);
-            grid.add(novaKomonentaNazad, 2, 3);
+            grid.add(novaKomponentaNazad, 2, 3);
             centerDodajBox.getChildren().addAll(grid);
             HBox footerDodajBox = new HBox();
             BorderPane dodajBox = new BorderPane();
@@ -467,7 +479,7 @@ public class Nabavka extends Application {
         
         
         //Taster prozora Nova Komponenta NAZAD
-        novaKomonentaNazad.setOnAction(e ->{
+        novaKomponentaNazad.setOnAction(e ->{
             try {
                 primaryStage.close();
                 new Nabavka().start(primaryStage);
@@ -503,8 +515,8 @@ public class Nabavka extends Application {
             noviDobavljacUlica.setPromptText("Ulica");
             noviDobavljacBroj.setPromptText("Broj");
             noviDobavljacGrad.setPromptText("Grad");
-            noviDobavljacPostBroj.setPromptText("Postanski Broj");
-            noviDobavljacDrzava.setPromptText("Drzava");
+            noviDobavljacPostBroj.setPromptText("Poštanski Broj");
+            noviDobavljacDrzava.setPromptText("Država");
             noviDobavljacTelefon.setPromptText("Telefon");
             grid.add(noviDobavljacNaziv, 0, 0);
             grid.add(noviDobavljacUlica, 0, 1);
@@ -548,7 +560,7 @@ public class Nabavka extends Application {
         
         
         //Taster prozora Nova Komponenta NAZAD
-        novaKomonentaNazad.setOnAction(e ->{
+        novaKomponentaNazad.setOnAction(e ->{
             try {
                 primaryStage.close();
                 new Nabavka().start(primaryStage);
@@ -579,7 +591,7 @@ public class Nabavka extends Application {
         //Kreiranje scene ,velicine,naziva povezivanje sa Css-om
         Scene scene = new Scene(root, 1000, 650);
         primaryStage.setResizable(false);
-        primaryStage.setTitle("Pretraga - UNDP OfflineStore");
+        primaryStage.setTitle("Nabavka - UNDP Offline Store");
         scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -595,8 +607,8 @@ public class Nabavka extends Application {
     
     private void poruka(String msg) {
         Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Greska");
-        alert.setHeaderText("Greska");
+        alert.setTitle("Greška");
+        alert.setHeaderText("Greška");
         alert.setContentText(msg);
         Platform.runLater( ()-> alert.showAndWait() );
     }

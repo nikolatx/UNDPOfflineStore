@@ -20,10 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-/**
- *
- * @author Nebojsa
- */
+
 public class Izvestaji extends Application {
     //Kreiranje HBox  i VBox - eva
     HBox headerHBox = new HBox();
@@ -35,9 +32,9 @@ public class Izvestaji extends Application {
     Button nabavkaButton = new Button("Nabavka");
     Button nazadButton = new Button("Nazad");
     //Kreiranje labela sa ispisima
-    Label prodajaLabel = new Label("Izvestaji prodaje");
-    Label nabavkaLabel = new Label("Izvestaji nabavke");
-    Label nazivLabel = new Label("Izvestaji");
+    Label prodajaLabel = new Label("Izveštaji prodaje");
+    Label nabavkaLabel = new Label("Izveštaji nabavke");
+    Label nazivLabel = new Label("Izveštaji");
     Font font = new Font(25);
     
     @Override
@@ -119,7 +116,7 @@ public class Izvestaji extends Application {
         
         //Kreiranje scene ,velicine i povezivanje sa CSS-om
         Scene scene = new Scene(root, 1000, 650);
-        primaryStage.setTitle("Izvestaji - UndpOfflineStore");
+        primaryStage.setTitle("Izveštaji - UndpOfflineStore");
         scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);

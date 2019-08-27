@@ -22,9 +22,9 @@ public class DBUtil {
         Connection conn=null;
         try {
             conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
-            System.out.println("Uspesna konekcija");
+            System.out.println("Uspešna konekcija");
         } catch (SQLException ex) {
-            System.out.println("Neuspesna konekcija");
+            System.out.println("Neuspešna konekcija");
             Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
         return conn;
@@ -37,7 +37,7 @@ public class DBUtil {
         try {
             rs = conn.createStatement().executeQuery(upit);
         } catch (SQLException ex) {
-            System.out.println("Neuspesna konekcija");
+            System.out.println("Neuspešna konekcija");
             Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
         return rs;
@@ -51,7 +51,7 @@ public class DBUtil {
         List<String> lista=new ArrayList<>();
         try {
             conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
-            System.out.println("Uspesna konekcija");
+            System.out.println("Uspešna konekcija");
             statement=conn.createStatement();
             PreparedStatement ps=conn.prepareStatement(upit);
             ps.setString(1,param1);
@@ -60,7 +60,7 @@ public class DBUtil {
                 lista.add(rs.getString("naziv"));
             }
         } catch (SQLException ex) {
-            System.out.println("Neuspesna konekcija");
+            System.out.println("Neuspešna konekcija");
             Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
         finally {
@@ -79,10 +79,10 @@ public class DBUtil {
         int promenjeno=0;
         try {
             conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
-            System.out.println("Uspesna konekcija");
+            System.out.println("Uspešna konekcija");
             promenjeno = conn.createStatement().executeUpdate(upit);
         } catch (SQLException ex) {
-            System.out.println("Neuspesna konekcija");
+            System.out.println("Neuspešna konekcija");
             Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
         finally {
@@ -103,7 +103,7 @@ public class DBUtil {
         int result=-1;
         try {
             conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
-            System.out.println("Uspesna konekcija");
+            System.out.println("Uspešna konekcija");
             String upit="SELECT kolicina FROM komponenta WHERE komponenta_id=?";
             PreparedStatement ps=conn.prepareStatement(upit);
             ps.setInt(1,id);
@@ -111,7 +111,7 @@ public class DBUtil {
             if (rs.next())
                 result=rs.getInt(1);
         } catch (SQLException ex) {
-            System.out.println("Neuspesna konekcija");
+            System.out.println("Neuspešna konekcija");
             Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
         finally {
