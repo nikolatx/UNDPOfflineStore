@@ -373,10 +373,18 @@ public class Nabavka extends Application {
                     alert.setTitle("Prijem robe");
                     alert.setHeaderText("Ažuriranje stanja u bazi podataka i štampanje prijemnice");
                     alert.setContentText("Izaberi opciju");
+                    
+                    DialogPane dialogPane = alert.getDialogPane();
+                   dialogPane.getStylesheets().add(
+                   getClass().getResource("styles.css").toExternalForm());
+                   dialogPane.getStyleClass().add("dialogPane");
 
                     ButtonType dugmeAzuriraj = new ButtonType("Odobri prijem robe");
+                    
+                    
                     ButtonType dugmeAzurirajStampaj = new ButtonType("Odobri i štampaj");
                     ButtonType dugmeOdustani = new ButtonType("Odustani", ButtonData.CANCEL_CLOSE);
+                    
 
                     alert.getButtonTypes().setAll(dugmeAzuriraj, dugmeAzurirajStampaj, dugmeOdustani);
                     Platform.runLater(()->{
@@ -415,6 +423,8 @@ public class Nabavka extends Application {
             }
             
         });
+        
+        
         
         
         

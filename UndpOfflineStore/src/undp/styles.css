@@ -276,6 +276,19 @@
     -fx-background-insets: 10px;
 }
 
+.dialogPane{
+    -fx-background-image: url("../resources/logo.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center;
+    -fx-background-size: 200px 150px;
+    -fx-background-color: #0068d8;
+   
+ }
+ .dialogPane.label{
+     -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+ }
 
 
 
