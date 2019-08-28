@@ -18,6 +18,8 @@ import javafx.stage.Stage;
 import com.grupa1.dbconnection.*;
 import com.grupa1.model.Dokument;
 import com.grupa1.model.Komponenta;
+import com.grupa1.model.KomponentaSaSlikom;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;      
 import java.sql.SQLException;
@@ -39,12 +41,26 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
+import javafx.stage.StageStyle;
+import javafx.util.Callback;
+
+
+
 
 public class Pretraga extends Application {
-
+    
+    //putanja do slika
+    private final static String SLIKE_PATH = "D:\\UNDPOfflineStore\\Slike";
+    //velicina uvecane slike
+    private final static int VELICINA_SLIKE=400;
+    
+    
     //objekat za konekciju sa bazom podataka
     Connection conn;
   
@@ -57,11 +73,13 @@ public class Pretraga extends Application {
     //Kreiranje 3 ComboBox-a na formi
     ComboBox tipCB = new ComboBox(opcijeTip);
     ComboBox proizvodjacCB = new ComboBox(opcijeProizvodjac);
-    //ComboBox dobavljacCB = new ComboBox(opcijeDobavljac);
+
+    
+    CheckBox aktuelneCB = new CheckBox();
     
     //Liste za pracenje informacija u tabelama
-    ObservableList<Komponenta> podaciFiltrirano=FXCollections.observableArrayList();;
-    ObservableList<Komponenta> podaciOdabrano=FXCollections.observableArrayList();;
+    ObservableList<KomponentaSaSlikom> podaciFiltrirano=FXCollections.observableArrayList();;
+    //ObservableList<Komponenta> podaciOdabrano=FXCollections.observableArrayList();;
     
     //tabela za prikaz komponenata koje zadovoljavaju zadate kriterijume pretrage
     TableView tabelaFiltrirano = new TableView();
@@ -100,7 +118,6 @@ public class Pretraga extends Application {
     public void init() throws Exception {
         super.init();
         kreirajTabelu(tabelaFiltrirano);
-       // kreirajTabelu(tabelaOdabrano);       
     }
     
     @Override
@@ -161,21 +178,27 @@ public class Pretraga extends Application {
         footerHB.setSpacing(30);
         nazadDugme.setId("buttonStyle");
         footerHB.setMargin(nazadDugme, new Insets(0, 0, 0, 860));
-        footerHB.getChildren().addAll(nazadDugme);
-
+        //footerHB.getChildren().addAll(nazadDugme);
+        
+        //podesavanje checkbox-a za prikaz aktuelnih komponenata
+        aktuelneCB.setText("Samo aktuelne");
+        aktuelneCB.setSelected(true);
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
         desniVB.setAlignment(Pos.CENTER);
         desniVB.setMinSize(200, 530);
         desniVB.setId("bottomStyle");
-        VBox.setMargin(nazadDugme, new Insets(500, 0, 0, 50));
-        desniVB.getChildren().addAll(nazadDugme);
+        desniVB.setAlignment(Pos.TOP_CENTER); //.TOP_LEFT);
+        desniVB.setPadding(new Insets(10));
+        desniVB.setSpacing(30);
+        VBox.setMargin(nazadDugme, new Insets(430, 0, 0, 5));
+        desniVB.getChildren().addAll(aktuelneCB, nazadDugme);
         
         //popunjavanje combobox-eva podacima
         ispuniComboBoxZaTip();
         ispuniComboBoxZaProizvodjaca();
         ispuniComboBoxZaDobavljaca();
         
-      
+        
         //pretrazivanje na osnovu zadatih kriterijuma
         pretragaDugme.setOnAction(e -> {
             try {
@@ -303,7 +326,9 @@ public class Pretraga extends Application {
             //sve unete parametre (combobox-evi i uneti tekst za pretragu)
             if (tip==null) tip="";
             if (proizvodjac==null) proizvodjac="";
-            String uslov="";
+            String uslov="", uslovAktuelna="";
+            if (aktuelneCB.isSelected())
+                uslovAktuelna=" AND k.aktuelna<>0";
             if (tip.equals("") && proizvodjac.equals(""))
                 uslov="WHERE k.naziv like '%" + komponenta + "%'";
             else if (tip.equals(""))
@@ -313,10 +338,10 @@ public class Pretraga extends Application {
             else
                 uslov="WHERE t.naziv='" + tip + "' AND p.naziv='" + proizvodjac + "' AND k.naziv like '%"+ komponenta + "%'";
 
-            String upit="SELECT k.komponenta_id, k.naziv, p.naziv, t.naziv, k.kolicina, k.cena " +
+            String upit="SELECT k.komponenta_id, k.naziv, p.naziv, t.naziv, k.kolicina, k.cena, k.slika, k.aktuelna " +
                         "FROM komponenta as k " +
                         "INNER JOIN tip as t ON k.tip_id=t.tip_id " +
-                        "INNER JOIN proizvodjac as p ON k.proizvodjac_id=p.proizvodjac_id " + uslov;
+                        "INNER JOIN proizvodjac as p ON k.proizvodjac_id=p.proizvodjac_id " + uslov+uslovAktuelna;
             //postavljanje upita nad bazom podataka
             ResultSet rs=DBUtil.prikupiPodatke(conn, upit);
             //obrada rezultata upita
@@ -329,9 +354,9 @@ public class Pretraga extends Application {
                     //ubacivanje podataka u listu
                     while (rs.next()) {
                         //dodavanje komponente u listu
-                        podaciFiltrirano.add(new Komponenta(rs.getInt(1), rs.getString(2),
+                        podaciFiltrirano.add(new KomponentaSaSlikom(rs.getInt(1), rs.getString(2),
                                                             rs.getString(3), rs.getString(4), 
-                                                            rs.getInt(5), rs.getDouble(6)));
+                                                            rs.getInt(5), rs.getDouble(6), rs.getString(7)));
                     }
                     //ubacivanje podataka u tabelu
                     tabelaFiltrirano.setItems(podaciFiltrirano);
@@ -344,9 +369,87 @@ public class Pretraga extends Application {
         }  
     }
     
+    //otvara se uvecana slika kada se klikne na sliku u prvoj koloni tabele
+    private void klikNaSliku() {
+        //ocitavanje odabrane komponente iz TableView-a
+        KomponentaSaSlikom komponenta = (KomponentaSaSlikom) tabelaFiltrirano.getSelectionModel().getSelectedItem();
+        if (komponenta==null) return;
+        //putanja do slike
+        String imageFile=SLIKE_PATH + "\\" + komponenta.getSlika();
+        //inicijalizacija image objekta na osnovu putanje i naziva fajla
+        Image image=new Image(new File(imageFile).toURI().toString());
+        ImageView imageView=new ImageView(image);
+        //podesavanje velicine uvecane slike
+        if (image.getHeight()>image.getWidth())
+            imageView.setFitHeight(VELICINA_SLIKE-10);
+        else
+            imageView.setFitWidth(VELICINA_SLIKE-10);
+        imageView.setPreserveRatio(true);
+        //slika se smesta u StackPane
+        StackPane pane=new StackPane();
+        pane.getChildren().add(imageView);
+        //podesavanje border-a StackPane-a
+        pane.setStyle("-fx-border-color: black;-fx-border-style: solid;-fx-border-width: 5;");
+        
+        Scene scena = new Scene(pane, VELICINA_SLIKE, VELICINA_SLIKE);
+        //podesavanje novog prozora
+        Stage noviProzor=new Stage();
+        noviProzor.setTitle(komponenta.getNaziv()+" "+komponenta.getProizvodjac());
+        noviProzor.setScene(scena);
+
+        scena.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
+        noviProzor.initStyle(StageStyle.UNDECORATED);
+        noviProzor.initModality(Modality.APPLICATION_MODAL);
+        //aktiviranje i prikaz novog prozora
+        noviProzor.show();
+
+        pane.setOnMouseClicked(f->{
+            noviProzor.close();
+        });
+    }
+    
     private void kreirajTabelu(TableView tabela) {
         //zabrana menjanja velicine da bi se zadale sirine kolona
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        
+        //podesavanje kolone sa slikom komponente
+        TableColumn<KomponentaSaSlikom, String> kolonaSlika = new TableColumn<>();
+        Callback<TableColumn<KomponentaSaSlikom, String>, TableCell<KomponentaSaSlikom, String>> cellFactory;
+        kolonaSlika.setCellValueFactory(new PropertyValueFactory("slika"));
+        
+        cellFactory= new Callback<TableColumn<KomponentaSaSlikom, String>, TableCell<KomponentaSaSlikom, String>>() {
+            @Override
+            public TableCell<KomponentaSaSlikom, String> call(TableColumn<KomponentaSaSlikom, String> param) {
+                StackPane box= new StackPane();                         
+                ImageView imageview = new ImageView();
+                return new TableCell<KomponentaSaSlikom, String> () {
+                    @Override
+                    public void updateItem(String item, boolean empty) {
+                        if (item != null) {
+                            box.setPadding(new Insets(4, 4, 4, 4));
+                            Image img = null;
+                            KomponentaSaSlikom k = getTableView().getItems().get(getIndex());
+                            String slikaFajl=SLIKE_PATH+"\\"+k.getSlika();
+                            img = new Image(new File(slikaFajl).toURI().toString());
+ 
+                            imageview.setImage(img);
+                            imageview.setFitHeight(50.0);
+                            imageview.setFitWidth(50.0);
+                        }
+                        if(!box.getChildren().contains(imageview)) {
+                        box.getChildren().add(imageview);
+                        box.setOnMouseClicked(e->{
+                            klikNaSliku();
+                        });
+                       setGraphic(box);
+                       }
+                   }
+                };
+            }
+        };
+        kolonaSlika.setCellFactory(cellFactory);
+        kolonaSlika.setMaxWidth(1f * Integer.MAX_VALUE * 9); // 9% width       
+        
         //dodavanje nove kolone odgovarajuceg naziva
         TableColumn kolonaSifra = new TableColumn("Sifra");
         kolonaSifra.setStyle( "-fx-alignment: CENTER;");
@@ -356,23 +459,23 @@ public class Pretraga extends Application {
         kolonaSifra.setMaxWidth(1f * Integer.MAX_VALUE * 5); // 5% width
         TableColumn kolonaOpis = new TableColumn("Naziv komponente");
         kolonaOpis.setCellValueFactory(new PropertyValueFactory<Komponenta, String>("naziv"));
-        kolonaOpis.setMaxWidth(1f * Integer.MAX_VALUE * 37); // 37% width
+        kolonaOpis.setMaxWidth(1f * Integer.MAX_VALUE * 42); // 42% width
         kolonaOpis.setStyle( "-fx-alignment: CENTER;");
         TableColumn kolonaProizvodjac = new TableColumn("Proizvodjac");
         kolonaProizvodjac.setCellValueFactory(new PropertyValueFactory<Komponenta, String>("proizvodjac"));
-        kolonaProizvodjac.setMaxWidth(1f * Integer.MAX_VALUE * 23); // 23% width
+        kolonaProizvodjac.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10% width
         kolonaProizvodjac.setStyle( "-fx-alignment: CENTER;");
         TableColumn kolonaTip = new TableColumn("Tip");
         kolonaTip.setCellValueFactory(new PropertyValueFactory<Komponenta, String>("tip"));
-        kolonaTip.setMaxWidth(1f * Integer.MAX_VALUE * 16); // 16% width
+        kolonaTip.setMaxWidth(1f * Integer.MAX_VALUE * 19); // 19% width
         kolonaTip.setStyle( "-fx-alignment: CENTER;");
         TableColumn kolonaKolicina = new TableColumn("Kolicina");
         kolonaKolicina.setCellValueFactory(new PropertyValueFactory<Komponenta, Integer>("kolicina"));
-        kolonaKolicina.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10% width
+        kolonaKolicina.setMaxWidth(1f * Integer.MAX_VALUE * 7); // 10% width
         kolonaKolicina.setStyle( "-fx-alignment: CENTER;");
         TableColumn kolonaCena = new TableColumn("Cena");
         kolonaCena.setCellValueFactory(new PropertyValueFactory<Komponenta, Double>("cena"));
-        kolonaCena.setMaxWidth(1f * Integer.MAX_VALUE * 9); // 9% width
+        kolonaCena.setMaxWidth(1f * Integer.MAX_VALUE * 8); // 8% width
         kolonaCena.setStyle("-fx-alignment: CENTER-RIGHT");
         //podesavanje formata cene: 2 decimale i thousand separator
         kolonaCena.setCellFactory(tc -> new TableCell<Komponenta, Number>() {
@@ -388,8 +491,8 @@ public class Pretraga extends Application {
         });
 
         //dodavanje kolona u tabelu
-        tabela.getColumns().addAll(kolonaSifra, kolonaOpis, kolonaProizvodjac,
-                kolonaTip, kolonaKolicina, kolonaCena);
+        tabela.getColumns().addAll(kolonaSlika, kolonaSifra, kolonaOpis, 
+                kolonaProizvodjac, kolonaTip, kolonaKolicina, kolonaCena);
     }
     
     
