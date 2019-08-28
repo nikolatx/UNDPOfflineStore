@@ -16,10 +16,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import com.grupa1.dbconnection.*;
-import com.grupa1.model.DetaljiDokumenta;
 import com.grupa1.model.Dokument;
 import com.grupa1.model.Komponenta;
-import java.sql.Blob;
+import com.grupa1.model.Osoba;
 import java.sql.Connection;
 import java.sql.ResultSet;      
 import java.sql.SQLException;
@@ -44,11 +43,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
+import util.DocxExport;
 
 public class Nabavka extends Application {
     //objekat za konekciju sa bazom podataka
@@ -93,6 +91,8 @@ public class Nabavka extends Application {
     Label labelOdabraneKomponente = new Label("Odabrane komponente");
     Label novaKomponentaLabel = new Label("Dodavanje komponente");
     Label noviDobavljacNaslov = new Label("Dodavanje dobavljača");
+    Label aktuelneLabel = new Label("Samo aktuelne");
+    CheckBox aktuelneCB = new CheckBox();
     
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
     HBox opisiCB = new HBox();
@@ -130,7 +130,9 @@ public class Nabavka extends Application {
     public void init() throws Exception {
         super.init(); //To change body of generated methods, choose Tools | Templates.
         kreirajTabelu(tabelaFiltrirano);
+        tabelaFiltrirano.setId("tabela-filtrirano");
         kreirajTabelu(tabelaOdabrano);
+        tabelaFiltrirano.setId("tabela-odabrano");
     }
     
     @Override
@@ -201,12 +203,16 @@ public class Nabavka extends Application {
         dodavanjeDugme.setId("buttonStyleNabavka");
         dodavanjeDugme.setMinSize(150, 25);
         desniVB.getChildren().add(dodavanjeDugme);
-        desniVB.setAlignment(Pos.TOP_LEFT);
+        desniVB.setAlignment(Pos.TOP_CENTER); //.TOP_LEFT);
         desniVB.setPadding(new Insets(10));
         desniVB.setSpacing(30);
         dobavljacDugme.setId("buttonStyleNabavka");
         dobavljacDugme.setMinSize(150, 25);
-        desniVB.getChildren().addAll(dobavljacCB, dobavljacDugme);
+        aktuelneCB.setSelected(true);
+        desniVB.getChildren().addAll(dobavljacCB, dobavljacDugme, aktuelneLabel, aktuelneCB);
+        
+        
+        
         
         //popunjavanje combobox-eva podacima
         ispuniComboBoxZaTip();
@@ -375,9 +381,9 @@ public class Nabavka extends Application {
                     alert.setContentText("Izaberi opciju");
                     
                     DialogPane dialogPane = alert.getDialogPane();
-                   dialogPane.getStylesheets().add(
-                   getClass().getResource("styles.css").toExternalForm());
-                   dialogPane.getStyleClass().add("dialogPane");
+                    dialogPane.getStylesheets().add(
+                    getClass().getResource("styles.css").toExternalForm());
+                    dialogPane.getStyleClass().add("dialogPane");
 
                     ButtonType dugmeAzuriraj = new ButtonType("Odobri prijem robe");
                     
@@ -391,15 +397,23 @@ public class Nabavka extends Application {
                         Optional<ButtonType> result = alert.showAndWait();
                         int a=1;
                         if (result.get() != dugmeOdustani){
+                            Osoba dobavljac=new Osoba();
+                            Dokument prijemnica=new Dokument();
+                            
                             //azuriranje kolicina i pravljenje prijemnice
-                            boolean uspesno=nabavkaRobe();
+                            boolean uspesno=nabavkaRobe(dobavljac, prijemnica);
                             Alert alert1 = new Alert(AlertType.INFORMATION);
                             alert1.setTitle("Obavestenje");
                             alert1.setHeaderText(null);
                             if (uspesno) {
                                 alert1.setContentText("Roba uspešno uneta u bazu podataka!");
                                 if (result.get() == dugmeAzurirajStampaj) {
-                                    
+                                    try {
+                                        DocxExport.exportData(true, dobavljac, prijemnica, podaciOdabrano);
+                                    } catch (Exception ex) {
+                                        Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+
 
 
                                 }
@@ -472,7 +486,6 @@ public class Nabavka extends Application {
             dodajBox.setTop(headerDodajBox);
             dodajBox.setCenter(centerDodajBox);
             dodajBox.setBottom(footerDodajBox);
-            
            
             //Kreiranje scene za novu komponentu
             Scene scena = new Scene(dodajBox, 500, 350); 
@@ -485,19 +498,15 @@ public class Nabavka extends Application {
             noviProzor.initOwner(primaryStage);
             //aktiviranje i prikaz novog prozora
             noviProzor.show();
+            
+            //povratak na nabavku sa forme za unosenje nove komponente
+            novaKomponentaNazad.setOnAction(ev ->{
+                noviProzor.close();
+            });
+            
         });
         
         
-        //Taster prozora Nova Komponenta NAZAD
-        novaKomponentaNazad.setOnAction(e ->{
-            try {
-                primaryStage.close();
-                new Nabavka().start(primaryStage);
-            } catch (SQLException ex) {
-                Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
-            }
-               
-           });
         
         //Taster za Scenu dodavanja novog dobavljaca
         dobavljacDugme.setOnAction(e ->{
@@ -569,17 +578,6 @@ public class Nabavka extends Application {
         });
         
         
-        //Taster prozora Nova Komponenta NAZAD
-        novaKomponentaNazad.setOnAction(e ->{
-            try {
-                primaryStage.close();
-                new Nabavka().start(primaryStage);
-            } catch (SQLException ex) {
-                Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
-            }
-               
-           });
-        
         
         
         //Taster prozora Nabavke za nazad
@@ -623,25 +621,32 @@ public class Nabavka extends Application {
         Platform.runLater( ()-> alert.showAndWait() );
     }
 
-    private boolean nabavkaRobe() {
+    private boolean nabavkaRobe(Osoba dobavljac, Dokument prijemnica) {
         
         boolean uspesno=false;
         conn=DBUtil.napraviKonekciju();
         if (conn!=null) {
             try {
                 //upit za nalazenje dobavljac_id vrednosti za zadat naziv dobavljaca
-                PreparedStatement stmt0=conn.prepareStatement("SELECT dobavljac_id FROM dobavljac WHERE naziv=?");
+                PreparedStatement stmt0=conn.prepareStatement("SELECT dobavljac_id, naziv, ulica, broj, grad, postanski_broj, "
+                        + "drzava, telefon FROM dobavljac WHERE naziv=?");
                 String str1=(String) dobavljacCB.getSelectionModel().getSelectedItem();
                 stmt0.setString(1, str1);
                 ResultSet rs=stmt0.executeQuery();
-                int dobavljacId=-1;
-                if (rs.next())
-                    dobavljacId=rs.getInt(1);
-                
+                //int dobavljacId=-1;
+                if (rs.next()) {
+                    dobavljac.setId(rs.getInt(1));
+                    dobavljac.setNaziv(rs.getString(2));
+                    dobavljac.setUlica(rs.getString(3));
+                    dobavljac.setBroj(rs.getString(4));
+                    dobavljac.setGrad(rs.getString(5));
+                    dobavljac.setPostBr(rs.getString(6));
+                    dobavljac.setDrzava(rs.getString(7));
+                    dobavljac.setTelefon(rs.getString(8));
+                }
                 //priprema za batchupdate
                 conn.setAutoCommit(false);
                 //kreiranje nove prijemnice
-                Dokument prijemnica=new Dokument();
                 //tekuci datum
                 Date datum= new java.sql.Date(Calendar.getInstance().getTime().getTime());
                 
@@ -649,7 +654,7 @@ public class Nabavka extends Application {
                 //potrebno je sacuvati vrednost prijemnica_id novokreirane prijemnice
                 String columnNames[] = new String[] { "prijemnica_id" };
                 PreparedStatement stmt1=conn.prepareStatement("INSERT INTO prijemnica (dobavljac_id, datum) VALUES (?,?)", columnNames);
-                stmt1.setInt(1, dobavljacId);
+                stmt1.setInt(1, dobavljac.getId());
                 stmt1.setDate(2, datum);
                 prijemnicaId=0;
                 if (stmt1.executeUpdate()>0) {
@@ -657,36 +662,40 @@ public class Nabavka extends Application {
                     if (generatedKeys.next()) {
                         prijemnicaId=generatedKeys.getInt(1);
                     }
-                }
-                
-                //upit za azuriranje kolicine komponente
-                PreparedStatement stmt2=conn.prepareStatement("UPDATE komponenta SET kolicina=kolicina+? WHERE komponenta_id=?");
-                //upit za kreiranje detalja prijemnice
-                PreparedStatement stmt3=conn.prepareStatement("INSERT INTO detaljiprijemnice (prijemnica_id, komponenta_id, cena, kolicina) VALUES (?,?,?,?)");
-                //priprema za batch update i insert
-                podaciOdabrano.forEach(e->{
-                    try {
-                        //batch update kolicine
-                        stmt2.setInt(1, e.getKolicina());
-                        stmt2.setInt(2, e.getId());
-                        stmt2.addBatch();
-                        //batch update detalja prijemnice
-                        stmt3.setInt(1, prijemnicaId);
-                        stmt3.setInt(2, e.getId());
-                        stmt3.setDouble(3, e.getCena());
-                        stmt3.setInt(4, e.getKolicina());
-                        stmt3.addBatch();
-                    } catch (SQLException ex) {
-                        Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
-                    } 
-                });
+                    int dob=dobavljac.getId();
+                    prijemnica.setOsobaId(dob);
+                    prijemnica.setDokumentId(prijemnicaId);
+                    prijemnica.setDatum(datum);
+                    
+                    //upit za azuriranje kolicine komponente
+                    PreparedStatement stmt2=conn.prepareStatement("UPDATE komponenta SET kolicina=kolicina+? WHERE komponenta_id=?");
+                    //upit za kreiranje detalja prijemnice
+                    PreparedStatement stmt3=conn.prepareStatement("INSERT INTO detaljiprijemnice (prijemnica_id, komponenta_id, cena, kolicina) VALUES (?,?,?,?)");
+                    //priprema za batch update i insert
+                    podaciOdabrano.forEach(e->{
+                        try {
+                            //batch update kolicine
+                            stmt2.setInt(1, e.getKolicina());
+                            stmt2.setInt(2, e.getId());
+                            stmt2.addBatch();
+                            //batch update detalja prijemnice
+                            stmt3.setInt(1, prijemnicaId);
+                            stmt3.setInt(2, e.getId());
+                            stmt3.setDouble(3, e.getCena());
+                            stmt3.setInt(4, e.getKolicina());
+                            stmt3.addBatch();
+                        } catch (SQLException ex) {
+                            Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
+                        } 
+                    });
 
-                //izvrsavanje batch update upita
-                stmt1.executeBatch();
-                stmt2.executeBatch();
-                stmt3.executeBatch();
-                conn.commit();
-                uspesno=true;
+                    //izvrsavanje batch update upita
+                    stmt1.executeBatch();
+                    stmt2.executeBatch();
+                    stmt3.executeBatch();
+                    conn.commit();
+                    uspesno=true;
+                }
             } catch (SQLException ex) {
                 try {
                     conn.rollback();
@@ -704,13 +713,6 @@ public class Nabavka extends Application {
         }
         return uspesno;
     }
-
-
-
-
-
-
-
 
 
 
@@ -793,6 +795,9 @@ public class Nabavka extends Application {
             //sve unete parametre (combobox-evi i uneti tekst za pretragu)
             if (tip==null) tip="";
             if (proizvodjac==null) proizvodjac="";
+            String uslovAktuelne="";
+            if (aktuelneCB.isSelected())
+                uslovAktuelne=" AND k.aktuelna=1";
             String uslov="";
             if (tip.equals("") && proizvodjac.equals(""))
                 uslov="WHERE k.naziv like '%" + komponenta + "%'";
@@ -806,7 +811,7 @@ public class Nabavka extends Application {
             String upit="SELECT k.komponenta_id, k.naziv, p.naziv, t.naziv, k.kolicina, k.cena " +
                         "FROM komponenta as k " +
                         "INNER JOIN tip as t ON k.tip_id=t.tip_id " +
-                        "INNER JOIN proizvodjac as p ON k.proizvodjac_id=p.proizvodjac_id " + uslov;
+                        "INNER JOIN proizvodjac as p ON k.proizvodjac_id=p.proizvodjac_id " + uslov + uslovAktuelne;
             //postavljanje upita nad bazom podataka
             ResultSet rs=DBUtil.prikupiPodatke(conn, upit);
             //obrada rezultata upita
@@ -841,31 +846,51 @@ public class Nabavka extends Application {
     
     private void kreirajTabelu(TableView tabela) {
         //zabrana menjanja velicine da bi se zadale sirine kolona
-        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY );
+        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         //dodavanje nove kolone odgovarajuceg naziva
-        TableColumn kolonaSifra=new TableColumn("Sifra");
+        TableColumn kolonaSifra = new TableColumn("Sifra");
+        kolonaSifra.setStyle( "-fx-alignment: CENTER;");
         //definisanje valueFactory-a za celije kolone
         kolonaSifra.setCellValueFactory(new PropertyValueFactory<Komponenta, Integer>("id"));
         //definisanje procentualne sirine kolone
-        kolonaSifra.setMaxWidth( 1f * Integer.MAX_VALUE * 5 ); // 5% width
-        TableColumn kolonaOpis=new TableColumn("Naziv komponente");
+        kolonaSifra.setMaxWidth(1f * Integer.MAX_VALUE * 5); // 5% width
+        TableColumn kolonaOpis = new TableColumn("Naziv komponente");
         kolonaOpis.setCellValueFactory(new PropertyValueFactory<Komponenta, String>("naziv"));
-        kolonaOpis.setMaxWidth( 1f * Integer.MAX_VALUE * 37 ); // 37% width
-        TableColumn kolonaProizvodjac=new TableColumn("Proizvodjac");
+        kolonaOpis.setMaxWidth(1f * Integer.MAX_VALUE * 37); // 37% width
+        kolonaOpis.setStyle( "-fx-alignment: CENTER;");
+        TableColumn kolonaProizvodjac = new TableColumn("Proizvodjac");
         kolonaProizvodjac.setCellValueFactory(new PropertyValueFactory<Komponenta, String>("proizvodjac"));
-        kolonaProizvodjac.setMaxWidth( 1f * Integer.MAX_VALUE * 23 ); // 23% width
-        TableColumn kolonaTip=new TableColumn("Tip");
+        kolonaProizvodjac.setMaxWidth(1f * Integer.MAX_VALUE * 23); // 23% width
+        kolonaProizvodjac.setStyle( "-fx-alignment: CENTER;");
+        TableColumn kolonaTip = new TableColumn("Tip");
         kolonaTip.setCellValueFactory(new PropertyValueFactory<Komponenta, String>("tip"));
-        kolonaTip.setMaxWidth( 1f * Integer.MAX_VALUE * 16 ); // 16% width
-        TableColumn kolonaKolicina=new TableColumn("Kolicina");
+        kolonaTip.setMaxWidth(1f * Integer.MAX_VALUE * 16); // 16% width
+        kolonaTip.setStyle( "-fx-alignment: CENTER;");
+        TableColumn kolonaKolicina = new TableColumn("Kolicina");
         kolonaKolicina.setCellValueFactory(new PropertyValueFactory<Komponenta, Integer>("kolicina"));
-        kolonaKolicina.setMaxWidth( 1f * Integer.MAX_VALUE * 10 ); // 10% width
-        TableColumn kolonaCena=new TableColumn("Cena");
-        kolonaCena.setCellValueFactory(new PropertyValueFactory<Komponenta, Integer>("cena"));
-        kolonaCena.setMaxWidth( 1f * Integer.MAX_VALUE * 9 ); // 9% width
+        kolonaKolicina.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10% width
+        kolonaKolicina.setStyle( "-fx-alignment: CENTER;");
+        
+        TableColumn kolonaCena = new TableColumn("Cena");
+        kolonaCena.setCellValueFactory(new PropertyValueFactory<Komponenta, Double>("cena"));
+        kolonaCena.setMaxWidth(1f * Integer.MAX_VALUE * 9); // 9% width
+        kolonaCena.setStyle("-fx-alignment: CENTER-RIGHT");
+        //podesavanje formata cene: 2 decimale i thousand separator
+        kolonaCena.setCellFactory(tc -> new TableCell<Komponenta, Number>() {
+            @Override
+            protected void updateItem(Number value, boolean empty) {
+                super.updateItem(value, empty) ;
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(String.format("%,.2f", value.doubleValue()));
+                }
+            }
+        });
+
         //dodavanje kolona u tabelu
-        tabela.getColumns().addAll(kolonaSifra, kolonaOpis, kolonaProizvodjac, 
-                                    kolonaTip, kolonaKolicina, kolonaCena);
+        tabela.getColumns().addAll(kolonaSifra, kolonaOpis, kolonaProizvodjac,
+                kolonaTip, kolonaKolicina, kolonaCena);
     }
     
     

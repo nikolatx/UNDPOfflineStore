@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import com.grupa1.dbconnection.*;
 import com.grupa1.model.Dokument;
 import com.grupa1.model.Komponenta;
+import com.grupa1.model.Osoba;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,6 +30,8 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -44,6 +47,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
+import util.DocxExport;
 
 public class Prodaja extends Application {
 
@@ -53,40 +57,43 @@ public class Prodaja extends Application {
     //Liste sa opcijama ComboBox-ova
     ObservableList opcijeTip = FXCollections.observableArrayList();
     ObservableList opcijeProizvodjac = FXCollections.observableArrayList();
-    ObservableList opcijeDobavljac = FXCollections.observableArrayList();
+    ObservableList opcijeKupac = FXCollections.observableArrayList();
 
     //Kreiranje 3 ComboBox-a na formi
     ComboBox tipCB = new ComboBox(opcijeTip);
     ComboBox proizvodjacCB = new ComboBox(opcijeProizvodjac);
-    ComboBox dobavljacCB = new ComboBox(opcijeDobavljac);
+    ComboBox kupacCB = new ComboBox(opcijeKupac);
 
     //Liste za pracenje informacija u tabelama
     ObservableList<Komponenta> podaciFiltrirano = FXCollections.observableArrayList();
-    ;
     ObservableList<Komponenta> podaciOdabrano = FXCollections.observableArrayList();
-    ;
     
     //tabela za prikaz komponenata koje zadovoljavaju zadate kriterijume pretrage
     TableView tabelaFiltrirano = new TableView();
     //tabela za prikaz odabranih komponenata
     TableView tabelaOdabrano = new TableView();
-    ;
     
     //polje za unos dela naziva komponente kao kriterijuma za pretragu
     TextField deoNaziva = new TextField();
-
+    
+    //kontrole za odabir samo aktuelnih komponenata
+    Label aktuelneLabel = new Label("Samo aktuelne");
+    CheckBox aktuelneCB = new CheckBox();
+    
     //Kreiranje dugmica
     Button pretragaDugme = new Button("Pretraži");
     Button prihvatiDugme = new Button("Prihvati");
     Button nazadDugme = new Button("Nazad");
-    Button dobavljacDugme = new Button("Dodaj dobavljača");
-
+    Button kupacDugme = new Button("Dodaj kupca");
+    Button noviKupacPotvrda = new Button("Dodaj");
+    Button noviKupacNazad = new Button("Nazad");
+    
     //Kreiranje opisa koji ce da stoje na formi
     Label naslovForme = new Label("Prodaja");
     Label labelFiltriraneKomponente = new Label("Rezultat pretrage - DUPLIM KLIKOM ODABERITE ŽELJENU KOMPONENTU");
     Label labelOdabraneKomponente = new Label("Odabrane komponente");
-    Label aktuelnaLabel = new Label("Aktuelna komponenta");
-
+    Label noviKupacNaslov = new Label("Dodavanje kupca");
+    
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
     HBox opisiCB = new HBox();
     HBox comboboxHB = new HBox();
@@ -95,8 +102,6 @@ public class Prodaja extends Application {
     VBox desniVB = new VBox();
     VBox headerHB = new VBox();
     VBox boxZaTabele = new VBox();
-
-    CheckBox aktuelnaCheckBox = new CheckBox();
 
     //Kreiranje Fonta
     Font font = new Font(25);
@@ -120,8 +125,8 @@ public class Prodaja extends Application {
         tipCB.setMinSize(150, 25);
         proizvodjacCB.setPromptText("Izaberi proizvodjača");
         proizvodjacCB.setMinSize(150, 25);
-        dobavljacCB.setPromptText("Izaberi dobavljača");
-        dobavljacCB.setMinSize(150, 25);
+        kupacCB.setPromptText("Izaberi kupca");
+        kupacCB.setMinSize(150, 25);
 
         //podesavanja dugmeta za pretragu
         pretragaDugme.setMinSize(100, 25);
@@ -172,22 +177,28 @@ public class Prodaja extends Application {
         footerHB.setMargin(prihvatiDugme, new Insets(0, 0, 0, 250));
 
         footerHB.getChildren().addAll(prihvatiDugme, nazadDugme);
-
+        
+        //prikaz aktuelnih komponenata
+        aktuelneCB.setSelected(true);
+        aktuelneCB.setText("Samo aktuelne");
+        
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
         desniVB.setAlignment(Pos.TOP_CENTER);
-        VBox.setMargin(aktuelnaLabel, new Insets(0, 40, 0, 0));
-        VBox.setMargin(aktuelnaCheckBox, new Insets(0, 40, 0, 0));
+        VBox.setMargin(kupacCB, new Insets(20, 40, 0, 0));
+        VBox.setMargin(kupacDugme, new Insets(0, 40, 0, 0));
+        VBox.setMargin(aktuelneLabel, new Insets(0, 40, 0, 0));
+        VBox.setMargin(aktuelneCB, new Insets(0, 40, 0, 0));
         desniVB.setPadding(new Insets(10));
-        desniVB.setSpacing(30);
-        dobavljacDugme.setMinSize(150, 25);
-        dobavljacDugme.setId("buttonStyle");
+        desniVB.setSpacing(20);
+        kupacDugme.setMinSize(150, 25);
+        kupacDugme.setId("buttonStyle");
         desniVB.setId("bottomStyle");
-        desniVB.getChildren().addAll(aktuelnaLabel, aktuelnaCheckBox);
+        desniVB.getChildren().addAll(kupacCB, kupacDugme, aktuelneCB);
 
         //popunjavanje combobox-eva podacima
         ispuniComboBoxZaTip();
         ispuniComboBoxZaProizvodjaca();
-        ispuniComboBoxZaDobavljaca();
+        ispuniComboBoxZaKupca();
 
         //pretrazivanje na osnovu zadatih kriterijuma
         pretragaDugme.setOnAction(e -> {
@@ -353,13 +364,13 @@ public class Prodaja extends Application {
         //dugme za azuriranje baze i stampanje dopremnice/fakture
         prihvatiDugme.setOnAction(e -> {
             if (podaciOdabrano.size() != 0) {
-                if (dobavljacCB.getSelectionModel().getSelectedIndex() > -1) {
+                if (kupacCB.getSelectionModel().getSelectedIndex() > -1) {
                     Alert alert = new Alert(AlertType.CONFIRMATION);
-                    alert.setTitle("Prijem robe");
-                    alert.setHeaderText("Azuriranje stanja u bazi podataka i stampanje prijemnice");
+                    alert.setTitle("Prodaja robe");
+                    alert.setHeaderText("Azuriranje stanja u bazi podataka i stampanje fakture");
                     alert.setContentText("Izaberi opciju");
 
-                    ButtonType dugmeAzuriraj = new ButtonType("Odobri prijem robe");
+                    ButtonType dugmeAzuriraj = new ButtonType("Odobri prodaju robe");
                     ButtonType dugmeAzurirajStampaj = new ButtonType("Odobri i stampaj");
                     ButtonType dugmeOdustani = new ButtonType("Odustani", ButtonData.CANCEL_CLOSE);
 
@@ -368,18 +379,25 @@ public class Prodaja extends Application {
                         Optional<ButtonType> result = alert.showAndWait();
                         int a = 1;
                         if (result.get() != dugmeOdustani) {
+                            Osoba kupac=new Osoba();
+                            Dokument faktura=new Dokument();
                             //pokusaj azuriranja kolicina
-                            boolean uspesno = azuriraj();
+                            boolean uspesno = prodajaRobe(kupac, faktura);
                             Alert alert1 = new Alert(AlertType.INFORMATION);
-                            alert1.setTitle("Obavestenje");
+                            alert1.setTitle("Obaveštenje");
                             alert1.setHeaderText(null);
                             if (uspesno) {
-                                alert1.setContentText("Roba sa dopremnice uspesno uneta!");
+                                alert1.setContentText("Prodaja robe uspešno obavljena!");
                                 if (result.get() == dugmeAzurirajStampaj) {
-
+                                    try {
+                                        DocxExport.exportData(false, kupac, faktura, podaciOdabrano);
+                                    } catch (Exception ex) {
+                                        Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                    
                                 }
                             } else {
-                                alert1.setContentText("Doslo je do greske pri unosu podataka!");
+                                alert1.setContentText("Došlo je do greške pri prodaji!");
                             }
                             Platform.runLater(() -> {
                                 alert1.showAndWait();
@@ -390,7 +408,7 @@ public class Prodaja extends Application {
                         }
                     });
                 } else {
-                    poruka("Dobavljac mora biti odabran!");
+                    poruka("Kupac mora biti odabran!");
                 }
             } else {
                 poruka("Nijedna komponenta nije odabrana!");
@@ -425,67 +443,63 @@ public class Prodaja extends Application {
 
     private void poruka(String msg) {
         Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Greska");
-        alert.setHeaderText("Greska");
+        alert.setTitle("Greška");
+        alert.setHeaderText("Greška");
         alert.setContentText(msg);
         Platform.runLater(() -> alert.showAndWait());
     }
 
-    //prilagodi za prodaju
-    //promeni naziv u prodajaRobe()
-    private boolean azuriraj() {
+    //ayuriranje kolicina pri prodaji
+    private boolean prodajaRobe(Osoba kupac, Dokument faktura) {
 
         boolean uspesno = false;
         conn = DBUtil.napraviKonekciju();
         if (conn != null) {
             try {
-                //promeni u kupac
-                PreparedStatement stmt0 = conn.prepareStatement("SELECT dobavljac_id FROM dobavljac WHERE naziv=?");
-                String str1 = (String) dobavljacCB.getSelectionModel().getSelectedItem();
-                //String nadjiIdDobavljaca="SELECT dobavljac_id FROM dobavljac WHERE naziv='" + str1+"'";
-                //int dobavljacId=DBUtil.prikupiPodatke(conn, nadjiIdDobavljaca).getInt(1);
+                //upit za nalazenje kupca po nazivu
+                PreparedStatement stmt0=conn.prepareStatement("SELECT kupac_id, naziv, ulica, broj, grad, postanski_broj, "
+                        + "drzava, telefon FROM kupac WHERE naziv=?");
+                String nazivKupca=(String) kupacCB.getSelectionModel().getSelectedItem();
+                stmt0.setString(1, nazivKupca);
+                ResultSet rs=stmt0.executeQuery();
+                if (rs.next()) {
+                    kupac.setId(rs.getInt(1));
+                    kupac.setNaziv(rs.getString(2));
+                    kupac.setUlica(rs.getString(3));
+                    kupac.setBroj(rs.getString(4));
+                    kupac.setGrad(rs.getString(5));
+                    kupac.setPostBr(rs.getString(6));
+                    kupac.setDrzava(rs.getString(7));
+                    kupac.setTelefon(rs.getString(8));
+                }
+                //priprema za batchupdate
                 conn.setAutoCommit(false);
 
-                stmt0.setString(1, str1);
-                ResultSet rs = stmt0.executeQuery();
-                int dobavljacId = -1;
-                if (rs.next()) {
-                    dobavljacId = rs.getInt(1);
-                }
-
-                //kreiranje nove prijemnice
-                Dokument prijemnica = new Dokument();
-                //upit za nalazenje dobavljac_id vrednosti za zadat naziv dobavljaca
                 Date datum = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 
-                //umesto prijemnica stavi faktura
                 //PreparedStatement objekat za drugi upit
-                String columnNames[] = new String[]{"prijemnica_id"};
-                PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO prijemnica (dobavljac_id, datum) VALUES (?,?)", columnNames);
-                stmt1.setInt(1, dobavljacId);
+                String columnNames[] = new String[]{"faktura_id"};
+                PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO faktura (kupac_id, datum) VALUES (?,?)", columnNames);
+                stmt1.setInt(1, kupac.getId());
                 stmt1.setDate(2, datum);
-                prijemnicaId = 0;
+                //postavljanje polja faktura_id na tekucu vrednost
                 if (stmt1.executeUpdate() > 0) {
                     java.sql.ResultSet generatedKeys = stmt1.getGeneratedKeys();
                     if (generatedKeys.next()) {
-                        prijemnicaId = generatedKeys.getInt(1);
+                        faktura.setDokumentId(generatedKeys.getInt(1));
                     }
                 }
 
                 PreparedStatement stmt2 = conn.prepareStatement("UPDATE komponenta SET kolicina=kolicina-? WHERE komponenta_id=?");
-                PreparedStatement stmt3 = conn.prepareStatement("INSERT INTO detaljiprijemnice (prijemnica_id, komponenta_id, cena, kolicina) VALUES (?,?,?,?)");
+                PreparedStatement stmt3 = conn.prepareStatement("INSERT INTO detaljifakture (faktura_id, komponenta_id, cena, kolicina) VALUES (?,?,?,?)");
 
                 podaciOdabrano.forEach(e -> {
                     try {
-                        //String kolicina=String.valueOf(e.getKolicina());
-                        //String id=String.valueOf(e.getId());
-                        //String upit="UPDATE komponenta SET kolicina=kolicina-" + kolicina + " WHERE komponenta_id="+id;
                         stmt2.setInt(1, e.getKolicina());
                         stmt2.setInt(2, e.getId());
                         stmt2.addBatch();
 
-                        //DetaljiDokumenta detaljiPrijemnice=new DetaljiDokumenta();
-                        stmt3.setInt(1, prijemnicaId);
+                        stmt3.setInt(1, faktura.getDokumentId());
                         stmt3.setInt(2, e.getId());
                         stmt3.setDouble(3, e.getCena());
                         stmt3.setInt(4, e.getKolicina());
@@ -496,13 +510,11 @@ public class Prodaja extends Application {
                     }
                 });
 
-                //int[] result=st.executeBatch();
                 stmt1.executeBatch();
                 stmt2.executeBatch();
                 stmt3.executeBatch();
                 conn.commit();
                 uspesno = true;
-                //opcijeTip.addAll(DBUtil.prikupiPodatke(conn, "SELECT naziv FROM tip"));
             } catch (SQLException ex) {
                 try {
                     conn.rollback();
@@ -531,7 +543,6 @@ public class Prodaja extends Application {
                 while (rs.next()) {
                     opcijeTip.add(rs.getString("naziv"));
                 }
-                //opcijeTip.addAll(DBUtil.prikupiPodatke(conn, "SELECT naziv FROM tip"));
             } catch (SQLException ex) {
                 Logger.getLogger(Prodaja.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
@@ -566,15 +577,15 @@ public class Prodaja extends Application {
         }
     }
 
-    //ucitavanje vrednosti u ComboBox dobavljaca
-    public void ispuniComboBoxZaDobavljaca() {
+    //ucitavanje vrednosti u ComboBox kupca
+    public void ispuniComboBoxZaKupca() {
         ResultSet rs = null;
         conn = DBUtil.napraviKonekciju();
         if (conn != null) {
             try {
-                rs = DBUtil.prikupiPodatke(conn, "SELECT naziv FROM dobavljac");
+                rs = DBUtil.prikupiPodatke(conn, "SELECT naziv FROM kupac");
                 while (rs.next()) {
-                    opcijeDobavljac.add(rs.getString("naziv"));
+                    opcijeKupac.add(rs.getString("naziv"));
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(Prodaja.class.getName()).log(Level.SEVERE, null, ex);
@@ -602,6 +613,9 @@ public class Prodaja extends Application {
             if (proizvodjac == null) {
                 proizvodjac = "";
             }
+            String uslovAktuelne="";
+            if (aktuelneCB.isSelected())
+                uslovAktuelne=" AND k.aktuelna=1";
             String uslov = "";
             if (tip.equals("") && proizvodjac.equals("")) {
                 uslov = "WHERE k.naziv like '%" + komponenta + "%'";
@@ -616,7 +630,7 @@ public class Prodaja extends Application {
             String upit = "SELECT k.komponenta_id, k.naziv, p.naziv, t.naziv, k.kolicina, k.cena "
                     + "FROM komponenta as k "
                     + "INNER JOIN tip as t ON k.tip_id=t.tip_id "
-                    + "INNER JOIN proizvodjac as p ON k.proizvodjac_id=p.proizvodjac_id " + uslov;
+                    + "INNER JOIN proizvodjac as p ON k.proizvodjac_id=p.proizvodjac_id " + uslov + uslovAktuelne;
             //postavljanje upita nad bazom podataka
             ResultSet rs = DBUtil.prikupiPodatke(conn, upit);
             //obrada rezultata upita
@@ -652,6 +666,7 @@ public class Prodaja extends Application {
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         //dodavanje nove kolone odgovarajuceg naziva
         TableColumn kolonaSifra = new TableColumn("Sifra");
+        kolonaSifra.setStyle( "-fx-alignment: CENTER;");
         //definisanje valueFactory-a za celije kolone
         kolonaSifra.setCellValueFactory(new PropertyValueFactory<Komponenta, Integer>("id"));
         //definisanje procentualne sirine kolone
@@ -659,18 +674,37 @@ public class Prodaja extends Application {
         TableColumn kolonaOpis = new TableColumn("Naziv komponente");
         kolonaOpis.setCellValueFactory(new PropertyValueFactory<Komponenta, String>("naziv"));
         kolonaOpis.setMaxWidth(1f * Integer.MAX_VALUE * 37); // 37% width
+        kolonaOpis.setStyle( "-fx-alignment: CENTER;");
         TableColumn kolonaProizvodjac = new TableColumn("Proizvodjac");
         kolonaProizvodjac.setCellValueFactory(new PropertyValueFactory<Komponenta, String>("proizvodjac"));
         kolonaProizvodjac.setMaxWidth(1f * Integer.MAX_VALUE * 23); // 23% width
+        kolonaProizvodjac.setStyle( "-fx-alignment: CENTER;");
         TableColumn kolonaTip = new TableColumn("Tip");
         kolonaTip.setCellValueFactory(new PropertyValueFactory<Komponenta, String>("tip"));
         kolonaTip.setMaxWidth(1f * Integer.MAX_VALUE * 16); // 16% width
+        kolonaTip.setStyle( "-fx-alignment: CENTER;");
         TableColumn kolonaKolicina = new TableColumn("Kolicina");
         kolonaKolicina.setCellValueFactory(new PropertyValueFactory<Komponenta, Integer>("kolicina"));
         kolonaKolicina.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10% width
+        kolonaKolicina.setStyle( "-fx-alignment: CENTER;");
+        
         TableColumn kolonaCena = new TableColumn("Cena");
-        kolonaCena.setCellValueFactory(new PropertyValueFactory<Komponenta, Integer>("cena"));
+        kolonaCena.setCellValueFactory(new PropertyValueFactory<Komponenta, Double>("cena"));
         kolonaCena.setMaxWidth(1f * Integer.MAX_VALUE * 9); // 9% width
+        kolonaCena.setStyle("-fx-alignment: CENTER-RIGHT");
+        //podesavanje formata cene: 2 decimale i thousand separator
+        kolonaCena.setCellFactory(tc -> new TableCell<Komponenta, Number>() {
+            @Override
+            protected void updateItem(Number value, boolean empty) {
+                super.updateItem(value, empty) ;
+                if (empty) {
+                    setText(null);
+                } else {
+                    setText(String.format("%,.2f", value.doubleValue()));
+                }
+            }
+        });
+
         //dodavanje kolona u tabelu
         tabela.getColumns().addAll(kolonaSifra, kolonaOpis, kolonaProizvodjac,
                 kolonaTip, kolonaKolicina, kolonaCena);
