@@ -1,66 +1,144 @@
-
 package undp;
 
+import com.grupa1.dbconnection.DBUtil;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javax.swing.JOptionPane;
+import javafx.util.Duration;
 
 public class UndpOfflineStore extends Application {
-    
+        //dugmici za realizaciju pojedinih funkcija
+        Button btn1 = new Button("Pretraga");
+        Button btn2 = new Button("Nabavka");
+        Button btn3 = new Button("Prodaja");
+        Button btn4 = new Button("Izveštaji");
+        Button btn5 = new Button("Ažuriranje");
+        
+        //Kreiranje HBox panela za popunjvenje scene
+        HBox hb1 = new HBox();
+        HBox hb2 = new HBox();
+        HBox hb3 = new HBox();
+        
+        //Kreiranje tekstualnih labela i fonta
+        Label lab1 = new Label("UNDP Offline Store");
+        Font font = new Font(25);
+       
+        
     @Override
     public void start(Stage primaryStage) {
         
-        //dugmici za realizaciju pojedinih funkcija
-        Button btn1 = new Button("Nabavka");
-        Button btn2 = new Button("Prodaja");
-        Button btn3 = new Button("Izvestaji");
-        Button btn4 = new Button("Azuriranje");
-
-        //Nabavka komponenata
-        btn1.setOnAction(e->{
-            Platform.runLater(()->{
-                JOptionPane.showMessageDialog(null, "Jos uvek nije implementirano!");
-            });
+              
+        //Podesavanje velicine , izgleda i dodavanje nodova na Hbox
+        hb1.setMinSize(800, 120);
+        lab1.setId("headerLabel");       
+        hb1.setId("headerBackground");    //Css - Style: podesavanje izgleda
+        hb1.setAlignment(Pos.CENTER);
+        lab1.setFont(font);
+        hb1.getChildren().add(lab1);
+        
+        
+        ////Podesavanje velicine , izgleda i dodavanje nodova na Hbox;
+        FadeTransition fade= new FadeTransition();
+        fade.setDuration(Duration.millis(3500));
+        fade.setFromValue(0);
+        fade.setToValue(1);
+        fade.setAutoReverse(true);
+        fade.setNode(hb2);
+        fade.play();
+        hb2.setMinSize(800, 350);
+        hb2.setAlignment(Pos.CENTER);
+        hb2.setId("centerPicture");      //Css - Style: podesavanje izgleda
+        
+        //Podesavanje velicine , izgleda i dodavanje nodova na Hbox
+        hb3.setMinSize(800, 130);
+        hb3.setAlignment(Pos.CENTER);
+        btn1.setId("buttonStyle");
+        btn2.setId("buttonStyle");
+        btn3.setId("buttonStyle");       //Css - Style: podesavanje izgleda
+        btn4.setId("buttonStyle");
+        btn5.setId("buttonStyle");
+        hb3.getChildren().addAll(btn1,btn2,btn3,btn4,btn5);
+        hb3.setSpacing(40);
+        hb3.setId("bottomStyle");       //Css - Style: podesavanje izgleda
+        
+        //Kreiranje BorderPane-a za rasporedjivanje HBoc panela na sceni
+        BorderPane root = new BorderPane();
+        root.setTop(hb1);
+        root.setCenter(hb2);
+        root.setBottom(hb3);
+        
+        
+        //taster btn1 sa funkcijom (prelazak na Pretragu)
+        btn1.setOnAction(e ->{
+            primaryStage.close();
+            try {
+                new Pretraga().start(primaryStage);
+            } catch (SQLException ex) {
+                Logger.getLogger(UndpOfflineStore.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
         
-        //Prodaja komponenata
-        btn2.setOnAction(e->{
-            Platform.runLater(()->{
-                JOptionPane.showMessageDialog(null, "Jos uvek nije implementirano!");
-            });
+        
+        //Taster btn2 sa akcijom (prelazak na nabavku)
+        btn2.setOnAction(e ->{
+            try {
+                primaryStage.close();
+                new Nabavka().start(primaryStage);
+            } catch (SQLException ex) {
+                Logger.getLogger(UndpOfflineStore.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
         
-        //Kreiranje izvestaja
-        btn3.setOnAction(e->{
-            Platform.runLater(()->{
-                JOptionPane.showMessageDialog(null, "Jos uvek nije implementirano!");
-            });
+        
+        //Taster btn3 sa akcijom (prelazak na stage Prodaja)
+        btn3.setOnAction(e ->{
+            try {
+                primaryStage.close();
+                new Prodaja().start(primaryStage);
+            } catch (SQLException ex) {
+                Logger.getLogger(UndpOfflineStore.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
         });
         
-        //Azuriranje komponenata
-        btn4.setOnAction(e->{
-            Platform.runLater(()->{
-                JOptionPane.showMessageDialog(null, "Jos uvek nije implementirano!");
-            });
+        
+        //taster btn4 sa akcijom (prelak na stage Izvestaji)
+        btn4.setOnAction(e ->{
+            primaryStage.close();
+            new Izvestaji().start(primaryStage);
+            
         });
-                
         
-        GridPane root = new GridPane();
-        root.add(btn1, 0, 0);
-        root.add(btn2, 1, 0);
-        root.add(btn3, 2, 0);
-        root.add(btn4, 3, 0);
-        root.setPadding(new Insets(50,50,50,50));
-        root.setHgap(50);
         
-        Scene scene = new Scene(root, 600, 500);
+        //taster btn4 sa akcijom (prelak na stage Azuriranje)
+        btn5.setOnAction(e ->{
+            try {
+                primaryStage.close();
+                new Azuriranje().start(primaryStage);
+            } catch (SQLException ex) {
+                Logger.getLogger(UndpOfflineStore.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        });
         
+        
+        //Kreiranje scene,velicine,naziva i povezivanje sa css-om
+        Scene scene = new Scene(root, 1000, 650);
+        primaryStage.setResizable(false);
         primaryStage.setTitle("UNDP Offline Store");
+        scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
     }

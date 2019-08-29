@@ -1,0 +1,303 @@
+#headerBackground{
+    -fx-background-image: url("../resources/logo.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center;
+    -fx-background-size: 200px 150px;
+    -fx-background-color: #0068d8;
+
+    
+}
+
+#headerLabel{
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+}
+
+#centerPicture{
+    -fx-background-image: url("../resources/komputers.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center;
+    -fx-background-size: 700px 300px;
+    -fx-background-color: #FFFFFF;
+}
+
+#bottomStyle{
+    -fx-background-color: #FFFFFF;
+}
+
+#buttonStyle{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-min-width: 120px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 10, 0.0, 0, 8 );
+    -fx-border: 2px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.5em;
+    -fx-background-radius: 0.5em;
+    -fx-margin-bottom: 50px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    -fx-border-i: 10, 10, 10, 10;
+    
+}
+
+#buttonStyle:hover{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,1.4) , 10, 0.0 , 0 , 10 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
+}
+
+#buttonStyle:hover:pressed{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
+}
+
+#labelIndex{
+    -fx-text-fill: #0068d8;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+}
+
+#spinner{
+    -fx-effect: innershadow(gaussian, #039ed3, 2, 1.0, 0, 0);
+    -fx-border-color: black;
+}
+#serchLabel{
+    -fx-text-fill: #0068d8;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-text-align: right;
+    -fx-background-color: #FFFFFF;
+    
+}
+
+#rezultatLabel{
+    -fx-text-fill: #0068d8;
+    -fx-font-weight: bold;
+    -fx-text-align: right;
+    -fx-background-color: #FFFFFF;
+    -fx-vertical-align: top;
+    
+    
+}
+
+#buttonNabavka{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 2px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.5em;
+    -fx-background-radius: 0.5em;
+    -fx-margin-bottom: 50px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+}
+
+#buttonStyleNabavka{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 2px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.5em;
+    -fx-background-radius: 0.5em;
+    -fx-margin-bottom: 50px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
+}
+
+#buttonNabavka:hover{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 60px;
+    -fx-pref-width: 110px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
+}
+
+#buttonNabavka:hover:pressed{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+    
+}
+
+#nabavkaBTMBack{
+    -fx-background-image: url("../resources/nabavka.jpg");
+    -fx-background-position: left;
+    -fx-background-size: 100px 60px;
+    -fx-background-repeat: no-repeat;
+    -fx-background-color: #ffffff;
+}
+
+
+#nabavkaLabel{
+    -fx-text-fill: #0068d8;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-text-align: right;
+   
+}
+
+#pretragaButton{
+   -fx-background-color:linear-gradient(to bottom, #2f6ac4, #2291d9, #4cb6e7, #84d9f1, #bffaff);
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+#pretragaButton:hover{
+   -fx-background-color:linear-gradient(to top, #2f6ac4, #2291d9, #4cb6e7, #84d9f1, #bffaff);
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+#pretragaButton:hover:pressed{
+   -fx-background-color: linear-gradient(to bottom, #352fc4, #0067e6, #0090ef, #00b3e8, #36d2e0);
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 3px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.6em;
+    -fx-background-radius: 0.6em;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+
+#nabavkaLabel{
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    
+}
+
+#dodavanjeDugme{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 25px;
+    -fx-pref-width: 150px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 2px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.5em;
+    -fx-background-radius: 0.5em;
+    -fx-margin-bottom: 50px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+}
+
+#dodavanjeDugme:hover{
+    -fx-background-color: #0068d8;
+    -fx-pref-height:22px;
+    -fx-pref-width: 148px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 2px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.5em;
+    -fx-background-radius: 0.5em;
+    -fx-margin-bottom: 50px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+}
+
+#dodavanjeDugme:hover:pressed{
+    -fx-background-color: #0068d8;
+    -fx-pref-height: 25px;
+    -fx-pref-width: 150px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+    -fx-border: 2px;
+    -fx-border-color: #00ffdd;
+    -fx-border-radius: 0.5em;
+    -fx-background-radius: 0.5em;
+    -fx-margin-bottom: 50px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+}
+
+.dialogPane{
+    -fx-background-image: url("../resources/logo.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position:center;
+    -fx-background-size: 200px 150px;
+    -fx-background-color: #0068d8;
+   
+ }
+ .dialogPane.label{
+     -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+ }
+
+.dialogPane.label{
+     -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+ }
+
+ #my-table .table-column {
+  -fx-alignment: CENTER-RIGHT;
+}
+
+
