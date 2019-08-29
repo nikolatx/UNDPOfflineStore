@@ -30,8 +30,6 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyDoubleWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -39,14 +37,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Modality;
-import javafx.stage.StageStyle;
+import pomocne.PomocneDB;
 import util.DocxExport;
 
 public class Prodaja extends Application {
@@ -196,9 +190,9 @@ public class Prodaja extends Application {
         desniVB.getChildren().addAll(kupacCB, kupacDugme, aktuelneCB);
 
         //popunjavanje combobox-eva podacima
-        ispuniComboBoxZaTip();
-        ispuniComboBoxZaProizvodjaca();
-        ispuniComboBoxZaKupca();
+        PomocneDB.ispuniComboBoxZaTip(opcijeTip, false);
+        PomocneDB.ispuniComboBoxZaProizvodjaca(opcijeProizvodjac, false);
+        PomocneDB.ispuniComboBoxZaDobavljaca(opcijeKupac);
 
         //pretrazivanje na osnovu zadatih kriterijuma
         pretragaDugme.setOnAction(e -> {
@@ -224,67 +218,21 @@ public class Prodaja extends Application {
                         return;
                     }
                     //kreiranje kolona tabele ukoliko vec nisu kreirane
-                    if (tabelaOdabrano.getColumns().size() == 0) {
+                    if (tabelaOdabrano.getColumns().isEmpty()) {
                         kreirajTabelu(tabelaOdabrano);
                     }
 
                     //ukoliko komponenta ne postoji u tabeli sa odabranim komponentama - dodavanje
                     if (!podaciOdabrano.contains(komponenta)) {
 
-                        Button dugmePotvrdi = new Button("Potvrdi");
-                        Button dugmeOdustani = new Button("Odustani");
-                        dugmePotvrdi.setId("buttonStyle");
-                        dugmeOdustani.setId("buttonStyle");
-                        //boxovi za smestaj kontrola na sceni
-                        VBox rootBox = new VBox();
-                        HBox gornjiHBox = new HBox();
-                        HBox donjiHBox = new HBox();
-
-                        Label labela1 = new Label("Unesi željenu kolicinu:");
-                        labela1.setFont(Font.font("Verdana", FontWeight.BOLD, 17));
-                        //spinner-om se vrsi odabir kolicine komponente koja se dodaje
-                        Spinner spinner = new Spinner();
-                        spinner.setId("buttonStyleNabavka");
-
-                        //ocitaj raspolozivu kolicinu komponente
-                        komponenta.setKolicina(DBUtil.preuzmiAktuelnoStanje(komponenta.getId()));
-
-                        //podesavanje granicnih vrednosti spinnera i podesene vrednosti
-                        spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, komponenta.getKolicina(), 1));
-
-                        //dodavanje u gornji red labele i spinnera
-                        gornjiHBox.getChildren().addAll(labela1, spinner);
-                        gornjiHBox.setAlignment(Pos.CENTER);
-                        //dodavanje u donji red dugmica
-                        donjiHBox.getChildren().addAll(dugmePotvrdi, dugmeOdustani);
-                        donjiHBox.setAlignment(Pos.CENTER);
-                        //ubacivanje komponenti u glavni VBox a zatim i u novu scenu
-                        rootBox.getChildren().addAll(gornjiHBox, donjiHBox);
-                        Scene scena = new Scene(rootBox, 350, 130);
-                        scena.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
-                        //podesavanje novog prozora
-                        Stage noviProzor = new Stage();
-                        noviProzor.setTitle("Odabir količine");
-                        noviProzor.setScene(scena);
-                        noviProzor.initModality(Modality.WINDOW_MODAL);
-                        noviProzor.initStyle(StageStyle.UNDECORATED);
-                        noviProzor.initOwner(primaryStage);
-                        //aktiviranje i prikaz novog prozora
-                        noviProzor.show();
-
-                        //dugme potvrdi - promena kolicine komponente i ubacivanje u listu odabranih
-                        dugmePotvrdi.setOnAction(e -> {
-                            int kolicina = (Integer) spinner.getValue();
-                            if (kolicina > 0) {
-                                komponenta.setKolicina(kolicina);
-                                podaciOdabrano.add(komponenta);
-                                tabelaOdabrano.setItems(podaciOdabrano);
-                            }
-                            noviProzor.close();
-                        });
-
-                        //zatvranje novog prozora ukoliko je odabrano dugme odustani
-                        dugmeOdustani.setOnAction(e -> noviProzor.close());
+                        //zadavanje kolicine
+                        int kolicina=SpinnerDialog.display("Kolicina", "Odaberi kolicinu", komponenta.getKolicina(), 1);
+                        if (kolicina>0) {
+                            komponenta.setKolicina(kolicina);
+                            podaciOdabrano.add(komponenta);
+                            tabelaOdabrano.setItems(podaciOdabrano);
+                        }
+                        
                     }
                 }
             }
@@ -307,54 +255,15 @@ public class Prodaja extends Application {
                         //preuzimanje aktuelne kolicine odabrane komponente
                         int maksKolicina = DBUtil.preuzmiAktuelnoStanje(komponenta.getId());
                         if (maksKolicina > 0) {
-                            //otvaranje novog prozora za izmenu kolicine odabrane komponente
-                            Button dugmePotvrdi = new Button("Potvrdi");
-                            Button dugmeOdustani = new Button("Odustani");
-                            //boxovi za smestaj kontrola na sceni
-                            VBox rootBox = new VBox();
-                            HBox gornjiHBox = new HBox();
-                            HBox donjiHBox = new HBox();
-
-                            Label labela1 = new Label("Unesi željenu količinu:");
-                            //spinner-om se vrsi odabir kolicine komponente
-                            Spinner spinner = new Spinner();
-                            //podesavanje granicnih vrednosti spinnera i podesene vrednosti
-                            spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, maksKolicina, komponenta.getKolicina()));
-
-                            //dodavanje u gornji red labele i spinnera
-                            gornjiHBox.getChildren().addAll(labela1, spinner);
-                            //dodavanje u donji red dugmica
-                            donjiHBox.getChildren().addAll(dugmePotvrdi, dugmeOdustani);
-                            //ubacivanje komponenti u glavni VBox a zatim i u novu scenu
-                            rootBox.getChildren().addAll(gornjiHBox, donjiHBox);
-                            Scene scena = new Scene(rootBox, 350, 150);
-
-                            //podesavanje novog prozora
-                            Stage noviProzor = new Stage();
-                            noviProzor.setTitle("Korekcija količine");
-                            noviProzor.setScene(scena);
-                            noviProzor.initModality(Modality.WINDOW_MODAL);
-                            noviProzor.initOwner(primaryStage);
-                            //aktiviranje i prikaz novog prozora
-                            noviProzor.show();
-
-                            //dugme potvrdi - promena kolicine komponente i ubacivanje u listu odabranih
-                            dugmePotvrdi.setOnAction(e -> {
-                                int kolicina = (Integer) spinner.getValue();
-                                if (kolicina > 0) {
-                                    int indeks = podaciOdabrano.indexOf(komponenta);
-                                    komponenta.setKolicina(kolicina);
-                                    podaciOdabrano.set(indeks, komponenta);
-                                } else {
-                                    podaciOdabrano.remove(komponenta);
-                                }
-                                noviProzor.close();
-                            });
-
-                            //zatvranje novog prozora ukoliko je odabrano dugme odustani
-                            dugmeOdustani.setOnAction(e -> noviProzor.close());
-                        } else {
-                            podaciOdabrano.remove(komponenta);
+                            int kolicina=SpinnerDialog.display("Kolicina", "Odaberi kolicinu", maksKolicina, komponenta.getKolicina());
+                            if (kolicina>0) {
+                                //korekcija kolicine u listi
+                                int indeks=podaciOdabrano.indexOf(komponenta);
+                                komponenta.setKolicina(kolicina);
+                                podaciOdabrano.set(indeks,komponenta);
+                            } else if (kolicina==0) {
+                                podaciOdabrano.remove(komponenta);
+                            }
                         }
                     }
                 }
@@ -416,6 +325,14 @@ public class Prodaja extends Application {
 
         });
 
+        //dodavanje novog kupca
+        kupacDugme.setOnAction(e ->{
+            //dodaj novog dobavljaca
+            Osoba kupac=new Osoba();
+            NoviKupac.pokreni(kupac, kupacCB);
+        });
+        
+        //povratak na pocetnu formu
         nazadDugme.setOnAction(e -> {
             primaryStage.close();
             new UndpOfflineStore().start(primaryStage);
@@ -533,72 +450,7 @@ public class Prodaja extends Application {
         return uspesno;
     }
 
-    //ucitavanje vrednosti u ComboBox tipa
-    public void ispuniComboBoxZaTip() {
-        ResultSet rs = null;
-        conn = DBUtil.napraviKonekciju();
-        if (conn != null) {
-            try {
-                rs = DBUtil.prikupiPodatke(conn, "SELECT naziv FROM tip");
-                while (rs.next()) {
-                    opcijeTip.add(rs.getString("naziv"));
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(Prodaja.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    conn.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(Prodaja.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
-    //ucitavanje vrednosti u ComboBox proizvodjaca
-    public void ispuniComboBoxZaProizvodjaca() {
-        ResultSet rs = null;
-        conn = DBUtil.napraviKonekciju();
-        if (conn != null) {
-            try {
-                rs = DBUtil.prikupiPodatke(conn, "SELECT naziv FROM proizvodjac");
-                while (rs.next()) {
-                    opcijeProizvodjac.add(rs.getString("naziv"));
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(Prodaja.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    conn.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(Prodaja.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
-    //ucitavanje vrednosti u ComboBox kupca
-    public void ispuniComboBoxZaKupca() {
-        ResultSet rs = null;
-        conn = DBUtil.napraviKonekciju();
-        if (conn != null) {
-            try {
-                rs = DBUtil.prikupiPodatke(conn, "SELECT naziv FROM kupac");
-                while (rs.next()) {
-                    opcijeKupac.add(rs.getString("naziv"));
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(Prodaja.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    conn.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(Prodaja.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
+   
     private void preuzmiPodatke() throws SQLException {
         if (conn != null) {
             //uzimanje podataka iz combobox-eva i polja za unos teksta

@@ -290,3 +290,14 @@
     -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
  }
 
+.dialogPane.label{
+     -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );
+ }
+
+ #my-table .table-column {
+  -fx-alignment: CENTER-RIGHT;
+}
+
+

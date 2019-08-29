@@ -1,13 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package undp;
 
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,7 +11,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -63,8 +58,8 @@ public class Izvestaji extends Application {
         leftBox.setMinSize(510, 430);
         leftBox.setAlignment(Pos.CENTER);
         leftBox.setId("bottomStyle");
-        prodajaButton.setId("buttonStyle");
-        nabavkaButton.setId("buttonStyle");
+        prodajaButton.setId("buttonStyleNabavka");
+        nabavkaButton.setId("buttonStyleNabavka");
         prodajaButton.setMinSize(150, 70);
         nabavkaButton.setMinSize(150,70); 
         leftBox.setSpacing(50);
@@ -72,7 +67,7 @@ public class Izvestaji extends Application {
         //podesavanje izgleda i velicine footerHBox-a i dodavanje nodova
         footerHBox.setMinSize(1000, 100);
         footerHBox.setId("bottomStyle");
-        nazadButton.setId("buttonStyle");
+        nazadButton.setId("buttonStyleNabavka");
         nazadButton.setMinSize(100, 25);
         footerHBox.setAlignment(Pos.BASELINE_RIGHT);
         HBox.setMargin(nazadButton, new Insets(50, 20, 0, 0));
@@ -98,14 +93,22 @@ public class Izvestaji extends Application {
         
          //funkcija tastera za prelazak na izvestaje prodaje
         prodajaButton.setOnAction(e ->{
-            primaryStage.close();
-            new IzvestajProdaje().start(primaryStage);
+            try {
+                primaryStage.close();
+                new IzvestajProdaje().start(primaryStage);
+            } catch (SQLException ex) {
+                Logger.getLogger(Izvestaji.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
         
         //funkcija tastera za prelazak na izvestaje nabavke
         nabavkaButton.setOnAction(e ->{
-            primaryStage.close();
-            new IzvestajNabavke().start(primaryStage);
+            try {
+                primaryStage.close();
+                new IzvestajNabavke().start(primaryStage);
+            } catch (SQLException ex) {
+                Logger.getLogger(Izvestaji.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
         
         //Funkcija tastera za povratak na pocetak alikacije
@@ -123,9 +126,7 @@ public class Izvestaji extends Application {
         primaryStage.show();
     }
 
-    /**
-     * @param args the command line arguments
-     */
+   
     public static void main(String[] args) {
         launch(args);
     }

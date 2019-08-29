@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -47,6 +48,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
+import pomocne.PomocneDB;
+import static undp.NovaKomponenta.tipCB;
 import util.DocxExport;
 
 public class Nabavka extends Application {
@@ -212,9 +215,9 @@ public class Nabavka extends Application {
         desniVB.getChildren().addAll(dobavljacCB, dobavljacDugme, aktuelneCB);
         
         //popunjavanje combobox-eva podacima
-        ispuniComboBoxZaTip();
-        ispuniComboBoxZaProizvodjaca();
-        ispuniComboBoxZaDobavljaca();
+        PomocneDB.ispuniComboBoxZaTip(opcijeTip, false);
+        PomocneDB.ispuniComboBoxZaProizvodjaca(opcijeProizvodjac, false);
+        PomocneDB.ispuniComboBoxZaDobavljaca(opcijeDobavljac);
         
         //pretrazivanje na osnovu zadatih kriterijuma
         pretragaDugme.setOnAction(e -> {
@@ -238,7 +241,7 @@ public class Nabavka extends Application {
                     Komponenta komponenta = (Komponenta) tabelaFiltrirano.getSelectionModel().getSelectedItem();
                     if (komponenta==null) return;
                     //kreiranje kolona tabele ukoliko vec nisu kreirane
-                    if (tabelaOdabrano.getColumns().size()==0)
+                    if (tabelaOdabrano.getColumns().isEmpty())
                         kreirajTabelu(tabelaOdabrano);
                     
                     //ukoliko komponenta ne postoji u tabeli sa odabranim komponentama - dodavanje
@@ -273,8 +276,7 @@ public class Nabavka extends Application {
                             int indeks=podaciOdabrano.indexOf(komponenta);
                             komponenta.setKolicina(kolicina);
                             podaciOdabrano.set(indeks,komponenta);
-                        }
-                        else 
+                        } else if (kolicina==0)
                             podaciOdabrano.remove(komponenta);
                     }
                 }
@@ -342,191 +344,18 @@ public class Nabavka extends Application {
             
         });
         
-        
-        
         //dugme za kreiranje nove komponente
         dodavanjeDugme.setOnAction(e ->{
+            //dodaj novu komponentu
             KomponentaSvaPolja komponenta=new KomponentaSvaPolja();
-            boolean dodata=NovaKomponenta.display(komponenta);
-            /*
-            if (dodata) {
-                komponenta.setNaziv(NovaKomponenta.novaKomponentaNaziv.getText());
-                komponenta.setProizvodjac(NovaKomponenta.novaKomponentaProizvodjac.getText());
-                //String naziv=(String) dobavljacCB.getSelectionModel().getSelectedItem();
-                komponenta.setTip(NovaKomponenta.novaKomponentaTip.getText());
-                komponenta.setKolicina(Integer.valueOf(NovaKomponenta.novaKomponentaKolicina.getText()));
-                komponenta.setCena(Double.valueOf(NovaKomponenta.novaKomponentaCena.getText()));
-                komponenta.setSlika(NovaKomponenta.novaKomponentaSlika.getText());
-                komponenta.setAktuelna(NovaKomponenta.novaKomponentaAktuletno.getText().equals("true"));
-
-                PreparedStatement stmt0=null, stmt1=null, stmt2=null, stmt3=null;
-                
-                int proizvodjacId=0, tipId=0, upisano=0;
-                try {
-                    
-                    stmt0=conn.prepareStatement("SELECT proizvodjac_id FROM proizvodjac WHERE naziv='?'");
-                    stmt0.setString(1, komponenta.getProizvodjac());
-                    ResultSet rs=stmt0.executeQuery();
-                    if (rs.next()) {
-                        proizvodjacId=rs.getInt(1);
-                    }
-                    stmt1=conn.prepareStatement("SELECT tip_id FROM tip WHERE naziv='?'");
-                    stmt1.setString(1, komponenta.getTip());
-                    ResultSet rs1=stmt1.executeQuery();
-                    if (rs1.next()) {
-                        tipId=rs1.getInt(1);
-                    }
-                    
-                    
-                    stmt2=conn.prepareStatement("INSERT INTO komponenta (naziv, proizvodjac_id, tip_id, kolicina, cena, slika, aktuelna) "
-                            + "VALUES (?,?,?,?,?,?,?)");
-                    
-                    stmt2.setString(1, NovaKomponenta.novaKomponentaNaziv.getText());
-                    stmt2.setInt(2, proizvodjacId);
-                    stmt2.setInt(3, tipId);
-                    stmt2.setInt(4, komponenta.getKolicina());
-                    stmt2.setDouble(4, komponenta.getCena());
-                    stmt2.setString(5, komponenta.getSlika());
-                    stmt2.setBoolean(6, komponenta.getAktuelna());
-                    upisano=stmt2.executeUpdate();
-                
-                } catch (SQLException ex) {
-                    Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                Alert alert1 = new Alert(AlertType.INFORMATION);
-                alert1.setTitle("Obavestenje");
-                alert1.setHeaderText(null);
-                if (upisano>0) 
-                    alert1.setContentText("Komponenta uspešno uneta u bazu podataka!");
-                else
-                    alert1.setContentText("Došlo je do greške pri unosu podataka!");
-                Platform.runLater( () -> {
-                    alert1.showAndWait();
-                });
-            }
-            */
-            /*
-            HBox headerDodajBox = new HBox();
-            headerDodajBox.setId("headerBackground");
-            headerDodajBox.setAlignment(Pos.CENTER);
-            novaKomponentaLabel.setFont(font);
-            novaKomponentaLabel.setId("headerLabel");
-            headerDodajBox.getChildren().add(novaKomponentaLabel);
-            headerDodajBox.setMinSize(500, 80);
-            HBox centerDodajBox = new HBox();
-            centerDodajBox.setId("bottomStyle");
-            centerDodajBox.setAlignment(Pos.CENTER);
-            GridPane grid = new GridPane();
-            grid.setAlignment(Pos.TOP_CENTER);
-            grid.setVgap(20);
-            grid.setHgap(20);
-            //Podesavanje velicine,izgleda i dodavanje nodova na scenu za Nova Komponenta
-            novaKomponentaPotvrda.setId("buttonStyle");
-            novaKomponentaNazad.setId("buttonStyle");
-            novaKomponentaPotvrda.setMinSize(100, 25);
-            novaKomponentaNazad.setMinSize(100, 25);
-            HBox.setMargin(grid, new Insets(40, 0, 0, 0));
-            novaKomponentaNaziv.setPromptText("Naziv");
-            novaKomponentaProizvodjac.setPromptText("Novi proizvodjač");
-            novaKomponentaTip.setPromptText("Tip");
-            novaKomponentaKolicina.setPromptText("Količina");
-            novaKomponentaCena.setPromptText("Cena");
-            novaKomponentaSlika.setPromptText("Slika");
-            grid.add(novaKomponentaNaziv, 0, 0);
-            grid.add(novaKomponentaProizvodjac, 0, 1);
-            grid.add(novaKomponentaTip, 0, 2);
-            grid.add(novaKomponentaKolicina, 1, 0);
-            grid.add(novaKomponentaCena, 1, 1);
-            grid.add(novaKomponentaSlika, 1, 2);
-            grid.add(novaKomponentaAktuelnoLabel, 0, 3);
-            grid.add(novaKomponentaAktuletno, 1, 3);
-            grid.add(novaKomponentaPotvrda, 2, 2);
-            grid.add(novaKomponentaNazad, 2, 3);
-            centerDodajBox.getChildren().addAll(grid);
-            HBox footerDodajBox = new HBox();
-            BorderPane dodajBox = new BorderPane();
-            dodajBox.setTop(headerDodajBox);
-            dodajBox.setCenter(centerDodajBox);
-            dodajBox.setBottom(footerDodajBox);
-           
-            //Kreiranje scene za novu komponentu
-            Scene scena = new Scene(dodajBox, 500, 350); 
-            Stage noviProzor=new Stage();
-            noviProzor.setResizable(false);
-            noviProzor.setTitle("Dodavanje Komponente");
-            scena.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
-            noviProzor.setScene(scena);
-            noviProzor.initModality(Modality.WINDOW_MODAL);
-            noviProzor.initOwner(primaryStage);
-            //aktiviranje i prikaz novog prozora
-            noviProzor.show();
-            
-            //povratak na nabavku sa forme za unosenje nove komponente
-            novaKomponentaNazad.setOnAction(ev ->{
-                noviProzor.close();
-            });
-            */
+            NovaKomponenta.pokreni(komponenta);
         });
-        
-        
         
         //Taster za Scenu dodavanja novog dobavljaca
         dobavljacDugme.setOnAction(e ->{
-            HBox headerDodajBox = new HBox();
-            headerDodajBox.setId("headerBackground");
-            headerDodajBox.setAlignment(Pos.CENTER);
-            noviDobavljacNaslov.setFont(font);
-            noviDobavljacNaslov.setId("headerLabel");
-            headerDodajBox.getChildren().add(noviDobavljacNaslov);
-            headerDodajBox.setMinSize(500, 80);
-            HBox centerDodajBox = new HBox();
-            centerDodajBox.setId("bottomStyle");
-            centerDodajBox.setAlignment(Pos.CENTER);
-            GridPane grid = new GridPane();
-            grid.setAlignment(Pos.TOP_CENTER);
-            grid.setVgap(20);
-            grid.setHgap(20);
-            //Podesavanje velicine,izgleda i dodavanje nodova na scenu za Nova Komponenta
-            noviDobavljacPotvrda.setId("buttonStyle");
-            noviDobavljacNazad.setId("buttonStyle");
-            noviDobavljacPotvrda.setMinSize(100, 25);
-            noviDobavljacNazad.setMinSize(100, 25);
-            HBox.setMargin(grid, new Insets(40, 0, 0, 0));
-            noviDobavljacNaziv.setPromptText("Naziv");
-            noviDobavljacUlica.setPromptText("Ulica");
-            noviDobavljacBroj.setPromptText("Broj");
-            noviDobavljacGrad.setPromptText("Grad");
-            noviDobavljacPostBroj.setPromptText("Poštanski Broj");
-            noviDobavljacDrzava.setPromptText("Država");
-            noviDobavljacTelefon.setPromptText("Telefon");
-            grid.add(noviDobavljacNaziv, 0, 0);
-            grid.add(noviDobavljacUlica, 0, 1);
-            grid.add(noviDobavljacBroj, 0, 2);
-            grid.add(noviDobavljacGrad, 1, 0);
-            grid.add(noviDobavljacPostBroj, 1, 1);
-            grid.add(noviDobavljacDrzava, 1, 2);
-            grid.add(noviDobavljacTelefon, 0, 3);
-            grid.add(noviDobavljacPotvrda, 1, 3);
-            grid.add(noviDobavljacNazad, 2, 3);
-            centerDodajBox.getChildren().addAll(grid);
-            HBox footerDodajBox = new HBox();
-            BorderPane dodajBox = new BorderPane();
-            dodajBox.setTop(headerDodajBox);
-            dodajBox.setCenter(centerDodajBox);
-            dodajBox.setBottom(footerDodajBox);
-            
-           
-            //Kreiranje scene za novog dobavljaca
-            Scene scena = new Scene(dodajBox, 500, 350); 
-            Stage noviProzor=new Stage();
-            noviProzor.setResizable(false);
-            noviProzor.setTitle("Dodavanje Komponente");
-            scena.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
-            noviProzor.setScene(scena);
-            noviProzor.initModality(Modality.WINDOW_MODAL);
-            noviProzor.initOwner(primaryStage);
-            //aktiviranje i prikaz novog prozora
-            noviProzor.show();
+            //dodaj novog dobavljaca
+            Osoba dobavljac=new Osoba();
+            NoviDobavljac.pokreni(dobavljac, dobavljacCB);
         });
         
         //Taster prozora novi dobavljac NAZAD
@@ -539,16 +368,11 @@ public class Nabavka extends Application {
             }
         });
         
-        
-        
-        
         //Taster prozora Nabavke za nazad
         nazadDugme.setOnAction(e ->{
             primaryStage.close();
             new UndpOfflineStore().start(primaryStage);
         });
-        
-        
         
 
         //Kreiranje BorderPane-a za raspored HBox i VBox panela
@@ -567,14 +391,7 @@ public class Nabavka extends Application {
         primaryStage.show();
     }
     
-    
-    
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-    
-    
+    //izbacivanje poruke o gresci
     private void poruka(String msg) {
         Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle("Greška");
@@ -675,77 +492,7 @@ public class Nabavka extends Application {
         }
         return uspesno;
     }
-
-
-
     
-    //ucitavanje vrednosti u ComboBox tipa
-    public void ispuniComboBoxZaTip() {
-        ResultSet rs=null;
-        conn=DBUtil.napraviKonekciju();
-        if (conn!=null) {
-            try {
-                rs=DBUtil.prikupiPodatke(conn, "SELECT naziv FROM tip");
-                while (rs.next()) {
-                    opcijeTip.add(rs.getString("naziv"));
-                }
-                //opcijeTip.addAll(DBUtil.prikupiPodatke(conn, "SELECT naziv FROM tip"));
-            } catch (SQLException ex) {
-                Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    conn.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-    
-    //ucitavanje vrednosti u ComboBox proizvodjaca
-    public void ispuniComboBoxZaProizvodjaca() {
-        ResultSet rs=null;
-        conn=DBUtil.napraviKonekciju();
-        if (conn!=null) {
-            try {
-                rs=DBUtil.prikupiPodatke(conn, "SELECT naziv FROM proizvodjac");
-                while (rs.next()) {
-                    opcijeProizvodjac.add(rs.getString("naziv"));
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    conn.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-    
-    
-    //ucitavanje vrednosti u ComboBox dobavljaca
-    public void ispuniComboBoxZaDobavljaca() {
-        ResultSet rs=null;
-        conn=DBUtil.napraviKonekciju();
-        if (conn!=null) {
-            try {
-                rs=DBUtil.prikupiPodatke(conn, "SELECT naziv FROM dobavljac");
-                while (rs.next()) {
-                    opcijeDobavljac.add(rs.getString("naziv"));
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    conn.close();
-                } catch (SQLException ex) {
-                    Logger.getLogger(Nabavka.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
     
     private void preuzmiPodatke() throws SQLException {
         if (conn!=null) {

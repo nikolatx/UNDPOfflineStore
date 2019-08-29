@@ -10,7 +10,7 @@ public class KomponentaSvaPolja extends KomponentaSaSlikom {
 
     public KomponentaSvaPolja() {
         super();
-        this.aktuelnaProperty=new SimpleBooleanProperty();
+        this.aktuelnaProperty=new SimpleBooleanProperty(true);
     }
 
     public KomponentaSvaPolja(int idProperty, String nazivProperty, String proizvodjacProperty, String tipProperty, int kolicinaProperty, double cenaProperty, String slikaProperty, boolean aktuelna) {
