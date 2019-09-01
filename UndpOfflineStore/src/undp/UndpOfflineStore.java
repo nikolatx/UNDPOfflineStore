@@ -1,8 +1,5 @@
 package undp;
 
-import com.grupa1.dbconnection.DBUtil;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -138,7 +135,7 @@ public class UndpOfflineStore extends Application {
         Scene scene = new Scene(root, 1000, 650);
         primaryStage.setResizable(false);
         primaryStage.setTitle("UNDP Offline Store");
-        scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
+        scene.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
     }

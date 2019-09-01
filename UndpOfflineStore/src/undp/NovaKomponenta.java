@@ -30,29 +30,29 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import pomocne.PomocneDB;
+import com.grupa1.dbconnection.PomocneDAO;
 
 public class NovaKomponenta {
     
     static Font font = new Font(25);
     //Kreiranje TextFiedla za novu komponentu i novog dobavljaca
-    static TextField novaKomponentaNaziv = new TextField();
+    TextField novaKomponentaNaziv = new TextField();
     //Liste za pracenje combobox-a
-    static ObservableList opcijeTip = FXCollections.observableArrayList();
-    static ObservableList opcijeProizvodjac = FXCollections.observableArrayList();
-    static ComboBox tipCB = new ComboBox(opcijeTip);
-    static ComboBox proizvodjacCB = new ComboBox(opcijeProizvodjac);
+    ObservableList opcijeTip = FXCollections.observableArrayList();
+    ObservableList opcijeProizvodjac = FXCollections.observableArrayList();
+    ComboBox tipCB = new ComboBox(opcijeTip);
+    ComboBox proizvodjacCB = new ComboBox(opcijeProizvodjac);
 
 
-    static TextField novaKomponentaKolicina = new TextField();
-    static TextField novaKomponentaCena = new TextField();
-    static TextField novaKomponentaSlika= new TextField();
-    static RadioButton novaKomponentaAktuelno = new RadioButton();
-    static Label novaKomponentaLabel = new Label("Dodavanje komponente");
-    static Button novaKomponentaPotvrda = new Button("Potvrdi");
-    static Button novaKomponentaNazad = new Button("Nazad");
+    TextField novaKomponentaKolicina = new TextField();
+    TextField novaKomponentaCena = new TextField();
+    TextField novaKomponentaSlika= new TextField();
+    RadioButton novaKomponentaAktuelno = new RadioButton();
+    Label novaKomponentaLabel = new Label("Dodavanje komponente");
+    Button novaKomponentaPotvrda = new Button("Potvrdi");
+    Button novaKomponentaNazad = new Button("Nazad");
     
-    public static void pokreni(KomponentaSvaPolja komponenta) {
+    public void pokreni(KomponentaSvaPolja komponenta) {
         HBox headerDodajBox = new HBox();
         headerDodajBox.setId("headerBackground");
         headerDodajBox.setAlignment(Pos.CENTER);
@@ -78,10 +78,10 @@ public class NovaKomponenta {
         novaKomponentaNaziv.setPromptText("Naziv");
         tipCB.setMinSize(150, 25);
         tipCB.setPromptText("Tip");
-        PomocneDB.ispuniComboBoxZaTip(opcijeTip, true);
+        PomocneDAO.ispuniComboBoxZaTip(opcijeTip, true);
         proizvodjacCB.setMinSize(150, 25);
         proizvodjacCB.setPromptText("Proizvođač");
-        PomocneDB.ispuniComboBoxZaProizvodjaca(opcijeProizvodjac, true);
+        PomocneDAO.ispuniComboBoxZaProizvodjaca(opcijeProizvodjac, true);
         novaKomponentaKolicina.setPromptText("Količina");
         novaKomponentaCena.setPromptText("Cena");
         novaKomponentaSlika.setPromptText("Naziv fajla slike");
@@ -103,11 +103,11 @@ public class NovaKomponenta {
         podesiFormatUnosa();
         
         //Kreiranje scene za novu komponentu
-        Scene scena = new Scene(dodajBox, 500, 350); 
+        Scene scena = new Scene(dodajBox, 500, 350);
+        scena.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         Stage noviProzor=new Stage();
         noviProzor.setResizable(false);
         noviProzor.setTitle("Dodavanje Komponente");
-        scena.getStylesheets().add("styles.css");
         noviProzor.setScene(scena);
         noviProzor.initModality(Modality.APPLICATION_MODAL);
         //aktiviranje i prikaz novog prozora
@@ -122,51 +122,51 @@ public class NovaKomponenta {
                         tipCB.getSelectionModel().getSelectedIndex()<0) 
                     throw new Exception();
                     
-                    //kreiranje nove komponente
-                    komponenta.setNaziv(novaKomponentaNaziv.getText());
-                    komponenta.setTip((String)tipCB.getSelectionModel().getSelectedItem());
-                    komponenta.setProizvodjac((String)proizvodjacCB.getSelectionModel().getSelectedItem());
-                    komponenta.setKolicina(Integer.valueOf(novaKomponentaKolicina.getText()));
-                    komponenta.setCena(Double.valueOf(novaKomponentaCena.getText()));
-                    komponenta.setSlika(novaKomponentaSlika.getText());
-                    komponenta.setAktuelna(novaKomponentaAktuelno.isSelected());
-                    
-                    //ocitavanje proizvodjacID polja iz baze
-                    List<Integer> tempList=new ArrayList<>();
-                    String upit1="SELECT proizvodjac_id FROM proizvodjac WHERE naziv=?";
-                    tempList=DBUtil.prikupiPodatkeParam(upit1, komponenta.getProizvodjac(), "proizvodjac_id");
-                    int proizvodjacId=tempList.get(0);
-                    
-                    //ocitavanje tipID polja iz baze
-                    String upit2="SELECT tip_id FROM tip WHERE naziv=?";
-                    tempList=DBUtil.prikupiPodatkeParam(upit2, komponenta.getTip(), "tip_id");
-                    int tipId=tempList.get(0);
-                    
-                    //proveri da ne postoji komponenta sa istim nazivom, istog tipa i proizvodjaca
-                    int duplikat=DBUtil.proveriDuplikatKomponente(komponenta.getNaziv(), proizvodjacId, tipId);
-                    
-                    //priprema obavestenja
-                    Alert alert2 = new Alert(AlertType.INFORMATION);
-                    alert2.setTitle("Obaveštenje");
-                    alert2.setHeaderText(null);
+                //kreiranje nove komponente
+                komponenta.setNaziv(novaKomponentaNaziv.getText());
+                komponenta.setTip((String)tipCB.getSelectionModel().getSelectedItem());
+                komponenta.setProizvodjac((String)proizvodjacCB.getSelectionModel().getSelectedItem());
+                komponenta.setKolicina(Integer.valueOf(novaKomponentaKolicina.getText()));
+                komponenta.setCena(Double.valueOf(novaKomponentaCena.getText()));
+                komponenta.setSlika(novaKomponentaSlika.getText());
+                komponenta.setAktuelna(novaKomponentaAktuelno.isSelected());
 
-                    int ubaceno=0;
-                    if (duplikat==0) {
-                        //ubaci komponentu u bazu podataka
-                        ubaceno=DBUtil.ubaciKomponentu(komponenta, proizvodjacId, tipId);
-                        if (ubaceno>0) {
-                            alert2.setContentText("Komponenta uspešno uneta u bazu podataka!");
-                            //povratak na formu Nabavka
-                            novaKomponentaNazad.fire();
-                        }
-                    } 
-                    if (duplikat>0)
-                        alert2.setContentText("Komponenta sa istim nazivom, proizvodjacem i tipom vec postoji u bazi podataka!");
-                    else if (ubaceno==0)
-                        alert2.setContentText("Došlo je do greške pri upisu u bazu podataka!");
-                    Platform.runLater( () -> {
-                        alert2.showAndWait();
-                    });
+                //ocitavanje proizvodjacID polja iz baze
+                List<Integer> tempList=new ArrayList<>();
+                String upit1="SELECT proizvodjac_id FROM proizvodjac WHERE naziv=?";
+                tempList=DBUtil.prikupiPodatkeParam(upit1, komponenta.getProizvodjac(), "proizvodjac_id");
+                int proizvodjacId=tempList.get(0);
+
+                //ocitavanje tipID polja iz baze
+                String upit2="SELECT tip_id FROM tip WHERE naziv=?";
+                tempList=DBUtil.prikupiPodatkeParam(upit2, komponenta.getTip(), "tip_id");
+                int tipId=tempList.get(0);
+
+                //proveri da ne postoji komponenta sa istim nazivom, istog tipa i proizvodjaca
+                int duplikat=DBUtil.proveriDuplikatKomponente(komponenta.getNaziv(), proizvodjacId, tipId);
+
+                //priprema obavestenja
+                Alert alert2 = new Alert(AlertType.INFORMATION);
+                alert2.setTitle("Obaveštenje");
+                alert2.setHeaderText(null);
+
+                int ubaceno=0;
+                if (duplikat==0) {
+                    //ubaci komponentu u bazu podataka
+                    ubaceno=DBUtil.ubaciKomponentu(komponenta, proizvodjacId, tipId);
+                    if (ubaceno>0) {
+                        alert2.setContentText("Komponenta uspešno uneta u bazu podataka!");
+                        //povratak na formu Nabavka
+                        novaKomponentaNazad.fire();
+                    }
+                } 
+                if (duplikat>0)
+                    alert2.setContentText("Komponenta sa istim nazivom, proizvodjacem i tipom vec postoji u bazi podataka!");
+                else if (ubaceno==0)
+                    alert2.setContentText("Došlo je do greške pri upisu u bazu podataka!");
+                Platform.runLater( () -> {
+                    alert2.showAndWait();
+                });
                     
                     
                     
@@ -303,7 +303,7 @@ public class NovaKomponenta {
         });
     }
     //podesava format unosa za cenu i kolicinu
-    public static void podesiFormatUnosa() {
+    public void podesiFormatUnosa() {
         //cena se formatira kao double: cifre, decimalni zarez, 2 decimale
         Pattern patternDouble = Pattern.compile("-?\\d*(\\.\\d{0,2})?");
         TextFormatter formatterDouble = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {

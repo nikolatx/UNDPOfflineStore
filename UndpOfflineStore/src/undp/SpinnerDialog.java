@@ -16,9 +16,9 @@ import javafx.stage.StageStyle;
 
 public class SpinnerDialog {
     
-    private static int result=-1;
+    private int result=-1;
     
-    public static int display(String title, String message, int maksKolicina, int pocetnaKolicina) {
+    public int display(String title, String message, int maksKolicina, int pocetnaKolicina) {
         
         Stage noviProzor = new Stage();
         noviProzor.initModality(Modality.APPLICATION_MODAL);
@@ -58,8 +58,7 @@ public class SpinnerDialog {
         Scene scena = new Scene(rootBox, 350, 130);
         noviProzor.setScene(scena);
         
-        //scena.getStylesheets().addAll(getClass().getResource("styles.css").toExternalForm());
-        scena.getStylesheets().add("styles.css");
+        scena.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         //dugme potvrdi - promena kolicine komponente i ubacivanje u listu odabranih
         dugmePotvrdi.setOnAction( e -> {
             result=(Integer)spinner.getValue();

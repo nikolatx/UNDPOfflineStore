@@ -3,6 +3,8 @@ package undp;
 
 import com.grupa1.dbconnection.DBUtil;
 import com.grupa1.model.Osoba;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -24,20 +27,20 @@ import javafx.stage.Stage;
 
 public class NoviDobavljac {
     
-    static Font font = new Font(25);
-    static TextField noviDobavljacNaziv = new TextField();
-    static TextField noviDobavljacUlica = new TextField();
-    static TextField noviDobavljacBroj = new TextField();
-    static TextField noviDobavljacGrad = new TextField();
-    static TextField noviDobavljacPostBroj = new TextField();
-    static TextField noviDobavljacDrzava = new TextField();
-    static TextField noviDobavljacTelefon = new TextField();   
-    static Button noviDobavljacPotvrda = new Button("Dodaj");
-    static Button noviDobavljacNazad = new Button("Nazad");
-    static Label noviDobavljacNaslov = new Label("Dodavanje komponente");
+    Font font = new Font(25);
+    TextField noviDobavljacNaziv = new TextField();
+    TextField noviDobavljacUlica = new TextField();
+    TextField noviDobavljacBroj = new TextField();
+    TextField noviDobavljacGrad = new TextField();
+    TextField noviDobavljacPostBroj = new TextField();
+    TextField noviDobavljacDrzava = new TextField();
+    TextField noviDobavljacTelefon = new TextField();   
+    Button noviDobavljacPotvrda = new Button("Dodaj");
+    Button noviDobavljacNazad = new Button("Nazad");
+    Label noviDobavljacNaslov = new Label("Dodavanje komponente");
     
     
-    public static void pokreni(Osoba dobavljac, ComboBox dobavljacCB) {
+    public void pokreni(Osoba dobavljac, ComboBox dobavljacCB) {
         HBox headerDodajBox = new HBox();
         headerDodajBox.setId("headerBackground");
         headerDodajBox.setAlignment(Pos.CENTER);
@@ -80,14 +83,14 @@ public class NoviDobavljac {
         dodajBox.setTop(headerDodajBox);
         dodajBox.setCenter(centerDodajBox);
         dodajBox.setBottom(footerDodajBox);
-
+        podesiFormatUnosa();
+        
         //Kreiranje scene za novog dobavljaca
         Scene scena = new Scene(dodajBox, 500, 350); 
+        scena.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         Stage noviProzor=new Stage();
         noviProzor.setResizable(false);
         noviProzor.setTitle("Dodavanje novog dobavljaca");
-        
-        scena.getStylesheets().add("styles.css");
         
         noviProzor.setScene(scena);
         noviProzor.initModality(Modality.APPLICATION_MODAL);
@@ -168,5 +171,25 @@ public class NoviDobavljac {
         
     }
 
-    
+    //podesava format unosa za cenu i kolicinu
+    public void podesiFormatUnosa() {
+        //naziv: eliminisati , zbog razdvajanja naziva i grada iz comboboxa
+        Pattern patternN = Pattern.compile("^[a-zA-Z0-9 ()+_-]*$");
+        TextFormatter formatterNaziv = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {
+            return patternN.matcher(change.getControlNewText()).matches() ? change : null;
+        });
+        noviDobavljacNaziv.setTextFormatter(formatterNaziv);
+        Pattern patternG = Pattern.compile("^[a-zA-Z0-9 ()+_-]*$");
+        TextFormatter formatterGrad = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {
+            return patternG.matcher(change.getControlNewText()).matches() ? change : null;
+        });
+        noviDobavljacGrad.setTextFormatter(formatterGrad);
+        
+        //kolicina se formatira kao int: samo cifre
+        Pattern patternTel = Pattern.compile("^[0-9 ()+-]*$");
+        TextFormatter formatterTel = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {
+            return patternTel.matcher(change.getControlNewText()).matches() ? change : null;
+        });
+        noviDobavljacTelefon.setTextFormatter(formatterTel);
+    }
 }

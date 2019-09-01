@@ -2,17 +2,13 @@ package undp;
 
 import com.grupa1.dbconnection.DBUtil;
 import com.grupa1.model.IzvestajPOJO;
-import com.grupa1.model.Komponenta;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
-import static javafx.application.Application.launch;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,15 +19,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import pomocne.Pomocne;
+import pomocne.Tabela;
 
 public class IzvestajNabavke extends Application {
 
@@ -96,12 +91,12 @@ public class IzvestajNabavke extends Application {
     @Override
     public void init() throws Exception {
         super.init();
-        kreirajTabelu(tabela);
+        Tabela.kreirajTabeluIzvestaja(tabela);
     }
 
     public void start(Stage primaryStage) throws SQLException {
 
-        //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
+        //podesavanje velicine,pozicije i izgleda panela
         comboboxHB.setAlignment(Pos.BOTTOM_LEFT);
         comboboxHB.setId("headerBackground");
         comboboxHB.setPadding(new Insets(10));
@@ -113,11 +108,8 @@ public class IzvestajNabavke extends Application {
         naslovForme.setTranslateX(-230);
         naslovForme.setFont(font);
         naslovForme.setId("headerLabel");
-
-        //dodavanje nodova u HBox
         comboboxHB.getChildren().add(naslovForme);
 
-        //podesavanje velicine,pozicije i izgleda panela sa opisima i combobox-evima
         headerHB.setId("headerBackground");
         headerHB.setMinSize(1000, 120);
         nazivLabel.setId("headerLabel");
@@ -125,7 +117,7 @@ public class IzvestajNabavke extends Application {
         nazivLabel.setFont(font);
         headerHB.getChildren().addAll(nazivLabel);
 
-        //podesavanje velicine,pozicije i izgleda panela sa 2 tableView prozora
+        //podesavanje velicine,pozicije i izgleda panela sa tableView 
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tabela.setMaxSize(800, 250);
         boxZaTabele.setPadding(new Insets(10));
@@ -147,8 +139,7 @@ public class IzvestajNabavke extends Application {
         footerHB.setMargin(nazadDugme, new Insets(0, 0, 0, 860));
         footerHB.getChildren().addAll(nazadDugme);
 
-        //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        //podesavanje velicine izgleda i dodavanje komponenti u rightBox
+        //podesavanje velicine izgleda i dodavanje komponenti u boxove
         desniVB.setMinSize(210, 430);
         desniVB.setId("bottomStyle");
         desniVB.setAlignment(Pos.CENTER);
@@ -166,10 +157,28 @@ public class IzvestajNabavke extends Application {
         odPicker.setMaxSize(150, 25);
         doPicker.setMaxSize(150, 25);
         desniVB.getChildren().addAll(dnevniButton, nedeljniButton, mesecniButton, godisnjiButton, odPicker, doPicker, odDoButton);
+        
+        //Kreiranje BorderPane-a za raspored HBox i VBox panela
+        BorderPane root = new BorderPane();
+        root.setTop(headerHB);
+        root.setCenter(boxZaTabele);
+        root.setBottom(footerHB);
+        root.setRight(desniVB);
 
+        Scene scene = new Scene(root, 1000, 650);
+        primaryStage.setResizable(false);
+
+        primaryStage.setTitle("Izveštaj nabavke - UNDP Offline Store");
+
+        scene.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        
+        
+        //izvestaj za danas
         dnevniButton.setOnAction(e -> {
             try {
-                String sql = "WHERE datum=DATE(NOW())";
+                String sql = "WHERE pr.datum=DATE(NOW())";
                 tabela.getItems().clear();
                 tabela.getColumns().clear();
                 conn = DBUtil.napraviKonekciju();
@@ -177,56 +186,72 @@ public class IzvestajNabavke extends Application {
                 sumaLabel.setText("UKUPNO U RSD: " + String.format("%,.2f", izracunajSumu(sql)));
                 preuzmiPodatke(sql);
             } catch (SQLException ex) {
-                System.out.println("Problem sa očitavanjem tabele 'faktura'!");
+                Pomocne.poruka("Problem sa očitavanjem podataka za izveštaj nabavke");
+                if (conn!=null) try {
+                    conn.close();
+                } catch (SQLException ex1) {}
             }
         });
 
+        //izvestaj za tekucu nedelju
         nedeljniButton.setOnAction(e -> {
             try {
-                String sql = "WHERE datum >= DATE(NOW()) + INTERVAL -6 DAY AND datum < NOW() + INTERVAL 0 DAY";
+                String sql = "WHERE YEARWEEK(pr.datum)=YEARWEEK(CURDATE())";
                 tabela.getItems().clear();
                 tabela.getColumns().clear();
                 conn = DBUtil.napraviKonekciju();
                 sumaLabel.setText("UKUPNO U RSD: " + String.format("%,.2f", izracunajSumu(sql)));
                 preuzmiPodatke(sql);
             } catch (SQLException ex) {
-                System.out.println("Problem sa očitavanjem tabele 'faktura'!");
+                Pomocne.poruka("Problem sa očitavanjem podataka za izveštaj nabavke");
+                if (conn!=null) try {
+                    conn.close();
+                } catch (SQLException ex1) {}
             }
         });
-
+        
+        //izvestaj za tekuci mesec
         mesecniButton.setOnAction(e -> {
             try {
-                String sql = "WHERE datum >= DATE(NOW()) + INTERVAL -30 DAY AND datum < NOW() + INTERVAL 0 DAY";
+                String sql = "WHERE MONTH(CURDATE())=MONTH(pr.datum) AND YEAR(CURDATE())=YEAR(pr.datum)";
                 tabela.getItems().clear();
                 tabela.getColumns().clear();
                 conn = DBUtil.napraviKonekciju();
                 sumaLabel.setText("UKUPNO U RSD: " + String.format("%,.2f", izracunajSumu(sql)));
                 preuzmiPodatke(sql);
             } catch (SQLException ex) {
-                System.out.println("Problem sa očitavanjem tabele 'faktura'!");
+                Pomocne.poruka("Problem sa očitavanjem podataka za izveštaj nabavke");
+                if (conn!=null) try {
+                    conn.close();
+                } catch (SQLException ex1) {}
             }
         });
-
+        
+        //izvestaj za tekucu godinu
         godisnjiButton.setOnAction(e -> {
             try {
-                String sql = "WHERE datum >= DATE(NOW()) + INTERVAL -355 DAY AND datum < NOW() + INTERVAL 0 DAY";
+                String sql = "WHERE YEAR(CURDATE())=YEAR(pr.datum)";
                 tabela.getItems().clear();
                 tabela.getColumns().clear();
                 conn = DBUtil.napraviKonekciju();
                 sumaLabel.setText("UKUPNO U RSD: " + String.format("%,.2f", izracunajSumu(sql)));
                 preuzmiPodatke(sql);
             } catch (SQLException ex) {
-                System.out.println("Problem sa očitavanjem tabele 'faktura'!");
+                Pomocne.poruka("Problem sa očitavanjem podataka za izveštaj nabavke!");
+                if (conn!=null) try {
+                    conn.close();
+                } catch (SQLException ex1) {}
             }
         });
-
+        
+        //izvestaj za zadati interval
         odDoButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent e) {
-                //Preuzimanje datuma iz datapicker
-                        LocalDate pocetniDatum = odPicker.getValue();
-                        LocalDate zavrsniDatum = doPicker.getValue();
-                        String sql = "WHERE datum>='" + pocetniDatum + "' AND datum<='" + zavrsniDatum + "'";
+                //Preuzimanje datuma iz datepicker
+                LocalDate pocetniDatum = odPicker.getValue();
+                LocalDate zavrsniDatum = doPicker.getValue();
+                String sql = "WHERE datum>='" + pocetniDatum + "' AND datum<='" + zavrsniDatum + "'";
                 if ((odPicker.getValue() != null) && (doPicker.getValue() != null)) {
                     try {
                         tabela.getItems().clear();
@@ -235,146 +260,68 @@ public class IzvestajNabavke extends Application {
                         sumaLabel.setText("UKUPNO U RSD: " + String.format("%,.2f", izracunajSumu(sql)));
                         preuzmiPodatke(sql);
                     } catch (SQLException ex) {
-                        Logger.getLogger(IzvestajProdaje.class.getName()).log(Level.SEVERE, null, ex);
+                        Pomocne.poruka("Problem sa očitavanjem podataka za izveštaj nabavke!");
+                        if (conn!=null) try {
+                            conn.close();
+                        } catch (SQLException ex1) {}
                     }
                 }
             }
         });
-
+        
+        //povratak na prethodnu formu
         nazadDugme.setOnAction(e -> {
             primaryStage.close();
             new Izvestaji().start(primaryStage);
         });
-
-        //Kreiranje BorderPane-a za raspored HBox i VBox panela
-        BorderPane root = new BorderPane();
-        root.setTop(headerHB);
-        root.setCenter(boxZaTabele);
-        root.setBottom(footerHB);
-        root.setRight(desniVB);
-
-        //Kreiranje scene ,velicine,naziva povezivanje sa Css-om
-        Scene scene = new Scene(root, 1000, 650);
-        primaryStage.setResizable(false);
-
-        primaryStage.setTitle("Izveštaj nabavke - UNDP Offline Store");
-
-        scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    private String prikupljanjeOdDugmeta(String uslov) {
-        return uslov;
-    }
-
+    //preuzimanje podataka iz baze po zadatom upitu
     private void preuzmiPodatke(String uslov) throws SQLException {
         if (conn != null) {
-            //uzimanje podataka iz combobox-eva i polja za unos teksta
-
-            String upit = "SELECT dp.komponenta_id, d.naziv, dp.cena, p.datum "
-                    + "FROM prijemnica as p "
-                    + "INNER JOIN dobavljac as d ON p.dobavljac_id=d.dobavljac_id "
-                    + "INNER JOIN detaljiprijemnice as dp ON p.prijemnica_id=dp.prijemnica_id "
-                    + uslov;
-
+            //formulisanje upita
+            String upit = "SELECT k.komponenta_id, k.naziv, p.naziv, SUM(dp.kolicina), SUM(dp.cena) "
+                    + "FROM prijemnica as pr "
+                    + "INNER JOIN detaljiprijemnice as dp ON pr.prijemnica_id=dp.prijemnica_id "
+                    + "INNER JOIN komponenta as k ON k.komponenta_id=dp.komponenta_id "
+                    + "INNER JOIN proizvodjac as p ON k.proizvodjac_id=p.proizvodjac_id "
+                    + uslov 
+                    + "GROUP BY dp.komponenta_id";
             //postavljanje upita nad bazom podataka
             ResultSet rs = DBUtil.prikupiPodatke(conn, upit);
             //obrada rezultata upita
             if (rs != null) {
-                try {
-                    podaci = FXCollections.observableArrayList();
-                    //dodavanje kolona, naziva kolona i podesavanje sirine kolona tabele
-                    if (tabela.getColumns().size() == 0) {
-                        kreirajTabelu(tabela);
-                    }
-                    //ubacivanje podataka u listu
-                    while (rs.next()) {
-                        //dodavanje komponente u listu
-                        podaci.add(new IzvestajPOJO(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getDate(4).toLocalDate()));
-                    }
-                    //ubacivanje podataka u tabelu
-                    tabela.setItems(podaci);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    if (conn != null) {
-                        conn.close();
-                    }
+                podaci = FXCollections.observableArrayList();
+                //dodavanje kolona, naziva kolona i podesavanje sirine kolona tabele
+                if (tabela.getColumns().size() == 0) {
+                    Tabela.kreirajTabeluIzvestaja(tabela);
                 }
+                //ubacivanje podataka u listu
+                while (rs.next()) {
+                    //dodavanje komponente u listu
+                    podaci.add(new IzvestajPOJO(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getDouble(5)));
+                }
+                //ubacivanje podataka u tabelu
+                tabela.setItems(podaci);
             }
         }
     }
     
+    //racuna ukupnu sumu za zadati period
     private double izracunajSumu(String uslov) throws SQLException {
-
         double suma = 0;
         if (conn != null) {
             String upit = "SELECT SUM(dp.cena) "
                     + "FROM detaljiprijemnice as dp "
-                    + "INNER JOIN prijemnica as p ON dp.prijemnica_id=p.prijemnica_id "
+                    + "INNER JOIN prijemnica as pr ON dp.prijemnica_id=pr.prijemnica_id "
                     + uslov;
-
             ResultSet rs = DBUtil.prikupiPodatke(conn, upit);
-
             if ((rs != null) && (rs.next())) {
-                try {
                     suma += rs.getDouble(1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } 
             }
         }
         return suma;
-    }
-
-    private void kreirajTabelu(TableView tabela) {
-        //zabrana menjanja velicine da bi se zadale sirine kolona
-        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        //dodavanje nove kolone odgovarajuceg naziva
-        TableColumn kolonaSifra = new TableColumn("Sifra");
-        //definisanje valueFactory-a za celije kolone
-        kolonaSifra.setCellValueFactory(new PropertyValueFactory<IzvestajPOJO, Integer>("id"));
-        //definisanje procentualne sirine kolone
-        kolonaSifra.setMaxWidth(1f * Integer.MAX_VALUE * 5); // 5% width
-        kolonaSifra.setStyle( "-fx-alignment: CENTER;");
-        
-        TableColumn kolonaOpis = new TableColumn("Naziv dobavljaca");
-        kolonaOpis.setCellValueFactory(new PropertyValueFactory<IzvestajPOJO, String>("naziv"));
-        kolonaOpis.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10% width
-        kolonaOpis.setStyle( "-fx-alignment: CENTER;");
-        
-        TableColumn kolonaCena = new TableColumn("Cena");
-        kolonaCena.setCellValueFactory(new PropertyValueFactory<IzvestajPOJO, Double>("cena"));
-        kolonaCena.setMaxWidth(1f * Integer.MAX_VALUE * 9); // 9% width
-        kolonaCena.setStyle("-fx-alignment: CENTER-RIGHT");
-        kolonaCena.setCellFactory(tc -> new TableCell<IzvestajPOJO, Number>() {
-            @Override
-            protected void updateItem(Number value, boolean empty) {
-                super.updateItem(value, empty) ;
-                if (empty) {
-                    setText(null);
-                } else {
-                    setText(String.format("%,.2f", value.doubleValue()));
-                }
-            }
-        });
-        
-        
-        
-        TableColumn<IzvestajPOJO, LocalDate> kolonaDatum = new TableColumn("Datum");
-
-        
-    
-        kolonaDatum.setCellValueFactory(new PropertyValueFactory<IzvestajPOJO, LocalDate>("datum"));
-        kolonaDatum.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10 width
-        kolonaDatum.setStyle( "-fx-alignment: CENTER;");
-        //dodavanje kolona u tabelu
-        tabela.getColumns().addAll(kolonaSifra, kolonaOpis, kolonaCena, kolonaDatum);
     }
 
 }

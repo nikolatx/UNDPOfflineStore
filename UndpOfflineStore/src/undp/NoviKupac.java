@@ -3,6 +3,8 @@ package undp;
 
 import com.grupa1.dbconnection.DBUtil;
 import com.grupa1.model.Osoba;
+import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -14,6 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -25,19 +28,19 @@ import javafx.stage.Stage;
 public class NoviKupac {
     
     static Font font = new Font(25);
-    static TextField noviKupacNaziv = new TextField();
-    static TextField noviKupacUlica = new TextField();
-    static TextField noviKupacBroj = new TextField();
-    static TextField noviKupacGrad = new TextField();
-    static TextField noviKupacPostBroj = new TextField();
-    static TextField noviKupacDrzava = new TextField();
-    static TextField noviKupacTelefon = new TextField();   
-    static Button noviKupacPotvrda = new Button("Dodaj");
-    static Button noviKupacNazad = new Button("Nazad");
-    static Label noviKupacNaslov = new Label("Dodavanje komponente");
+    TextField noviKupacNaziv = new TextField();
+    TextField noviKupacUlica = new TextField();
+    TextField noviKupacBroj = new TextField();
+    TextField noviKupacGrad = new TextField();
+    TextField noviKupacPostBroj = new TextField();
+    TextField noviKupacDrzava = new TextField();
+    TextField noviKupacTelefon = new TextField();   
+    Button noviKupacPotvrda = new Button("Dodaj");
+    Button noviKupacNazad = new Button("Nazad");
+    Label noviKupacNaslov = new Label("Dodavanje komponente");
     
     
-    public static void pokreni(Osoba kupac, ComboBox kupacCB) {
+    public void pokreni(Osoba kupac, ComboBox kupacCB) {
         HBox headerDodajBox = new HBox();
         headerDodajBox.setId("headerBackground");
         headerDodajBox.setAlignment(Pos.CENTER);
@@ -80,14 +83,15 @@ public class NoviKupac {
         dodajBox.setTop(headerDodajBox);
         dodajBox.setCenter(centerDodajBox);
         dodajBox.setBottom(footerDodajBox);
-
+        podesiFormatUnosa();
+        
         //Kreiranje scene za novog kupaca
         Scene scena = new Scene(dodajBox, 500, 350); 
         Stage noviProzor=new Stage();
         noviProzor.setResizable(false);
         noviProzor.setTitle("Dodavanje novog kupaca");
         
-        scena.getStylesheets().add("styles.css");
+        scena.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         
         noviProzor.setScene(scena);
         noviProzor.initModality(Modality.APPLICATION_MODAL);
@@ -168,5 +172,25 @@ public class NoviKupac {
         
     }
 
-    
+    //podesava format unosa za cenu i kolicinu
+    public void podesiFormatUnosa() {
+        //naziv: eliminisati , zbog razdvajanja naziva i grada iz comboboxa
+        Pattern patternN = Pattern.compile("^[a-zA-Z0-9 ()+_-]*$");
+        TextFormatter formatterNaziv = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {
+            return patternN.matcher(change.getControlNewText()).matches() ? change : null;
+        });
+        noviKupacNaziv.setTextFormatter(formatterNaziv);
+        Pattern patternG = Pattern.compile("^[a-zA-Z0-9 ()+_-]*$");
+        TextFormatter formatterGrad = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {
+            return patternG.matcher(change.getControlNewText()).matches() ? change : null;
+        });
+        noviKupacGrad.setTextFormatter(formatterGrad);
+        
+        //kolicina se formatira kao int: samo cifre
+        Pattern patternTel = Pattern.compile("^[0-9 ()+-]*$");
+        TextFormatter formatterTel = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {
+            return patternTel.matcher(change.getControlNewText()).matches() ? change : null;
+        });
+        noviKupacTelefon.setTextFormatter(formatterTel);
+    }
 }

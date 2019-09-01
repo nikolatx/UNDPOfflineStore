@@ -2,7 +2,7 @@
 package util;
 
 import com.grupa1.model.Dokument;
-import com.grupa1.model.Komponenta;
+import com.grupa1.model.KomponentaSaSlikom;
 import com.grupa1.model.Osoba;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -14,6 +14,7 @@ import java.util.Map;
 import javafx.collections.ObservableList;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import konstante.Konst;
 import org.docx4j.TraversalUtil;
 import org.docx4j.XmlUtils;
 import org.docx4j.finders.RangeFinder;
@@ -34,17 +35,10 @@ import org.docx4j.wml.Tr;
 
 public class DocxExport {
 
-    //definisanje konstanti
-    private final static boolean DELETE_BOOKMARK = false;
-    private final static String PRIJEMNICE_PATH = "D:\\UNDPOfflineStore\\Prijemnice";
-    private final static String PRIJEMNICA_TEMPLATE = "D:\\UNDPOfflineStore\\Prijemnice\\Prijemnica v1.03.docx";
-    private final static String FAKTURE_PATH = "D:\\UNDPOfflineStore\\Fakture";
-    private final static String FAKTURA_TEMPLATE = "D:\\UNDPOfflineStore\\Fakture\\Faktura v1.03.docx";
-
     private static org.docx4j.wml.ObjectFactory factory = Context.getWmlObjectFactory();
 
 
-    public static void exportData(boolean prijemnica, Osoba osoba, Dokument dokument, ObservableList<Komponenta> komponente) throws Exception {
+    public static void exportData(boolean prijemnica, Osoba osoba, Dokument dokument, ObservableList<KomponentaSaSlikom> komponente) throws Exception {
 
         //kreiranje mape za zamenu bookmarka
         Map<DataFieldName, String> map4Bookmarks = new HashMap<DataFieldName, String>();
@@ -63,11 +57,11 @@ public class DocxExport {
         File docxfile=null;
         try {
             if (prijemnica)
-                docxfile=new java.io.File(PRIJEMNICA_TEMPLATE);
+                docxfile=new java.io.File(Konst.PRIJEMNICA_TEMPLATE);
             else
-                docxfile=new java.io.File(FAKTURA_TEMPLATE);
+                docxfile=new java.io.File(Konst.FAKTURA_TEMPLATE);
         } catch (Exception ex) {
-            
+            throw new Exception("Na postoji template fajl " + (prijemnica?Konst.PRIJEMNICA_TEMPLATE:Konst.FAKTURA_TEMPLATE));
         }
         
         //ucitavanje elemenata docx fajla
@@ -93,7 +87,7 @@ public class DocxExport {
         int kolicina;
         double cena, ukupno, suma=0;
         //popunjavanje mape podacima
-        for(Komponenta komponenta:komponente) {
+        for(KomponentaSaSlikom komponenta:komponente) {
             map = new HashMap<String, String>();
             map.put( "UX", String.valueOf(komponenta.getId()));
             map.put( "UNDP_opis", komponenta.getNaziv());
@@ -113,14 +107,13 @@ public class DocxExport {
         //preuzimanje svih tabela iz docx dokumenta
         lista=getAllTbls(wordMLPackage);
         //pronalazenje tabele sa nazivom "PrijemnicaTBL"
-        Tbl tabela=new Tbl();
-        for(Tbl t:lista) {
+        Tbl tabela=null;
+        for(Tbl t:lista)
             try {
-            if (t.getTblPr().getTblCaption().getVal()!=null && t.getTblPr().getTblCaption().getVal().equals("PrijemnicaTBL"))
-                tabela=t;
+                if (t.getTblPr().getTblCaption().getVal()!=null && t.getTblPr().getTblCaption().getVal().equals("PrijemnicaTBL"))
+                    tabela=t;
             } catch (Exception ex) {}
-        }
-
+        
         if (tabela!=null) {
             //zameni placeholdere sa vrednostima iz mape po kljucu
             popuniTabelu(tabela, new String[]{"UX", "UNDP_opis", "UNDP_kol", "UNDP_jc", "UNDP_uk"}, listaMapa, wordMLPackage);
@@ -133,9 +126,11 @@ public class DocxExport {
             SimpleDateFormat formatter1 = new SimpleDateFormat("dd-MM-yyyy HH-mm-ss");
             String datum=formatter1.format(date);
             //zadavanje naziva fajla
-            String nazivFajla=(prijemnica)?PRIJEMNICE_PATH+"\\Prijemnica ":FAKTURE_PATH+"\\Faktura ";
+            String nazivFajla=(prijemnica)?Konst.PRIJEMNICE_PATH+"\\Prijemnica ":Konst.FAKTURE_PATH+"\\Faktura ";
             wordMLPackage.save(new java.io.File(nazivFajla + "broj " + dokument.getDokumentId() + " " + datum +".docx"));
-        }
+        } else
+            throw new Exception("Ne postoji odgovarajuća tabela u dokumentu " + (prijemnica?"prijemnice!":"fakture!"));
+        
     }
 
 
@@ -227,14 +222,14 @@ public class DocxExport {
                 for (Object ox : theList) {
                     Object listEntry = XmlUtils.unwrap(ox); 
                     if (listEntry.equals(bm)) {
-                        if (DELETE_BOOKMARK) {
+                        if (Konst.DELETE_BOOKMARK) {
                                 rangeStart=i;
                         } else {
                                 rangeStart=i+1;							
                         }
                     } else if (listEntry instanceof  CTMarkupRange) {
                         if ( ((CTMarkupRange)listEntry).getId().equals(bm.getId())) {
-                            if (DELETE_BOOKMARK) {
+                            if (Konst.DELETE_BOOKMARK) {
                                     rangeEnd=i;
                             } else {
                                     rangeEnd=i-1;							
@@ -262,7 +257,7 @@ public class DocxExport {
                 }
 
             } catch (ClassCastException cce) {
-                System.out.println(cce.getMessage());
+                throw new Exception(cce.getMessage());
             }
         }
     }

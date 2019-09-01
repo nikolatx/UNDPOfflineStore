@@ -15,17 +15,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import com.grupa1.dbconnection.*;
 import com.grupa1.model.Komponenta;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import pomocne.PomocneDB;
+import com.grupa1.dbconnection.PomocneDAO;
+import com.grupa1.model.KomponentaSaSlikom;
+import javafx.scene.control.CheckBox;
+import kontroleri.AzuriranjeKontroler;
 import pomocne.Tabela;
 
 public class Azuriranje extends Application {
@@ -36,18 +34,15 @@ public class Azuriranje extends Application {
     //Liste sa opcijama ComboBox-ova
     ObservableList opcijeTip = FXCollections.observableArrayList();
     ObservableList opcijeProizvodjac = FXCollections.observableArrayList();
-    //ObservableList opcijeDobavljac = FXCollections.observableArrayList();
 
     //Kreiranje 3 ComboBox-a na formi
     ComboBox tipCB = new ComboBox(opcijeTip);
     ComboBox proizvodjacCB = new ComboBox(opcijeProizvodjac);
-    //ComboBox dobavljacCB = new ComboBox(opcijeDobavljac);
+    CheckBox aktuelneCB = new CheckBox();
 
     //Liste za pracenje informacija u tabelama
-    ObservableList<Komponenta> podaciFiltrirano = FXCollections.observableArrayList();
-    
-    ObservableList<Komponenta> podaciOdabrano = FXCollections.observableArrayList();
-    
+    ObservableList<KomponentaSaSlikom> podaciFiltrirano = FXCollections.observableArrayList();
+
     
     //tabela za prikaz komponenata koje zadovoljavaju zadate kriterijume pretrage
     TableView tabelaFiltrirano = new TableView();
@@ -77,20 +72,13 @@ public class Azuriranje extends Application {
     //Kreiranje Fonta
     Font font = new Font(25);
     
-    //TextField za update Komponenti
-    //TextField nazivField = new TextField();
-   // TextField proizvodjacField = new TextField();
-   // TextField tipField = new TextField();
-   // TextField kolicinaField = new TextField();
-   // TextField cenaField = new TextField();
-
-    //kreiranje pomocnih promenljivih koje ce da se koriste u lambda izrazima
-    private Statement st = null;
+   
+    AzuriranjeKontroler kontroler=new AzuriranjeKontroler();
 
     @Override
     public void init() throws Exception {
         super.init();
-        Tabela.kreirajTabelu(tabelaFiltrirano);
+        Tabela.kreirajTabelu(tabelaFiltrirano, true);
     }
 
     @Override
@@ -101,7 +89,10 @@ public class Azuriranje extends Application {
         tipCB.setMinSize(150, 25);
         proizvodjacCB.setPromptText("Izaberi proizvodjača");
         proizvodjacCB.setMinSize(150, 25);
-
+        aktuelneCB.setText("Samo aktuelne");
+        aktuelneCB.setSelected(true);
+        
+        
         //podesavanja dugmeta za pretragu
         pretragaDugme.setMinSize(100, 25);
         pretragaDugme.setId("pretragaButton");
@@ -167,23 +158,13 @@ public class Azuriranje extends Application {
         desniVB.getChildren().addAll( izmeniDugme,brisiDugme);
 
         //popunjavanje combobox-eva podacima
-        PomocneDB.ispuniComboBoxZaTip(opcijeTip, false);
-        PomocneDB.ispuniComboBoxZaProizvodjaca(opcijeProizvodjac, false);
+        PomocneDAO.ispuniComboBoxZaTip(opcijeTip, false);
+        PomocneDAO.ispuniComboBoxZaProizvodjaca(opcijeProizvodjac, false);
 
         //pretrazivanje na osnovu zadatih kriterijuma
         pretragaDugme.setOnAction(e -> {
-            String tip = (String) tipCB.getSelectionModel().getSelectedItem();
-            String proizvodjac = (String) proizvodjacCB.getSelectionModel().getSelectedItem();
-            String komponenta = deoNaziva.getText();
-            try {
-                tabelaFiltrirano.getItems().clear();
-                tabelaFiltrirano.getColumns().clear();
-                conn = DBUtil.napraviKonekciju();
-                
-                PomocneDB.preuzmiPodatke(conn, tip, proizvodjac, komponenta, podaciFiltrirano, tabelaFiltrirano);
-            } catch (SQLException ex) {
-                System.out.println("Problem sa očitavanjem tabele 'komponenta'!");
-            }
+            kontroler.preuzmiPodatke(tipCB, proizvodjacCB, deoNaziva, aktuelneCB, 
+                               podaciFiltrirano, tabelaFiltrirano);
         });
 
         nazadDugme.setOnAction(e -> {
@@ -202,29 +183,14 @@ public class Azuriranje extends Application {
         Scene scene = new Scene(root, 1000, 650);
         primaryStage.setResizable(false);
         primaryStage.setTitle("Ažuriranje - UNDP Offline Store");
-        scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
+        scene.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    
-
-    private void poruka(String msg) {
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle("Greška");
-        alert.setHeaderText("Greška");
-        alert.setContentText(msg);
-        Platform.runLater(() -> alert.showAndWait());
-    }
-
-    
-   
-    
-    
-    
-    public void promeniPodatkeTabele(TableColumn.CellEditEvent<Komponenta, String> komponentaStringEdit){
+    public void promeniPodatkeTabele(TableColumn.CellEditEvent<KomponentaSaSlikom, String> komponentaStringEdit){
         
-        Komponenta k = (Komponenta) tabelaFiltrirano.getSelectionModel().getSelectedItem();
+        KomponentaSaSlikom k = (KomponentaSaSlikom) tabelaFiltrirano.getSelectionModel().getSelectedItem();
         k.setNaziv(komponentaStringEdit.getNewValue());
         k.setTip(komponentaStringEdit.getNewValue());
         k.setProizvodjac(komponentaStringEdit.getNewValue());

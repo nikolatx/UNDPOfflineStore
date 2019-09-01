@@ -1,8 +1,6 @@
 package undp;
 
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import pomocne.Pomocne;
 
 
 public class Izvestaji extends Application {
@@ -79,6 +78,14 @@ public class Izvestaji extends Application {
         root.setLeft(leftBox);
         root.setBottom(footerHBox);
         
+        //Kreiranje scene ,velicine i povezivanje sa CSS-om
+        Scene scene = new Scene(root, 1000, 650);
+        primaryStage.setTitle("Izveštaji - UndpOfflineStore");
+        scene.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
+        primaryStage.setResizable(false);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        
         //Vidljivost labela prilikom prelaska misa na taster prodaja i nabavka
         prodajaButton.setOnMouseEntered(e ->{
             prodajaLabel.setVisible(true);
@@ -97,7 +104,7 @@ public class Izvestaji extends Application {
                 primaryStage.close();
                 new IzvestajProdaje().start(primaryStage);
             } catch (SQLException ex) {
-                Logger.getLogger(Izvestaji.class.getName()).log(Level.SEVERE, null, ex);
+                Pomocne.poruka(ex.getMessage());
             }
         });
         
@@ -107,28 +114,17 @@ public class Izvestaji extends Application {
                 primaryStage.close();
                 new IzvestajNabavke().start(primaryStage);
             } catch (SQLException ex) {
-                Logger.getLogger(Izvestaji.class.getName()).log(Level.SEVERE, null, ex);
+                Pomocne.poruka(ex.getMessage());
             }
         });
         
         //Funkcija tastera za povratak na pocetak alikacije
         nazadButton.setOnAction(e ->{
-        primaryStage.close();
-        new UndpOfflineStore().start(primaryStage);
-    });
+            primaryStage.close();
+            new UndpOfflineStore().start(primaryStage);
+        });
         
-        //Kreiranje scene ,velicine i povezivanje sa CSS-om
-        Scene scene = new Scene(root, 1000, 650);
-        primaryStage.setTitle("Izveštaji - UndpOfflineStore");
-        scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
-        primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-   
-    public static void main(String[] args) {
-        launch(args);
+        
     }
     
 }
