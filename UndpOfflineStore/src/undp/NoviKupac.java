@@ -37,7 +37,7 @@ public class NoviKupac {
     TextField noviKupacTelefon = new TextField();   
     Button noviKupacPotvrda = new Button("Dodaj");
     Button noviKupacNazad = new Button("Nazad");
-    Label noviKupacNaslov = new Label("Dodavanje komponente");
+    Label noviKupacNaslov = new Label("Dodavanje novog kupca");
     
     
     public void pokreni(Osoba kupac, ComboBox kupacCB) {

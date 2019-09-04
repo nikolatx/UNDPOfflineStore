@@ -50,7 +50,7 @@ public class IzvestajNabavke extends Application {
 
     //Kreiranje opisa koji ce da stoje na formi
     Label naslovForme = new Label("Izveštaj nabavke");
-    Label labelFiltriraneKomponente = new Label("Rezultat pretrage");
+    Label labelFiltriraneKomponente = new Label("Izveštaj nabavke");
 
     //Kreiranje tastera za odredjene funkcije
     Button dnevniButton = new Button("Dnevni izveštaj");

@@ -188,7 +188,7 @@ public class NovaKomponenta {
                 
                 TextInputDialog dialog = new TextInputDialog("");
                 dialog.setTitle("Novi tip");
-                dialog.setHeaderText("Unosenje novog tipa komponente");
+                dialog.setHeaderText("Unošenje novog tipa komponente");
                 dialog.setContentText("Tip:");
                 
                 Platform.runLater(() -> {
@@ -244,9 +244,9 @@ public class NovaKomponenta {
             if (proizvodjacCB.getSelectionModel().getSelectedItem().equals(">>dodaj novog<<")) {
                 
                 TextInputDialog dialog = new TextInputDialog("");
-                dialog.setTitle("Novi proizvodjac");
-                dialog.setHeaderText("Unosenje novog proizvodjaca");
-                dialog.setContentText("Proizvodjac:");
+                dialog.setTitle("Novi proizvođač");
+                dialog.setHeaderText("Unošenje novog proizvođača");
+                dialog.setContentText("Proizvođač:");
                 
                 Platform.runLater(() -> {
                     Optional<String> result = dialog.showAndWait();
