@@ -15,7 +15,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import com.grupa1.model.Komponenta;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javafx.collections.FXCollections;

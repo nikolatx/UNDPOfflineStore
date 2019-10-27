@@ -168,7 +168,7 @@ public class Pretraga extends Application {
         PomocneDAO.ispuniComboBoxZaTip(opcijeTip, false);
         PomocneDAO.ispuniComboBoxZaProizvodjaca(opcijeProizvodjac, false);
         PomocneDAO.ispuniComboBoxZaDobavljaca(opcijeDobavljac);
-        
+
         //pretrazivanje na osnovu zadatih kriterijuma
         pretragaDugme.setOnAction(e -> {
             kontroler.preuzmiPodatke(tipCB, proizvodjacCB, deoNaziva, aktuelneCB,

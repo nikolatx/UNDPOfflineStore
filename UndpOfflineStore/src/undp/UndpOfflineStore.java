@@ -5,33 +5,40 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import pomocne.ServisKonekcija;
 
 public class UndpOfflineStore extends Application {
-        //dugmici za realizaciju pojedinih funkcija
-        Button btn1 = new Button("Pretraga");
-        Button btn2 = new Button("Nabavka");
-        Button btn3 = new Button("Prodaja");
-        Button btn4 = new Button("Izveštaji");
-        Button btn5 = new Button("Ažuriranje");
-        
-        //Kreiranje HBox panela za popunjvenje scene
-        HBox hb1 = new HBox();
-        HBox hb2 = new HBox();
-        HBox hb3 = new HBox();
-        
-        //Kreiranje tekstualnih labela i fonta
-        Label lab1 = new Label("UNDP Offline Store");
-        Font font = new Font(25);
-       
+    //dugmici za realizaciju pojedinih funkcija
+    Button btn1 = new Button("Pretraga");
+    Button btn2 = new Button("Nabavka");
+    Button btn3 = new Button("Prodaja");
+    Button btn4 = new Button("Izveštaji");
+    Button btn5 = new Button("Ažuriranje");
+
+    //Kreiranje HBox panela za popunjvenje scene
+    HBox hb1 = new HBox();
+    HBox hb2 = new HBox();
+    HBox hb3 = new HBox();
+
+    //Kreiranje tekstualnih labela i fonta
+    Label lab1 = new Label("UNDP Offline Store");
+    Font font = new Font(25);
+    ServisKonekcija servisKonekcija=new ServisKonekcija();
+    
         
     @Override
     public void start(Stage primaryStage) {
@@ -128,6 +135,33 @@ public class UndpOfflineStore extends Application {
                 Logger.getLogger(UndpOfflineStore.class.getName()).log(Level.SEVERE, null, ex);
             }
             
+        });
+        
+        servisKonekcija.start();
+        servisKonekcija.setOnSucceeded(e->{
+            if (servisKonekcija.getValue()==null) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Greška");
+                alert.setHeaderText("MySQL server nije pokrenut! Pokreni server!");
+                alert.setContentText("Izaberi opciju");
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(getClass().getResource("/resources/styles.css").toExternalForm());
+                dialogPane.getStyleClass().add("dialogPane");
+                ButtonType dugmePonovo = new ButtonType("Pokušaj ponovo");
+                ButtonType dugmeOdustani = new ButtonType("Napusti aplikaciju", ButtonBar.ButtonData.CANCEL_CLOSE);
+                //alert box za odabir opcije
+                alert.getButtonTypes().setAll(dugmePonovo, dugmeOdustani);
+                Platform.runLater(()->{
+                    alert.showAndWait();
+                    if (alert.getResult() == dugmePonovo) {
+                        servisKonekcija.reset();
+                        servisKonekcija.restart();
+                    }
+                    else 
+                        Platform.exit();
+                    alert.close();
+                });
+            }
         });
         
         

@@ -17,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import pomocne.Pomocne;
 
 public class DBUtil {
 
@@ -25,14 +26,13 @@ public class DBUtil {
     private static final String userName = "root";
     private static final String password = "";
 
-    public static Connection napraviKonekciju() {
+    public static Connection napraviKonekciju()  {
         Connection conn=null;
         try {
             conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
             System.out.println("Uspešna konekcija");
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
         return conn;
     }
@@ -45,7 +45,7 @@ public class DBUtil {
             rs = conn.createStatement().executeQuery(upit);
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         return rs;
     }
@@ -89,7 +89,7 @@ public class DBUtil {
             promenjeno = conn.createStatement().executeUpdate(upit);
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -118,7 +118,7 @@ public class DBUtil {
                 result=rs.getInt(1);
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -149,7 +149,7 @@ public class DBUtil {
             upisano=ps1.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -180,7 +180,7 @@ public class DBUtil {
             upisano=ps1.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -211,7 +211,7 @@ public class DBUtil {
             upisano=ps1.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -241,7 +241,7 @@ public class DBUtil {
             
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -274,7 +274,7 @@ public class DBUtil {
                 postoji=rs.getInt(1);
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -307,7 +307,7 @@ public class DBUtil {
                 postoji=rs.getInt(1);
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -335,7 +335,7 @@ public class DBUtil {
             upisano=ps1.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -390,9 +390,10 @@ public class DBUtil {
                     //dodavanje komponente u listu
                     podaciFiltrirano.add(kompon);
                 }
-                if (conn!=null) conn.close();
             }
-        }  
+        } else
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
+        if (conn!=null) conn.close();
     }
     
     

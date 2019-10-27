@@ -37,7 +37,7 @@ public class NoviDobavljac {
     TextField noviDobavljacTelefon = new TextField();   
     Button noviDobavljacPotvrda = new Button("Dodaj");
     Button noviDobavljacNazad = new Button("Nazad");
-    Label noviDobavljacNaslov = new Label("Dodavanje komponente");
+    Label noviDobavljacNaslov = new Label("Dodavanje novog dobavljača");
     
     
     public void pokreni(Osoba dobavljac, ComboBox dobavljacCB) {
