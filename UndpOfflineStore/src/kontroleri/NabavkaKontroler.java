@@ -63,7 +63,8 @@ public class NabavkaKontroler {
         if (komponenta==null) return;
         //kreiranje kolona tabele ukoliko vec nisu kreirane
         if (tabelaOdabrano.getColumns().isEmpty())
-            Tabela.kreirajTabeluBezSlike(tabelaOdabrano, false);
+            Tabela.kreirajTabelu(tabelaOdabrano, false);
+            //Tabela.kreirajTabeluBezSlike(tabelaOdabrano, false);
 
         //ukoliko komponenta ne postoji u tabeli sa odabranim komponentama - dodavanje
         if (!podaciOdabrano.contains(komponenta)) {
@@ -87,7 +88,8 @@ public class NabavkaKontroler {
             DBUtil.preuzmiPodatke(tipCB, proizvodjacCB, deoNaziva, aktuelneCB, podaciFiltrirano);
             //dodavanje kolona, naziva kolona i podesavanje sirine kolona tabele
             if (tabelaFiltrirano.getColumns().isEmpty())
-                Tabela.kreirajTabeluBezSlike(tabelaFiltrirano, false);
+                Tabela.kreirajTabelu(tabelaFiltrirano, false);
+//    Tabela.kreirajTabeluBezSlike(tabelaFiltrirano, false);
             //ucitavanje podataka u tabelu
             tabelaFiltrirano.setItems(podaciFiltrirano);
         } catch (SQLException ex) {
@@ -119,9 +121,11 @@ public class NabavkaKontroler {
     
     //kreiranje tabela
     public void kreirajTabele(TableView tFilt, TableView tOdab) {
-        Tabela.kreirajTabeluBezSlike(tFilt, false);
+        //Tabela.kreirajTabeluBezSlike(tFilt, false);
+        Tabela.kreirajTabelu(tFilt, false);
         tFilt.setId("tabela-filtrirano");
-        Tabela.kreirajTabeluBezSlike(tOdab, false);
+        //Tabela.kreirajTabeluBezSlike(tOdab, false);
+        Tabela.kreirajTabelu(tOdab, false);
         tFilt.setId("tabela-odabrano");
     }
     
