@@ -23,7 +23,9 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Priority;
 import kontroleri.NabavkaKontroler;
+import pomocne.Tabela;
 
 public class Nabavka extends Application {
     //objekat za konekciju sa bazom podataka
@@ -54,9 +56,10 @@ public class Nabavka extends Application {
     //Kreiranje dugmica
     Button pretragaDugme = new Button("Pretraži");
     Button dodavanjeDugme = new Button("Dodaj komponentu");
-    Button prihvatiDugme = new Button("Prihvati");
-    Button nazadDugme = new Button("Nazad");
+    Button prihvatiDugme = new Button("Realizuj nabavku");
+    Button nazadDugme = new Button("Odustani");
     Button dobavljacDugme = new Button("Dodaj dobavljača");
+    Button ponistiDugme = new Button("Poništi");
     
     //Kreiranje opisa koji ce da stoje na formi
     Label naslovForme = new Label("Nabavka");
@@ -65,13 +68,15 @@ public class Nabavka extends Application {
     CheckBox aktuelneCB = new CheckBox();
     
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
-    HBox opisiCB = new HBox();
-    HBox comboboxHB = new HBox();
     HBox footerHB = new HBox();
 
-    VBox desniVB = new VBox();
-    VBox headerHB = new VBox();
+    BorderPane desniBP = new BorderPane();
+    HBox headerHB = new HBox();
     VBox boxZaTabele = new VBox();
+    VBox filterVB = new VBox();
+    VBox donjiVB = new VBox();
+    HBox srednjiHB = new HBox();
+    VBox dobavljacVB = new VBox();
     
     //Kreiranje Fonta
     Font font = new Font(25);
@@ -85,97 +90,124 @@ public class Nabavka extends Application {
     @Override
     public void init() throws Exception {
         super.init(); 
-        kontroler.kreirajTabele(tabelaFiltrirano, tabelaOdabrano);
+        //kontroler.kreirajTabele(tabelaFiltrirano, tabelaOdabrano);
+        Tabela.kreirajTabelu(tabelaFiltrirano, false);
+        
     }
     
     @Override
     public void start(Stage primaryStage) throws SQLException {
+       
+        //podesavanje header boxa
+        naslovForme.setFont(font);
+        naslovForme.setId("headerLabel");
+
+        headerHB.setAlignment(Pos.CENTER);
+        headerHB.setId("headerBackground");
+        headerHB.setPadding(new Insets(10));
+        headerHB.setMinSize(1000, 100);
+        headerHB.getChildren().add(naslovForme);
         
+
         //podesavanje CB-a
         tipCB.setPromptText("Izaberi tip");
         tipCB.setMinSize(150, 25);
         proizvodjacCB.setPromptText("Izaberi proizvođača");
         proizvodjacCB.setMinSize(150, 25);
-        dobavljacCB.setPromptText("Izaberi dobavljača");
-        dobavljacCB.setMinSize(150, 25);
         
-        //podesavanja za dugme za pretragu
-        pretragaDugme.setMinSize(100, 25);
-        pretragaDugme.setId("pretragaButton");
-        pretragaDugme.setDefaultButton(true);
-
-        //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        comboboxHB.setAlignment(Pos.BOTTOM_LEFT);
-        comboboxHB.setId("headerBackground");
-        comboboxHB.setPadding(new Insets(10));
-        comboboxHB.setSpacing(30);
-        comboboxHB.setMinSize(1000, 100);
-        
-        deoNaziva.setPromptText("Pretraga");
-        
-        naslovForme.setTranslateY(-30);
-        naslovForme.setTranslateX(-230);
-        naslovForme.setFont(font);
-        naslovForme.setId("headerLabel");
-        
-        //dodavanje nodova u HBox
-        comboboxHB.getChildren().addAll(tipCB, proizvodjacCB, deoNaziva, pretragaDugme,naslovForme);
-        
-        //podesavanje velicine,pozicije i izgleda panela sa opisima i combobox-evima
-        headerHB.getChildren().addAll(opisiCB, comboboxHB);
-
-        //podesavanje velicine,pozicije i izgleda panela sa 2 tableView prozora
-        tabelaFiltrirano.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tabelaFiltrirano.setMaxSize(800, 250);
-        boxZaTabele.setPadding(new Insets(10));
-        
-        tabelaOdabrano.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tabelaOdabrano.setMaxSize(800, 250);
-        boxZaTabele.getChildren().addAll(labelFiltriraneKomponente,tabelaFiltrirano,labelOdabraneKomponente, tabelaOdabrano);
-        
-        
-        //podesavanje velicine,pozicije i izgleda panela sa dugmicima
-        footerHB.setAlignment(Pos.CENTER);
-        footerHB.setPadding(new Insets(10));
-        footerHB.setSpacing(30);
-        prihvatiDugme.setId("buttonStyleNabavka");
-        nazadDugme.setId("buttonStyleNabavka");
-        footerHB.setMargin(nazadDugme, new Insets(0, 0, 0, 410));
-        footerHB.setMargin(prihvatiDugme, new Insets(0, 0, 0, 350));
-        footerHB.getChildren().addAll(prihvatiDugme, nazadDugme);
-        
-        //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        dodavanjeDugme.setId("buttonStyleNabavka");
-        dodavanjeDugme.setMinSize(150, 25);
-        desniVB.getChildren().add(dodavanjeDugme);
-        desniVB.setAlignment(Pos.TOP_CENTER); //.TOP_LEFT);
-        desniVB.setPadding(new Insets(10));
-        desniVB.setSpacing(30);
-        dobavljacDugme.setId("buttonStyleNabavka");
-        dobavljacDugme.setMinSize(150, 25);
+        //checkbox za aktuelne komponente
         aktuelneCB.setSelected(true);
         aktuelneCB.setText("Samo aktuelne");
-        desniVB.getChildren().addAll(dobavljacCB, dobavljacDugme, aktuelneCB);
+        
+        //polje za unos reci za pretragu
+        deoNaziva.setPromptText("Pretraga");
+        
+        //podesavanja za dugme za pretragu
+        pretragaDugme.setId("buttonStyleNabavka");
+        pretragaDugme.setDefaultButton(true);
+        
+        //dugme za ponistavanje odabranih filtera
+        ponistiDugme.setId("buttonStyleNabavka");
+        
+        //podesavanje velicine, pozicije i izgleda panela sa combobox-evima i dugmicima za filtriranje
+        filterVB.getChildren().addAll(tipCB, proizvodjacCB, aktuelneCB, deoNaziva, pretragaDugme, ponistiDugme);
+        filterVB.setSpacing(15);
+        filterVB.setPadding(new Insets(10));
+        filterVB.setAlignment(Pos.CENTER);
+        
+        //dugme za dodavanje nove komponente
+        dodavanjeDugme.setId("buttonStyleNabavka");
+        //combobox za odabir dobavljaca
+        dobavljacCB.setPromptText("Izaberi dobavljača");
+        //dugme za dodavanje novog dobavljaca
+        dobavljacDugme.setId("buttonStyleNabavka");
+        
+        //podesavanje VBox-a za elemente vezane za dodavanje komponente i dobavljaca
+        dobavljacVB.setSpacing(15);
+        dobavljacVB.setPadding(new Insets(10));
+        dobavljacVB.setAlignment(Pos.CENTER);
+        dobavljacVB.getChildren().addAll(dodavanjeDugme, dobavljacCB, dobavljacDugme);
+        
+        //dugme za realizaciju nabavke
+        prihvatiDugme.setId("buttonStyleNabavka");
+        //dugme za odustajanje
+        nazadDugme.setId("buttonStyleNabavka");
+        //VBox za smestaj dva zadnja dugmeta
+        donjiVB.setPadding(new Insets(10));
+        donjiVB.setAlignment(Pos.CENTER);
+        donjiVB.getChildren().addAll(prihvatiDugme, nazadDugme);
+        
+        
+        //desni BorderPane sa filterima (gore), tabelama i delom za dobavljaca (sredina) i dugmicima za odustajanje i realizaciju (dole)
+        desniBP.setId("bottomStyle");
+        desniBP.setPadding(new Insets(10));
+        desniBP.setTop(filterVB); 
+        desniBP.setCenter(dobavljacVB);
+        desniBP.setBottom(donjiVB);
+        desniBP.setMinWidth(80);
+        
+        tabelaFiltrirano.setPlaceholder(new Label(""));
+        tabelaOdabrano.setPlaceholder(new Label(""));
+        
+        //podesavanje VBoxa koji sadrzi tabele
+        boxZaTabele.setSpacing(10);
+        boxZaTabele.setPadding(new Insets(10));
+        
+        
+        HBox.setHgrow(boxZaTabele, Priority.ALWAYS);
+        HBox.setHgrow(srednjiHB, Priority.ALWAYS);
+        
+        
+        boxZaTabele.getChildren().addAll(labelFiltriraneKomponente, tabelaFiltrirano, labelOdabraneKomponente, tabelaOdabrano );
+        
+        //dodavanje boxa za tabele i desnog BorderPane u srednji HBox
+        srednjiHB.getChildren().addAll(boxZaTabele, desniBP);
+        
+        
+        //podesavanje velicine,pozicije i izgleda donjeg boxa
+        footerHB.setAlignment(Pos.CENTER);
+        footerHB.setPadding(new Insets(10));
+        
         
         //popunjavanje combobox-eva podacima
         kontroler.popuniComboBoxeve(opcijeTip, opcijeProizvodjac, opcijeDobavljac);
         
-        //Kreiranje BorderPane-a za raspored HBox i VBox panela
-        BorderPane root = new BorderPane();
-        root.setTop(headerHB);
-        root.setCenter(boxZaTabele);
-        root.setBottom(footerHB);
-        root.setRight(desniVB);
-
+        //dodavanje boxeva u glavni VBox
+        VBox root = new VBox();
+        root.getChildren().addAll(headerHB, srednjiHB, footerHB);
+        
+        
         //Kreiranje scene ,velicine,naziva povezivanje sa Css-om
-        scene = new Scene(root, 1000, 650);
-        primaryStage.setResizable(false);
+        scene = new Scene(root, 1000, 800);
+        
         primaryStage.setTitle("Nabavka - UNDP Offline Store");
         scene.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.show();
-
-
+        primaryStage.setMinWidth(1000);
+        primaryStage.setMinHeight(800);
+        
+        
         //pretrazivanje na osnovu zadatih kriterijuma
         pretragaDugme.setOnAction(e -> {
             kontroler.preuzmiPodatke(tipCB, proizvodjacCB, deoNaziva, aktuelneCB,

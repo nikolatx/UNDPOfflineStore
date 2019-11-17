@@ -121,7 +121,8 @@ public class IzvestajNabavke extends Application {
         tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tabela.setMaxSize(800, 250);
         boxZaTabele.setPadding(new Insets(10));
-
+        tabela.setPlaceholder(new Label(""));
+        
         tabela.setMinSize(800, 430);
         tabela.setId("my-table");
         boxZaTabele.setId("bottomStyle");

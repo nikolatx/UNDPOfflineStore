@@ -42,7 +42,6 @@ public class UndpOfflineStore extends Application {
         
     @Override
     public void start(Stage primaryStage) {
-        
               
         //Podesavanje velicine , izgleda i dodavanje nodova na Hbox
         hb1.setMinSize(800, 120);
@@ -76,6 +75,13 @@ public class UndpOfflineStore extends Application {
         hb3.getChildren().addAll(btn1,btn2,btn3,btn4,btn5);
         hb3.setSpacing(40);
         hb3.setId("bottomStyle");       //Css - Style: podesavanje izgleda
+        
+        //disable dugmica dok se ne uspostavi konekcija
+        btn1.setDisable(true);
+        btn2.setDisable(true);
+        btn3.setDisable(true);
+        btn4.setDisable(true);
+        btn5.setDisable(true);
         
         //Kreiranje BorderPane-a za rasporedjivanje HBoc panela na sceni
         BorderPane root = new BorderPane();
@@ -137,8 +143,11 @@ public class UndpOfflineStore extends Application {
             
         });
         
+        //pokretanje servisa za proveru stanja MySQL servera
         servisKonekcija.start();
+        
         servisKonekcija.setOnSucceeded(e->{
+            //ukoliko server nije pokrenut prikazi poruku za ponovni pokusaj ili napustanje aplikacije
             if (servisKonekcija.getValue()==null) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Greška");
@@ -161,13 +170,22 @@ public class UndpOfflineStore extends Application {
                         Platform.exit();
                     alert.close();
                 });
+            } else {
+                //enable dugmica kad se uspostavi konekcija
+                btn1.setDisable(false);
+                btn2.setDisable(false);
+                btn3.setDisable(false);
+                btn4.setDisable(false);
+                btn5.setDisable(false);
             }
+                    
+                   
         });
         
         
         //Kreiranje scene,velicine,naziva i povezivanje sa css-om
         Scene scene = new Scene(root, 1000, 650);
-        primaryStage.setResizable(false);
+        //primaryStage.setResizable(false);
         primaryStage.setTitle("UNDP Offline Store");
         scene.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         primaryStage.setScene(scene);

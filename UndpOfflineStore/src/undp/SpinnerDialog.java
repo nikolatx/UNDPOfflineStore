@@ -23,7 +23,7 @@ public class SpinnerDialog {
         Stage noviProzor = new Stage();
         noviProzor.initModality(Modality.APPLICATION_MODAL);
         noviProzor.setTitle(title);
-        noviProzor.setWidth(300);
+        noviProzor.setWidth(350);
         noviProzor.setHeight(175);
         noviProzor.initStyle(StageStyle.UTILITY);
         Label label = new Label(message);
@@ -38,7 +38,7 @@ public class SpinnerDialog {
         HBox gornjiHBox=new HBox();
         HBox donjiHBox=new HBox();
         Label labela1=new Label("Unesi željenu količinu:");
-        labela1.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+        labela1.setFont(Font.font("Verdana", FontWeight.BOLD, 11));
         //spinner-om se vrsi odabir kolicine komponente koja se dodaje
         Spinner spinner=new Spinner();   
         spinner.setId("buttonStyleNabavka");

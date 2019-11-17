@@ -74,7 +74,10 @@ public class NabavkaKontroler {
             if (kolicina>0) {
                 komponenta.setKolicina(kolicina);
                 podaciOdabrano.add(komponenta);
-                tabelaOdabrano.setItems(podaciOdabrano);
+                //tabelaOdabrano .getItems().add(komponenta);
+                if (podaciOdabrano.size()==1)
+                    tabelaOdabrano.setItems(podaciOdabrano);
+                
             }
         }
     }

@@ -31,6 +31,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import com.grupa1.dbconnection.PomocneDAO;
+import com.grupa1.model.Slika;
 
 public class NovaKomponenta {
     
@@ -128,7 +129,8 @@ public class NovaKomponenta {
                 komponenta.setProizvodjac((String)proizvodjacCB.getSelectionModel().getSelectedItem());
                 komponenta.setKolicina(Integer.valueOf(novaKomponentaKolicina.getText()));
                 komponenta.setCena(Double.valueOf(novaKomponentaCena.getText()));
-                komponenta.setSlika(novaKomponentaSlika.getText());
+                //komponenta.setSlika(novaKomponentaSlika.getText());
+                komponenta.setSlika(new Slika(novaKomponentaSlika.getText()));
                 komponenta.setAktuelna(novaKomponentaAktuelno.isSelected());
 
                 //ocitavanje proizvodjacID polja iz baze

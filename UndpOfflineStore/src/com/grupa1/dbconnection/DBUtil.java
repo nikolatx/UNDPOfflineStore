@@ -3,6 +3,7 @@ package com.grupa1.dbconnection;
 import com.grupa1.model.KomponentaSaSlikom;
 import com.grupa1.model.KomponentaSvaPolja;
 import com.grupa1.model.Osoba;
+import com.grupa1.model.Slika;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -144,7 +145,7 @@ public class DBUtil {
             ps1.setInt(3, tipId);
             ps1.setInt(4, komponenta.getKolicina());
             ps1.setDouble(5, komponenta.getCena());
-            ps1.setString(6, komponenta.getSlika());
+            ps1.setString(6, ((Slika)komponenta.getSlika()).getNaziv());  //komponenta.getSlika());
             ps1.setBoolean(7, komponenta.getAktuelna());
             upisano=ps1.executeUpdate();
         } catch (SQLException ex) {
@@ -386,7 +387,7 @@ public class DBUtil {
                     //kreiranje komponente na osnovu podataka ocitanih iz baze
                     KomponentaSaSlikom kompon=new KomponentaSaSlikom(rs.getInt(1), rs.getString(2),
                                                         rs.getString(3), rs.getString(4), 
-                                                        rs.getInt(5), rs.getDouble(6), rs.getString(7));
+                                                        rs.getInt(5), rs.getDouble(6), new Slika(rs.getString(7)) );
                     //dodavanje komponente u listu
                     podaciFiltrirano.add(kompon);
                 }

@@ -3,6 +3,7 @@ package com.grupa1.dbconnection;
 
 import com.grupa1.model.Komponenta;
 import com.grupa1.model.KomponentaSaSlikom;
+import com.grupa1.model.Slika;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -52,7 +53,7 @@ public class AzuriranjeDAO {
                     //kreiranje komponente na osnovu podataka ocitanih iz baze
                     KomponentaSaSlikom kompon=new KomponentaSaSlikom(rs.getInt(1), rs.getString(2),
                                                         rs.getString(3), rs.getString(4), 
-                                                        rs.getInt(5), rs.getDouble(6), rs.getString(7));
+                                                        rs.getInt(5), rs.getDouble(6), new Slika(rs.getString(7)));
                     //dodavanje komponente u listu
                     podaciFiltrirano.add(kompon);
                 }

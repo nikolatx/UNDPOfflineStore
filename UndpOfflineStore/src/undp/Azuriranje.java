@@ -124,7 +124,7 @@ public class Azuriranje extends Application {
         tabelaFiltrirano.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         //tabelaFiltrirano.setMaxSize(800, 250);
         boxZaTabele.setPadding(new Insets(10));
-
+        tabelaFiltrirano.setPlaceholder(new Label(""));
         tabelaFiltrirano.setMinSize(800, 400);
         boxZaTabele.setId("bottomStyle");
         boxZaTabele.setMaxSize(800, 430);

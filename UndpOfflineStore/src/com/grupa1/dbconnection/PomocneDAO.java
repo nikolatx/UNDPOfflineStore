@@ -34,7 +34,32 @@ public class PomocneDAO {
             }
         }
     }
-    
+    //ucitavanje vrednosti u ComboBox tipa za zadatog proizvodjaca
+    public static void ispuniComboBoxZaTipProizvodjaca(ObservableList<String> opcijeTip, String proizvodjac, boolean dodajNovi) {
+        ResultSet rs=null;
+        conn=DBUtil.napraviKonekciju();
+        if (conn!=null) {
+            try {
+                String upit="SELECT DISTINCT t.naziv FROM tip as t "
+                        + "INNER JOIN komponenta as k ON k.tip_id=t.tip_id "
+                        + "INNER JOIN proizvodjac as p ON k.proizvodjac_id=p.proizvodjac_id "
+                        + "WHERE p.naziv='"+proizvodjac+"'";
+                rs=DBUtil.prikupiPodatke(conn, upit);
+                if (dodajNovi) opcijeTip.add(">>dodaj novi<<");
+                while (rs.next()) {
+                    opcijeTip.add(rs.getString("naziv"));
+                }
+            } catch (SQLException ex) {
+                Pomocne.poruka(ex.getMessage());
+            } finally {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Pomocne.poruka(ex.getMessage());
+                }
+            }
+        }
+    }
     //ucitavanje vrednosti u ComboBox proizvodjaca
     public static void ispuniComboBoxZaProizvodjaca(ObservableList<String> opcijeProizvodjac, boolean dodajNovog) {
         ResultSet rs=null;
@@ -57,7 +82,32 @@ public class PomocneDAO {
             }
         }
     }
-    
+    //ucitavanje vrednosti u ComboBox proizvodjaca
+    public static void ispuniComboBoxZaProizvodjacaPoTipu(ObservableList<String> opcijeProizvodjac, String tip, boolean dodajNovog) {
+        ResultSet rs=null;
+        conn=DBUtil.napraviKonekciju();
+        if (conn!=null) {
+            try {
+                String upit="SELECT DISTINCT p.naziv FROM proizvodjac as p "
+                        + "INNER JOIN komponenta as k ON k.proizvodjac_id=p.proizvodjac_id "
+                        + "INNER JOIN tip as t ON k.tip_id=t.tip_id "
+                        + "WHERE t.naziv='"+tip+"'";
+                rs=DBUtil.prikupiPodatke(conn, upit);
+                if (dodajNovog) opcijeProizvodjac.add(">>dodaj novog<<");
+                while (rs.next()) {
+                    opcijeProizvodjac.add(rs.getString("naziv"));
+                }
+            } catch (SQLException ex) {
+                Pomocne.poruka(ex.getMessage());
+            } finally {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    Pomocne.poruka(ex.getMessage());
+                }
+            }
+        }
+    }
     //ucitavanje vrednosti u ComboBox dobavljaca
     public static void ispuniComboBoxZaDobavljaca(ObservableList<String> opcijeDobavljac) {
         ResultSet rs=null;

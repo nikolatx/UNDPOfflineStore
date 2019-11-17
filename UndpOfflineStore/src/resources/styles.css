@@ -4,8 +4,6 @@
     -fx-background-position:center;
     -fx-background-size: 200px 150px;
     -fx-background-color: #0068d8;
-
-    
 }
 
 #headerLabel{
@@ -124,7 +122,7 @@
 #buttonStyleNabavka{
     -fx-background-color: #0068d8;
     -fx-pref-height: 50px;
-    -fx-pref-width: 100px;
+    -fx-pref-width: 150px;
     -fx-text-fill: #ffffff;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,0.9) , 9, 0.0 , 0 , 8 );

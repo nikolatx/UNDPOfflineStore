@@ -13,8 +13,8 @@ public class KomponentaSvaPolja extends KomponentaSaSlikom {
         this.aktuelnaProperty=new SimpleBooleanProperty(true);
     }
 
-    public KomponentaSvaPolja(int idProperty, String nazivProperty, String proizvodjacProperty, String tipProperty, int kolicinaProperty, double cenaProperty, String slikaProperty, boolean aktuelna) {
-        super(idProperty, nazivProperty, proizvodjacProperty, tipProperty, kolicinaProperty, cenaProperty, slikaProperty);
+    public KomponentaSvaPolja(int idProperty, String nazivProperty, String proizvodjacProperty, String tipProperty, int kolicinaProperty, double cenaProperty, Slika slika, boolean aktuelna) {
+        super(idProperty, nazivProperty, proizvodjacProperty, tipProperty, kolicinaProperty, cenaProperty, slika);
         this.aktuelnaProperty = new SimpleBooleanProperty(aktuelna);
     }
     

@@ -117,7 +117,8 @@ public class IzvestajProdaje extends Application {
         tabela.setMaxSize(800, 250);
         tabela.setId("my-table");
         boxZaTabele.setPadding(new Insets(10));
-
+        tabela.setPlaceholder(new Label(""));
+        
         tabela.setMaxSize(800, 400);
         boxZaTabele.setId("bottomStyle");
         boxZaTabele.setMaxSize(800, 450);

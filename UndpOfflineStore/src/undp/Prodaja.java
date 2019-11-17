@@ -142,7 +142,9 @@ public class Prodaja extends Application {
         tabelaOdabrano.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         tabelaOdabrano.setMaxSize(800, 250);
         boxZaTabele.getChildren().addAll(labelFiltriraneKomponente, tabelaFiltrirano, labelOdabraneKomponente, tabelaOdabrano);
-
+        tabelaFiltrirano.setPlaceholder(new Label(""));
+        tabelaOdabrano.setPlaceholder(new Label(""));
+        
         //podesavanje velicine, pozicije i izgleda panela sa dugmicima
         footerHB.setAlignment(Pos.CENTER);
         footerHB.setId("bottomStyle");
