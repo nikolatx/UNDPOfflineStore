@@ -6,6 +6,11 @@ import com.grupa1.model.Komponenta;
 import com.grupa1.model.KomponentaSaSlikom;
 import com.grupa1.model.Slika;
 import java.io.File;
+import java.util.Collections;
+import static java.util.Collections.list;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -43,42 +48,47 @@ public class Tabela {
 //otvara se uvecana slika kada se klikne na sliku u prvoj koloni tabele
     private static void klikNaSliku(TableView tabela) {
         //ocitavanje odabrane komponente iz TableView-a
-        KomponentaSaSlikom komponenta = (KomponentaSaSlikom) tabela.getSelectionModel().getSelectedItem();
-        String nazivSlike=((Slika)komponenta.getSlika()).getNaziv();
-        if (komponenta==null || nazivSlike.equals("")) return;
-        //putanja do slike
-        String imageFile=Konst.SLIKE_PATH + "\\" + nazivSlike;
-        //inicijalizacija image objekta na osnovu putanje i naziva fajla
-        Image image=new Image(new File(imageFile).toURI().toString());
-        ImageView imageView=new ImageView(image);
-        //podesavanje velicine uvecane slike
-        if (image.getHeight()>image.getWidth())
-            imageView.setFitHeight(Konst.VELICINA_SLIKE-10);
-        else
-            imageView.setFitWidth(Konst.VELICINA_SLIKE-10);
-        imageView.setPreserveRatio(true);
-        //slika se smesta u StackPane
-        StackPane pane=new StackPane();
-        pane.getChildren().add(imageView);
-        //podesavanje border-a StackPane-a
-        pane.setStyle("-fx-border-color: black;-fx-border-style: solid;-fx-border-width: 5;");
-        
-        Scene scena = new Scene(pane, Konst.VELICINA_SLIKE, Konst.VELICINA_SLIKE);
-        //podesavanje novog prozora
-        Stage noviProzor=new Stage();
-        noviProzor.setTitle(nazivSlike+" "+komponenta.getProizvodjac());
-        noviProzor.setScene(scena);
+        try {
+            KomponentaSaSlikom komponenta= (KomponentaSaSlikom) tabela.getSelectionModel().getSelectedItem();
+            String nazivSlike=((Slika)komponenta.getSlika()).getNaziv();
+            if (komponenta==null || nazivSlike.equals("")) return;
+            //putanja do slike
+            String imageFile=Konst.SLIKE_PATH + "\\" + nazivSlike;
+            //inicijalizacija image objekta na osnovu putanje i naziva fajla
+            Image image=new Image(new File(imageFile).toURI().toString());
+            ImageView imageView=new ImageView(image);
+            //podesavanje velicine uvecane slike
+            if (image.getHeight()>image.getWidth())
+                imageView.setFitHeight(Konst.VELICINA_SLIKE-10);
+            else
+                imageView.setFitWidth(Konst.VELICINA_SLIKE-10);
+            imageView.setPreserveRatio(true);
+            //slika se smesta u StackPane
+            StackPane pane=new StackPane();
+            pane.getChildren().add(imageView);
+            //podesavanje border-a StackPane-a
+            pane.setStyle("-fx-border-color: black;-fx-border-style: solid;-fx-border-width: 5;");
 
-        scena.getStylesheets().addAll(Tabela.class.getResource("/resources/styles.css").toExternalForm());
-        
-        noviProzor.initStyle(StageStyle.UNDECORATED);
-        noviProzor.initModality(Modality.APPLICATION_MODAL);
-        //aktiviranje i prikaz novog prozora
-        noviProzor.show();
+            Scene scena = new Scene(pane, Konst.VELICINA_SLIKE, Konst.VELICINA_SLIKE);
+            //podesavanje novog prozora
+            Stage noviProzor=new Stage();
+            noviProzor.setTitle(nazivSlike+" "+komponenta.getProizvodjac());
+            noviProzor.setScene(scena);
 
-        pane.setOnMouseClicked(ev->{
-            noviProzor.close();
-        });
+            scena.getStylesheets().addAll(Tabela.class.getResource("/resources/styles.css").toExternalForm());
+
+            noviProzor.initStyle(StageStyle.UNDECORATED);
+            noviProzor.initModality(Modality.APPLICATION_MODAL);
+            //aktiviranje i prikaz novog prozora
+            noviProzor.show();
+
+            pane.setOnMouseClicked(ev->{
+                noviProzor.close();
+            });
+        } catch (NullPointerException ex) {
+            
+        }
+            
     }
     //tabela u pretrazi i azuriranju
     public static void kreirajTabelu(TableView<KomponentaSaSlikom> tabela, boolean editable) {
@@ -98,47 +108,68 @@ public class Tabela {
                 
                 TableCell<KomponentaSaSlikom, Slika> cell = new TableCell<KomponentaSaSlikom, Slika>() {
                     
-                    StackPane box=new StackPane();
-                    ImageView imageview = new ImageView();
-                    
-                    
-                    
-                    
-                    
+                    int a=0;
                     
                     @Override
                     public void updateItem(Slika item, boolean empty) {
-                        //super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
-                        if (item != null) {
-                            box.setPadding(new Insets(4, 4, 4, 4));
-                            //Image img = null;
-                            KomponentaSaSlikom k = (KomponentaSaSlikom)tabela.getItems().get(getIndex());
-                            
-                            String nazivSlike=((Slika)k.getSlika()).getNaziv();
-                            String slikaFajl=Konst.SLIKE_PATH+"\\"+nazivSlike;
-                            
-                            if (!nazivSlike.equals("") && !nazivSlike.isEmpty() && k.getSlika()!=null) {
+                        //List<KomponentaSaSlikom> result = list.stream().filter(it -> item.getNaziv().equals( .getName()).collect(Collectors.toList());
+                        /*
+                        KomponentaSaSlikom kompo=new KomponentaSaSlikom(1, "", "", "", 1, 1, item);
+                        
+                        a=Collections.binarySearch(tabela.getItems(), kompo, new Comparator<KomponentaSaSlikom>() {
+                        @Override
+                        public int compare(KomponentaSaSlikom o1, KomponentaSaSlikom o2) {
+                            String s1=((Slika)o1.getSlika()).getNaziv();
+                            String s2=((Slika)o2.getSlika()).getNaziv();
+                            return s1.compareTo(s2);
+                            }
+                        });
+                        */
+                        boolean exists = tabela.getItems().stream().anyMatch(o -> ((Slika)o.getSlika()).getNaziv().equals(item.getNaziv()));
+                        
+                        if (tabela.getItems()!=null) {
+                        
+                            StackPane box=new StackPane();
+                            ImageView imageview = new ImageView();
+                            //super.updateItem(item, empty); //To change body of generated methods, choose Tools | Templates.
+                            if (item != null) {
+                                box.setPadding(new Insets(4, 4, 4, 4));
 
-                                Image img = new Image(new File(slikaFajl).toURI().toString());
+                                //Image img = null;
+                                KomponentaSaSlikom k;
+                                try {
+                                    k = (KomponentaSaSlikom)tabela.getItems().get(getIndex());
+                                    String nazivSlike=((Slika)k.getSlika()).getNaziv();
+                                    String slikaFajl=Konst.SLIKE_PATH+"\\"+nazivSlike;
+                                    if (!nazivSlike.equals("") && !nazivSlike.isEmpty() && k.getSlika()!=null) {
 
-                                imageview.setImage(img);
-                                imageview.setFitHeight(50.0); //50.0);
-                                imageview.setFitWidth(50.0); //50.0);
+                                        Image img = new Image(new File(slikaFajl).toURI().toString());
 
-                                
-                                if(!box.getChildren().contains(imageview)) {
-                                    box.getChildren().add(imageview);
-                                    box.setOnMouseClicked(e->{
-                                       klikNaSliku(tabela);
-                                    });
-                                    setGraphic(box);
+                                        imageview.setImage(img);
+                                        imageview.setFitHeight(50.0); //50.0);
+                                        imageview.setFitWidth(50.0); //50.0);
+
+
+                                        if(!box.getChildren().contains(imageview)) {
+                                            box.getChildren().add(imageview);
+                                            box.setOnMouseClicked(e->{
+                                               klikNaSliku(tabela);
+                                            });
+                                            setGraphic(box);
+
+                                        }
+                                    }
+
+
+                                } catch (NullPointerException ex) {
 
                                 }
+
+                            
+                            
                             }
                         }
                     }
-                    
-
                     
                 };
                 return cell;
