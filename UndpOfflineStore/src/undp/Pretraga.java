@@ -186,6 +186,7 @@ public class Pretraga extends Application {
             tipOdabran=false;
             proizvodjacOdabran=false;
             deoNaziva.setText("");
+            podaciFiltrirano.clear();
         });
         
         nazadDugme.setOnAction(e ->{

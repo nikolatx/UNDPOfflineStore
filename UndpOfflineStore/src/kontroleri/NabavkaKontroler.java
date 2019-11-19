@@ -72,6 +72,7 @@ public class NabavkaKontroler {
             SpinnerDialog spDialog=new SpinnerDialog();
             int kolicina=spDialog.display("Kolicina", "Odaberi kolicinu", Integer.MAX_VALUE, 1);
             if (kolicina>0) {
+                Tabela.broj=0;
                 komponenta.setKolicina(kolicina);
                 podaciOdabrano.add(komponenta);
                 //tabelaOdabrano .getItems().add(komponenta);
@@ -87,6 +88,7 @@ public class NabavkaKontroler {
                                ObservableList<KomponentaSaSlikom> podaciFiltrirano, TableView tabelaFiltrirano) {
         tabelaFiltrirano.getItems().clear();
         tabelaFiltrirano.getColumns().clear();
+        podaciFiltrirano.clear();
         try {
             DBUtil.preuzmiPodatke(tipCB, proizvodjacCB, deoNaziva, aktuelneCB, podaciFiltrirano);
             //dodavanje kolona, naziva kolona i podesavanje sirine kolona tabele
