@@ -2,6 +2,7 @@
 package kontroleri;
 
 import com.grupa1.dbconnection.DBUtil;
+import com.grupa1.dbconnection.PomocneDAO;
 import com.grupa1.dbconnection.ProdajaDAO;
 import com.grupa1.model.Dokument;
 import com.grupa1.model.KomponentaSaSlikom;
@@ -16,12 +17,11 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import pomocne.Pomocne;
+import pomocne.Tabela;
 import undp.NoviKupac;
 import undp.SpinnerDialog;
 import util.DocxExport;
@@ -69,13 +69,11 @@ public class ProdajaKontroler {
                                     ObservableList<KomponentaSaSlikom> podaciOdabrano) {
         //ocitavanje odabrane komponente
         KomponentaSaSlikom komponenta = (KomponentaSaSlikom) tabelaFiltrirano.getSelectionModel().getSelectedItem();
-        if (komponenta == null) {
+        if (komponenta == null)
             return;
-        }
         //kreiranje kolona tabele ukoliko vec nisu kreirane
-        if (tabelaOdabrano.getColumns().isEmpty()) {
-            kreirajTabelu(tabelaOdabrano);
-        }
+        if (tabelaOdabrano.getColumns().isEmpty())
+            Tabela.kreirajTabelu(tabelaOdabrano, false);
         //ukoliko komponenta ne postoji u tabeli sa odabranim komponentama - dodavanje
         if (!podaciOdabrano.contains(komponenta)) {
             //zadavanje kolicine
@@ -94,11 +92,12 @@ public class ProdajaKontroler {
                                ObservableList<KomponentaSaSlikom> podaciFiltrirano, TableView tabelaFiltrirano) {
         tabelaFiltrirano.getItems().clear();
         tabelaFiltrirano.getColumns().clear();
+        podaciFiltrirano.clear();
         try {
             DBUtil.preuzmiPodatke(tipCB, proizvodjacCB, deoNaziva, aktuelneCB, podaciFiltrirano);
             //dodavanje kolona, naziva kolona i podesavanje sirine kolona tabele
             if (tabelaFiltrirano.getColumns().isEmpty())
-                kreirajTabelu(tabelaFiltrirano);
+                Tabela.kreirajTabelu(tabelaFiltrirano, false);
             //ucitavanje podataka u tabelu
             tabelaFiltrirano.setItems(podaciFiltrirano);
         } catch (SQLException ex) {
@@ -106,63 +105,22 @@ public class ProdajaKontroler {
         }
     }
     
+    //popunjavanje comboboxeva podacima iz baze podataka
+    public void popuniComboBoxeve(ObservableList<String> opcijeTip, ObservableList<String> opcijeProizvodjac, 
+                                    ObservableList<String> opcijeKupac) {
+        PomocneDAO.ispuniComboBoxZaTip(opcijeTip, false);
+        PomocneDAO.ispuniComboBoxZaProizvodjaca(opcijeProizvodjac, false);
+        PomocneDAO.ispuniComboBoxZaKupca(opcijeKupac);
+    }
+    
     //pozivanje metode kreiranja obe tabele
     public void kreirajTabele(TableView tFilt, TableView tOdab) {
-        kreirajTabelu(tFilt);
+        Tabela.kreirajTabelu(tFilt, false);
         tFilt.setId("tabela-filtrirano");
-        kreirajTabelu(tOdab);
+        Tabela.kreirajTabelu(tOdab, false);
         tFilt.setId("tabela-odabrano");
     }
-    
-    //kreiranje tabele
-    private void kreirajTabelu(TableView tabela) {
-        //zabrana menjanja velicine da bi se zadale sirine kolona
-        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        //dodavanje nove kolone odgovarajuceg naziva
-        TableColumn kolonaSifra = new TableColumn("Sifra");
-        kolonaSifra.setStyle( "-fx-alignment: CENTER;");
-        //definisanje valueFactory-a za celije kolone
-        kolonaSifra.setCellValueFactory(new PropertyValueFactory<KomponentaSaSlikom, Integer>("id"));
-        //definisanje procentualne sirine kolone
-        kolonaSifra.setMaxWidth(1f * Integer.MAX_VALUE * 5); // 5% width
-        TableColumn kolonaOpis = new TableColumn("Naziv komponente");
-        kolonaOpis.setCellValueFactory(new PropertyValueFactory<KomponentaSaSlikom, String>("naziv"));
-        kolonaOpis.setMaxWidth(1f * Integer.MAX_VALUE * 37); // 37% width
-        kolonaOpis.setStyle( "-fx-alignment: CENTER;");
-        TableColumn kolonaProizvodjac = new TableColumn("Proizvodjac");
-        kolonaProizvodjac.setCellValueFactory(new PropertyValueFactory<KomponentaSaSlikom, String>("proizvodjac"));
-        kolonaProizvodjac.setMaxWidth(1f * Integer.MAX_VALUE * 23); // 23% width
-        kolonaProizvodjac.setStyle( "-fx-alignment: CENTER;");
-        TableColumn kolonaTip = new TableColumn("Tip");
-        kolonaTip.setCellValueFactory(new PropertyValueFactory<KomponentaSaSlikom, String>("tip"));
-        kolonaTip.setMaxWidth(1f * Integer.MAX_VALUE * 16); // 16% width
-        kolonaTip.setStyle( "-fx-alignment: CENTER;");
-        TableColumn kolonaKolicina = new TableColumn("Kolicina");
-        kolonaKolicina.setCellValueFactory(new PropertyValueFactory<KomponentaSaSlikom, Integer>("kolicina"));
-        kolonaKolicina.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10% width
-        kolonaKolicina.setStyle( "-fx-alignment: CENTER;");
-        
-        TableColumn kolonaCena = new TableColumn("Cena");
-        kolonaCena.setCellValueFactory(new PropertyValueFactory<KomponentaSaSlikom, Double>("cena"));
-        kolonaCena.setMaxWidth(1f * Integer.MAX_VALUE * 9); // 9% width
-        kolonaCena.setStyle("-fx-alignment: CENTER-RIGHT");
-        //podesavanje formata cene: 2 decimale i thousand separator
-        kolonaCena.setCellFactory(tc -> new TableCell<KomponentaSaSlikom, Number>() {
-            @Override
-            protected void updateItem(Number value, boolean empty) {
-                super.updateItem(value, empty) ;
-                if (empty) {
-                    setText(null);
-                } else {
-                    setText(String.format("%,.2f", value.doubleValue()));
-                }
-            }
-        });
-        //dodavanje kolona u tabelu
-        tabela.getColumns().addAll(kolonaSifra, kolonaOpis, kolonaProizvodjac,
-                                kolonaTip, kolonaKolicina, kolonaCena);
-    }
-    
+   
     //realizacija prodaje
     public void realizacijaProdaje(ObservableList<KomponentaSaSlikom> podaciOdabrano, ComboBox kupacCB, Button nazadDugme) {
         if (!podaciOdabrano.isEmpty()) {
@@ -175,7 +133,11 @@ public class ProdajaKontroler {
                 ButtonType dugmeAzuriraj = new ButtonType("Odobri prodaju robe");
                 ButtonType dugmeAzurirajStampaj = new ButtonType("Odobri i stampaj");
                 ButtonType dugmeOdustani = new ButtonType("Odustani", ButtonBar.ButtonData.CANCEL_CLOSE);
-
+                
+                DialogPane dialogPane = alert.getDialogPane();
+                dialogPane.getStylesheets().add(getClass().getResource("/resources/styles.css").toExternalForm());
+                dialogPane.getStyleClass().add("dialogPane");
+                
                 alert.getButtonTypes().setAll(dugmeAzuriraj, dugmeAzurirajStampaj, dugmeOdustani);
                 Platform.runLater(() -> {
                     Optional<ButtonType> result = alert.showAndWait();

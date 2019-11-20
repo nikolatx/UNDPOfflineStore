@@ -16,23 +16,21 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import com.grupa1.dbconnection.*;
 import com.grupa1.model.KomponentaSaSlikom;
-import com.grupa1.model.Slika;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
 import kontroleri.NabavkaKontroler;
+import pomocne.Pomocne;
 import pomocne.Tabela;
 
 public class Nabavka extends Application {
     //objekat za konekciju sa bazom podataka
     Connection conn;
-    
     
     //Liste za pracenje combobox-a
     ObservableList opcijeTip = FXCollections.observableArrayList();
@@ -42,7 +40,6 @@ public class Nabavka extends Application {
     ComboBox tipCB = new ComboBox(opcijeTip);
     ComboBox proizvodjacCB = new ComboBox(opcijeProizvodjac);
     ComboBox dobavljacCB = new ComboBox(opcijeDobavljac);
-    
     
     //Liste za pracenje informacija u tabeli
     ObservableList<KomponentaSaSlikom> podaciFiltrirano=FXCollections.observableArrayList();;
@@ -87,14 +84,12 @@ public class Nabavka extends Application {
     
     NabavkaKontroler kontroler=new NabavkaKontroler();
     NabavkaDAO nabavkaDAO=new NabavkaDAO();
-    
+    boolean tipOdabran, proizvodjacOdabran;
     
     @Override
     public void init() throws Exception {
         super.init(); 
-        //kontroler.kreirajTabele(tabelaFiltrirano, tabelaOdabrano);
         Tabela.kreirajTabelu(tabelaFiltrirano, false);
-        
     }
     
     @Override
@@ -216,6 +211,17 @@ public class Nabavka extends Application {
                                         podaciFiltrirano, tabelaFiltrirano);
         });
         
+        ponistiDugme.setOnAction(e->{
+            opcijeTip.clear();
+            opcijeProizvodjac.clear();
+            PomocneDAO.ispuniComboBoxZaTip(opcijeTip, false);
+            PomocneDAO.ispuniComboBoxZaProizvodjaca(opcijeProizvodjac, false);
+            tipOdabran=false;
+            proizvodjacOdabran=false;
+            deoNaziva.setText("");
+            podaciFiltrirano.clear();
+        });
+        
         //dvostruki klik na gornju tabelu - dodavanje komponente u donju tabelu
         tabelaFiltrirano.setOnMouseClicked((MouseEvent event) -> {
             //detektovanje dvostrukog klika levim dugmetom
@@ -252,6 +258,18 @@ public class Nabavka extends Application {
             primaryStage.close();
             new UndpOfflineStore().start(primaryStage);
         });
+        
+        //ucitavanje svih proizvodjaca koji imaju u ponudi trazeni tip
+        tipCB.setOnAction(e->{
+            tipOdabran=Pomocne.ucitajProizvodjace(proizvodjacOdabran, opcijeProizvodjac, (String) tipCB.getSelectionModel().getSelectedItem());
+        });
+        
+        //ucitavanje svih tipova odabranog proizvodjaca
+        proizvodjacCB.setOnAction(e->{
+            proizvodjacOdabran=Pomocne.ucitajTipove(tipOdabran, opcijeTip, (String) proizvodjacCB.getSelectionModel().getSelectedItem());
+        });
+        
+        
     }
     
     

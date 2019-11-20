@@ -22,6 +22,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.Priority;
 import kontroleri.PretragaKontroler;
+import pomocne.Pomocne;
 import pomocne.Tabela;
 
 
@@ -194,23 +195,14 @@ public class Pretraga extends Application {
             new UndpOfflineStore().start(primaryStage);
         });
         
-        
+        //ucitavanje svih proizvodjaca koji imaju u ponudi trazeni tip
         tipCB.setOnAction(e->{
-            //ucitavanje svih proizvodjaca koji imaju u ponudi trazeni tip
-            if (!proizvodjacOdabran) {
-                opcijeProizvodjac.clear();
-                PomocneDAO.ispuniComboBoxZaProizvodjacaPoTipu(opcijeProizvodjac, (String) tipCB.getSelectionModel().getSelectedItem(), false);
-                tipOdabran=true;
-            }
+            tipOdabran=Pomocne.ucitajProizvodjace(proizvodjacOdabran, opcijeProizvodjac, (String) tipCB.getSelectionModel().getSelectedItem());
         });
         
+        //ucitavanje svih tipova odabranog proizvodjaca
         proizvodjacCB.setOnAction(e->{
-            //ucitavanje svih tipova odabranog proizvodjaca
-            if (!tipOdabran) {
-                opcijeTip.clear();
-                PomocneDAO.ispuniComboBoxZaTipProizvodjaca(opcijeTip, (String) proizvodjacCB.getSelectionModel().getSelectedItem(), false);
-                proizvodjacOdabran=true;
-            }
+            proizvodjacOdabran=Pomocne.ucitajTipove(tipOdabran, opcijeTip, (String) proizvodjacCB.getSelectionModel().getSelectedItem());
         });
         
         
