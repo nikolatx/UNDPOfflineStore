@@ -1,5 +1,7 @@
 package undp;
 
+import com.grupa1.dbconnection.PodesavanjaDAO;
+import com.grupa1.model.Podesavanja;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import konstante.Konst;
 import pomocne.ServisKonekcija;
 
 public class UndpOfflineStore extends Application {
@@ -28,6 +31,7 @@ public class UndpOfflineStore extends Application {
     Button btn3 = new Button("Prodaja");
     Button btn4 = new Button("Izveštaji");
     Button btn5 = new Button("Ažuriranje");
+    Button btn6 = new Button("Podešavanja");
 
     //Kreiranje HBox panela za popunjvenje scene
     HBox hb1 = new HBox();
@@ -42,7 +46,19 @@ public class UndpOfflineStore extends Application {
         
     @Override
     public void start(Stage primaryStage) {
-              
+        
+        Podesavanja podesavanja=new Podesavanja();
+        podesavanja=PodesavanjaDAO.ucitaj();
+        if (podesavanja!=null)
+            Konst.podesiParametre(podesavanja);
+        else {
+            podesavanja=new Podesavanja();
+            PodesavanjaDAO.sacuvaj(true, podesavanja);
+        }
+            
+        
+        
+        
         //Podesavanje velicine , izgleda i dodavanje nodova na Hbox
         hb1.setMinSize(800, 120);
         lab1.setId("headerLabel");       
@@ -72,7 +88,8 @@ public class UndpOfflineStore extends Application {
         btn3.setId("buttonStyle");       //Css - Style: podesavanje izgleda
         btn4.setId("buttonStyle");
         btn5.setId("buttonStyle");
-        hb3.getChildren().addAll(btn1,btn2,btn3,btn4,btn5);
+        btn6.setId("buttonStyle");
+        hb3.getChildren().addAll(btn1,btn2,btn3,btn4,btn5,btn6);
         hb3.setSpacing(40);
         hb3.setId("bottomStyle");       //Css - Style: podesavanje izgleda
         
@@ -82,6 +99,7 @@ public class UndpOfflineStore extends Application {
         btn3.setDisable(true);
         btn4.setDisable(true);
         btn5.setDisable(true);
+        btn6.setDisable(true);
         
         //Kreiranje BorderPane-a za rasporedjivanje HBoc panela na sceni
         BorderPane root = new BorderPane();
@@ -140,8 +158,17 @@ public class UndpOfflineStore extends Application {
             } catch (SQLException ex) {
                 Logger.getLogger(UndpOfflineStore.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
         });
+
+        //taster btn4 sa akcijom (prelak na stage Podesavanja)
+        btn6.setOnAction(e ->{
+
+                //primaryStage.close();
+                PodesavanjaDialog dialog=new PodesavanjaDialog();
+                int result = dialog.display();
+                
+        });
+
         
         //pokretanje servisa za proveru stanja MySQL servera
         servisKonekcija.start();
@@ -177,9 +204,8 @@ public class UndpOfflineStore extends Application {
                 btn3.setDisable(false);
                 btn4.setDisable(false);
                 btn5.setDisable(false);
+                btn6.setDisable(false);
             }
-                    
-                   
         });
         
         
