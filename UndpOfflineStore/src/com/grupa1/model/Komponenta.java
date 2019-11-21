@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-//POJO class
 public class Komponenta {
 
     //id komponente property

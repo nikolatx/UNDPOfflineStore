@@ -78,7 +78,7 @@ public class Tabela {
     }
     //tabela u pretrazi i azuriranju
     public static void kreirajTabelu(TableView<KomponentaSaSlikom> tabela, boolean editable) {
-        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        //tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         //podesavanje kolone sa slikom komponente
         TableColumn<KomponentaSaSlikom, Slika> kolonaSlika = new TableColumn<>("Slika");
         //podesavanje zadavanja vrednosti celije

@@ -109,12 +109,7 @@ public class Prodaja extends Application {
         //podesavanje header boxa
         naslovForme.setFont(font);
         naslovForme.setId("headerLabel");
-        
-        headerHB.setAlignment(Pos.CENTER);
-        headerHB.setId("headerBackground");
-        headerHB.setPadding(new Insets(10));
-        headerHB.setMinSize(1000, 100);
-        headerHB.getChildren().add(naslovForme);
+        naslovForme.setAlignment(Pos.CENTER);
         
         //podesavanje CB-a
         tipCB.setPromptText("Izaberi tip");
@@ -150,12 +145,13 @@ public class Prodaja extends Application {
         pretragaDugme.setDefaultButton(true);
 
         //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        headerHB.setAlignment(Pos.BOTTOM_LEFT);
+        headerHB.setAlignment(Pos.CENTER);
         headerHB.setId("headerBackground");
         headerHB.setPadding(new Insets(10));
         headerHB.setSpacing(30);
         headerHB.setMinSize(1000, 100);
-
+        headerHB.getChildren().add(naslovForme);
+        
         //podesavanje polja za unos dela naziva komponente za pretragu
         deoNaziva.setPromptText("Prodaja");
 

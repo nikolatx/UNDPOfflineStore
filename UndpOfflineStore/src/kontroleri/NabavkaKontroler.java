@@ -64,8 +64,6 @@ public class NabavkaKontroler {
         //kreiranje kolona tabele ukoliko vec nisu kreirane
         if (tabelaOdabrano.getColumns().isEmpty())
             Tabela.kreirajTabelu(tabelaOdabrano, false);
-            //Tabela.kreirajTabeluBezSlike(tabelaOdabrano, false);
-
         //ukoliko komponenta ne postoji u tabeli sa odabranim komponentama - dodavanje
         if (!podaciOdabrano.contains(komponenta)) {
             //zadavanje kolicine
@@ -75,10 +73,8 @@ public class NabavkaKontroler {
                 Tabela.broj=0;
                 komponenta.setKolicina(kolicina);
                 podaciOdabrano.add(komponenta);
-                //tabelaOdabrano .getItems().add(komponenta);
                 if (podaciOdabrano.size()==1)
                     tabelaOdabrano.setItems(podaciOdabrano);
-                
             }
         }
     }
@@ -94,7 +90,6 @@ public class NabavkaKontroler {
             //dodavanje kolona, naziva kolona i podesavanje sirine kolona tabele
             if (tabelaFiltrirano.getColumns().isEmpty())
                 Tabela.kreirajTabelu(tabelaFiltrirano, false);
-//    Tabela.kreirajTabeluBezSlike(tabelaFiltrirano, false);
             //ucitavanje podataka u tabelu
             tabelaFiltrirano.setItems(podaciFiltrirano);
         } catch (SQLException ex) {
