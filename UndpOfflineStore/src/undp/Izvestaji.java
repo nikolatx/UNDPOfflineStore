@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import kontroleri.IzvestajKontroler;
 import pomocne.Pomocne;
 
 
@@ -33,6 +34,8 @@ public class Izvestaji extends Application {
     Label nabavkaLabel = new Label("Izveštaji nabavke");
     Label nazivLabel = new Label("Izveštaji");
     Font font = new Font(25);
+    IzvestajKontroler kontroler=new IzvestajKontroler();
+    
     
     @Override
     public void start(Stage primaryStage) {
@@ -72,12 +75,12 @@ public class Izvestaji extends Application {
         rightBox.setBottom(donjiBox);
         //rightBox.getChildren().addAll(gornjiBox, donjiBox);
         
-        //podesavanje izgleda i velicine leftBox-a i dodavanje nodova
+        //podesavanje izgleda i velicine srednjeg box-a i dodavanje nodova
         srednjiBox.setMinWidth(800);
         srednjiBox.setAlignment(Pos.CENTER);
         srednjiBox.setId("bottomStyle");
         //srednjiBox.getChildren().addAll();
-        
+        srednjiBox.getChildren().add(IzvestajKontroler.napraviGrafik());
         
         
         //Kreiranje borderpane-a za raspored po stage-a
