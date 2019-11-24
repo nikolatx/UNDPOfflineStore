@@ -1,380 +1,194 @@
 package undp;
 
-import com.grupa1.dbconnection.DBUtil;
 import com.grupa1.model.IzvestajPOJO;
-import com.grupa1.model.Komponenta;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
-import static javafx.application.Application.launch;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import kontroleri.IzvestajKontroler;
+import pomocne.Tabela;
 
 public class IzvestajNabavke extends Application {
 
     //objekat za konekciju sa bazom podataka
     Connection conn;
 
-    //Liste sa opcijama ComboBox-ova
-    ObservableList opcijeTip = FXCollections.observableArrayList();
-    ObservableList opcijeProizvodjac = FXCollections.observableArrayList();
-    ObservableList opcijeDobavljac = FXCollections.observableArrayList();
-
-    //Liste za pracenje informacija u tabeli
+    //Lista za pracenje informacija u tabeli
     ObservableList<IzvestajPOJO> podaci = FXCollections.observableArrayList();
-    
-    //tabela za prikaz komponenata koje zadovoljavaju zadate kriterijume pretrage
     TableView tabela = new TableView();
 
     //Kreiranje dugmica
     Button pretragaDugme = new Button("Pretraži");
     Button nazadDugme = new Button("Nazad");
 
-    //Kreiranje opisa koji ce da stoje na formi
-    Label naslovForme = new Label("Izveštaj nabavke");
-    Label labelFiltriraneKomponente = new Label("Rezultat pretrage");
+    //Kreiranje opisa na formi
+    Label naslovForme = new Label("Izveštaji nabavke");
+    Label labelFiltriraneKomponente = new Label("Izveštaj nabavke");
 
-    //Kreiranje tastera za odredjene funkcije
+    //Kreiranje dugmica za odredjene funkcije
     Button dnevniButton = new Button("Dnevni izveštaj");
     Button nedeljniButton = new Button("Nedeljni izveštaj");
     Button mesecniButton = new Button("Mesečni izveštaj");
     Button godisnjiButton = new Button("Godišnji izveštaj");
     Button odDoButton = new Button("Odabrani datum");
     Button nazadButton = new Button("Nazad");
-    Button exportButton = new Button("PDF");
 
     //Kreiranje DatePicker-a za izbor datuma za pretragu
     DatePicker odPicker = new DatePicker();
     DatePicker doPicker = new DatePicker();
-
     SimpleDateFormat prostDatum = new SimpleDateFormat("dd/MM/yyyy");
 
-    //Kreiranje labela sa izpisima
+    //Kreiranje labela
     Label sumaLabel = new Label();
-    Label odDoLabel = new Label("");
     Label nazivLabel = new Label("Izveštaji nabavke");
 
     //Kreiranje fonta
     Font font = new Font(25);
 
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
-    HBox opisiCB = new HBox();
-    HBox comboboxHB = new HBox();
+    HBox headerHB = new HBox();
     HBox footerHB = new HBox();
 
-    VBox desniVB = new VBox();
-    HBox headerHB = new HBox();
-    VBox boxZaTabele = new VBox();
-
-    //kreiranje pomocnih promenljivih koje ce da se koriste u lambda izrazima
-    private Statement st = null;
-    private int prijemnicaId;
-
+    BorderPane desniBP = new BorderPane();
+    VBox desniGornjiVB = new VBox();
+    VBox desniDonjiVB = new VBox();
+    VBox srednjiVB = new VBox();
+    HBox sumaHB = new HBox();
+    
+    IzvestajKontroler kontroler = new IzvestajKontroler();
+    
     @Override
     public void init() throws Exception {
         super.init();
-        kreirajTabelu(tabela);
+        Tabela.kreirajTabeluIzvestaja(tabela);
     }
 
     public void start(Stage primaryStage) throws SQLException {
 
-        //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        comboboxHB.setAlignment(Pos.BOTTOM_LEFT);
-        comboboxHB.setId("headerBackground");
-        comboboxHB.setPadding(new Insets(10));
-        comboboxHB.setSpacing(30);
-        comboboxHB.setMinSize(1000, 100);
-
         //podesavanje naslova forme
-        naslovForme.setTranslateY(-30);
-        naslovForme.setTranslateX(-230);
         naslovForme.setFont(font);
         naslovForme.setId("headerLabel");
-
-        //dodavanje nodova u HBox
-        comboboxHB.getChildren().add(naslovForme);
-
-        //podesavanje velicine,pozicije i izgleda panela sa opisima i combobox-evima
+        //podesavanje velicine,pozicije i izgleda panela
+        headerHB.setAlignment(Pos.CENTER);
         headerHB.setId("headerBackground");
         headerHB.setMinSize(1000, 120);
-        nazivLabel.setId("headerLabel");
-        headerHB.setAlignment(Pos.CENTER);
-        nazivLabel.setFont(font);
-        headerHB.getChildren().addAll(nazivLabel);
+        headerHB.getChildren().add(naslovForme);
 
-        //podesavanje velicine,pozicije i izgleda panela sa 2 tableView prozora
-        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tabela.setMaxSize(800, 250);
-        boxZaTabele.setPadding(new Insets(10));
-
-        tabela.setMinSize(800, 430);
+        //podesavanje velicine,pozicije i izgleda panela sa tableView 
+        srednjiVB.setPadding(new Insets(10));
+        srednjiVB.setId("bottomStyle");
+        srednjiVB.setAlignment(Pos.CENTER_LEFT);
+        //podesavanje tabele da raste po x i y osi
+        HBox.setHgrow(tabela, Priority.ALWAYS);
+        VBox.setVgrow(tabela, Priority.ALWAYS);
         tabela.setId("my-table");
-        boxZaTabele.setId("bottomStyle");
-        boxZaTabele.setMaxSize(800, 430);
-        boxZaTabele.setAlignment(Pos.CENTER_LEFT);
-        sumaLabel.setTranslateX(+550);
-        boxZaTabele.getChildren().addAll(labelFiltriraneKomponente, tabela,sumaLabel);
-
+        tabela.setPlaceholder(new Label(""));
+        //polje koje prikazuje ukupnu cenu ispod donjeg desnog ugla tabele
+        sumaHB.setAlignment(Pos.CENTER_RIGHT);
+        sumaHB.getChildren().add(sumaLabel);
+        srednjiVB.getChildren().addAll(labelFiltriraneKomponente, tabela, sumaHB);
+        
         //podesavanje velicine, pozicije i izgleda panela sa dugmicima
-        footerHB.setAlignment(Pos.CENTER);
-        footerHB.setPadding(new Insets(10));
-        footerHB.setSpacing(30);
         footerHB.setId("bottomStyle");
         nazadDugme.setId("buttonStyle");
-        footerHB.setMargin(nazadDugme, new Insets(0, 0, 0, 860));
-        footerHB.getChildren().addAll(nazadDugme);
 
-        //podesavanje velicine,pozicije i izgleda panela sa combobox-evima
-        //podesavanje velicine izgleda i dodavanje komponenti u rightBox
-        desniVB.setMinSize(210, 430);
-        desniVB.setId("bottomStyle");
-        desniVB.setAlignment(Pos.CENTER);
-        desniVB.setSpacing(10);
-        dnevniButton.setMinSize(150, 25);
+        //podesavanje velicine izgleda i dodavanje komponenti u boxove
+        desniGornjiVB.setId("bottomStyle");
+        desniGornjiVB.setAlignment(Pos.CENTER);
+        desniGornjiVB.setPadding(new Insets(10));
+        desniGornjiVB.setSpacing(10);
+        dnevniButton.setMaxSize(150, 25);
         dnevniButton.setId("buttonStyleNabavka");
-        nedeljniButton.setMinSize(150, 25);
+        nedeljniButton.setMaxSize(150, 25);
         nedeljniButton.setId("buttonStyleNabavka");
-        mesecniButton.setMinSize(150, 25);
+        mesecniButton.setMaxSize(150, 25);
         mesecniButton.setId("buttonStyleNabavka");
-        godisnjiButton.setMinSize(150, 25);
+        godisnjiButton.setMaxSize(150, 25);
         godisnjiButton.setId("buttonStyleNabavka");
-        odDoButton.setMinSize(150, 25);
+        odDoButton.setMaxSize(150, 25);
         odDoButton.setId("buttonStyleNabavka");
-        odPicker.setMaxSize(150, 25);
-        doPicker.setMaxSize(150, 25);
-        desniVB.getChildren().addAll(dnevniButton, nedeljniButton, mesecniButton, godisnjiButton, odPicker, doPicker, odDoButton);
+        odPicker.setMaxSize(130, 25);
+        doPicker.setMaxSize(130, 25);
+        desniGornjiVB.getChildren().addAll(dnevniButton, nedeljniButton, mesecniButton, godisnjiButton, odPicker, doPicker, odDoButton);
+        
+        //VBox za smestaj dva zadnja dugmeta
+        desniDonjiVB.setAlignment(Pos.BOTTOM_CENTER);
+        desniDonjiVB.getChildren().add(nazadDugme);
+        desniDonjiVB.setPadding(new Insets(10));
+        desniBP.setMinWidth(200);
+        desniBP.setTop(desniGornjiVB);
+        desniBP.setBottom(desniDonjiVB);
+        
+        //Kreiranje BorderPane-a za raspored HBox i VBox panela
+        BorderPane root = new BorderPane();
+        root.setTop(headerHB);
+        root.setCenter(srednjiVB);
+        root.setBottom(footerHB);
+        root.setRight(desniBP);
 
+        Scene scene = new Scene(root, 1000, 650);
+        primaryStage.setTitle("Izveštaj nabavke - UNDP Offline Store");
+
+        scene.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
+        primaryStage.setScene(scene);
+        primaryStage.show();
+        
+        //izvestaj za danas
         dnevniButton.setOnAction(e -> {
-            try {
-                String sql = "WHERE datum=DATE(NOW())";
-                tabela.getItems().clear();
-                tabela.getColumns().clear();
-                conn = DBUtil.napraviKonekciju();
-                
-                sumaLabel.setText("UKUPNO U RSD: " + String.format("%,.2f", izracunajSumu(sql)));
-                preuzmiPodatke(sql);
-            } catch (SQLException ex) {
-                System.out.println("Problem sa očitavanjem tabele 'faktura'!");
-            }
+            kontroler.dnevniIzvestaj(tabela, sumaLabel, false);
         });
-
+        
+        //izvestaj za tekucu nedelju
         nedeljniButton.setOnAction(e -> {
-            try {
-                String sql = "WHERE datum >= DATE(NOW()) + INTERVAL -6 DAY AND datum < NOW() + INTERVAL 0 DAY";
-                tabela.getItems().clear();
-                tabela.getColumns().clear();
-                conn = DBUtil.napraviKonekciju();
-                sumaLabel.setText("UKUPNO U RSD: " + String.format("%,.2f", izracunajSumu(sql)));
-                preuzmiPodatke(sql);
-            } catch (SQLException ex) {
-                System.out.println("Problem sa očitavanjem tabele 'faktura'!");
-            }
+            kontroler.nedeljniIzvestaj(tabela, sumaLabel, false);
         });
-
+        
+        //izvestaj za tekuci mesec
         mesecniButton.setOnAction(e -> {
-            try {
-                String sql = "WHERE datum >= DATE(NOW()) + INTERVAL -30 DAY AND datum < NOW() + INTERVAL 0 DAY";
-                tabela.getItems().clear();
-                tabela.getColumns().clear();
-                conn = DBUtil.napraviKonekciju();
-                sumaLabel.setText("UKUPNO U RSD: " + String.format("%,.2f", izracunajSumu(sql)));
-                preuzmiPodatke(sql);
-            } catch (SQLException ex) {
-                System.out.println("Problem sa očitavanjem tabele 'faktura'!");
-            }
+            kontroler.mesecniIzvestaj(tabela, sumaLabel, false);
         });
-
+        
+        //izvestaj za tekucu godinu
         godisnjiButton.setOnAction(e -> {
-            try {
-                String sql = "WHERE datum >= DATE(NOW()) + INTERVAL -355 DAY AND datum < NOW() + INTERVAL 0 DAY";
-                tabela.getItems().clear();
-                tabela.getColumns().clear();
-                conn = DBUtil.napraviKonekciju();
-                sumaLabel.setText("UKUPNO U RSD: " + String.format("%,.2f", izracunajSumu(sql)));
-                preuzmiPodatke(sql);
-            } catch (SQLException ex) {
-                System.out.println("Problem sa očitavanjem tabele 'faktura'!");
+            kontroler.godisnjiIzvestaj(tabela, sumaLabel, false);
+        });
+        
+        //izvestaj za zadati interval
+        odDoButton.setOnAction((ActionEvent e) -> {
+            //Preuzimanje datuma iz datepicker
+            LocalDate pocetniDatum = odPicker.getValue();
+            LocalDate zavrsniDatum = doPicker.getValue();
+            String uslov = "WHERE datum>='" + pocetniDatum + "' AND datum<='" + zavrsniDatum + "'";
+            if ((odPicker.getValue() != null) && (doPicker.getValue() != null)) {
+                    kontroler.intervalniIzvestaj(tabela, uslov, sumaLabel, false);
             }
         });
-
-        odDoButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                //Preuzimanje datuma iz datapicker
-                        LocalDate pocetniDatum = odPicker.getValue();
-                        LocalDate zavrsniDatum = doPicker.getValue();
-                        String sql = "WHERE datum>='" + pocetniDatum + "' AND datum<='" + zavrsniDatum + "'";
-                if ((odPicker.getValue() != null) && (doPicker.getValue() != null)) {
-                    try {
-                        tabela.getItems().clear();
-                        tabela.getColumns().clear();
-                        conn = DBUtil.napraviKonekciju();
-                        sumaLabel.setText("UKUPNO U RSD: " + String.format("%,.2f", izracunajSumu(sql)));
-                        preuzmiPodatke(sql);
-                    } catch (SQLException ex) {
-                        Logger.getLogger(IzvestajProdaje.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        });
-
+        
+        //povratak na prethodnu formu
         nazadDugme.setOnAction(e -> {
             primaryStage.close();
             new Izvestaji().start(primaryStage);
         });
-
-        //Kreiranje BorderPane-a za raspored HBox i VBox panela
-        BorderPane root = new BorderPane();
-        root.setTop(headerHB);
-        root.setCenter(boxZaTabele);
-        root.setBottom(footerHB);
-        root.setRight(desniVB);
-
-        //Kreiranje scene ,velicine,naziva povezivanje sa Css-om
-        Scene scene = new Scene(root, 1000, 650);
-        primaryStage.setResizable(false);
-
-        primaryStage.setTitle("Izveštaj nabavke - UNDP Offline Store");
-
-        scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        
     }
 
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    private String prikupljanjeOdDugmeta(String uslov) {
-        return uslov;
-    }
-
-    private void preuzmiPodatke(String uslov) throws SQLException {
-        if (conn != null) {
-            //uzimanje podataka iz combobox-eva i polja za unos teksta
-
-            String upit = "SELECT dp.komponenta_id, d.naziv, dp.cena, p.datum "
-                    + "FROM prijemnica as p "
-                    + "INNER JOIN dobavljac as d ON p.dobavljac_id=d.dobavljac_id "
-                    + "INNER JOIN detaljiprijemnice as dp ON p.prijemnica_id=dp.prijemnica_id "
-                    + uslov;
-
-            //postavljanje upita nad bazom podataka
-            ResultSet rs = DBUtil.prikupiPodatke(conn, upit);
-            //obrada rezultata upita
-            if (rs != null) {
-                try {
-                    podaci = FXCollections.observableArrayList();
-                    //dodavanje kolona, naziva kolona i podesavanje sirine kolona tabele
-                    if (tabela.getColumns().size() == 0) {
-                        kreirajTabelu(tabela);
-                    }
-                    //ubacivanje podataka u listu
-                    while (rs.next()) {
-                        //dodavanje komponente u listu
-                        podaci.add(new IzvestajPOJO(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getDate(4).toLocalDate()));
-                    }
-                    //ubacivanje podataka u tabelu
-                    tabela.setItems(podaci);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    if (conn != null) {
-                        conn.close();
-                    }
-                }
-            }
-        }
-    }
     
-    private double izracunajSumu(String uslov) throws SQLException {
-
-        double suma = 0;
-        if (conn != null) {
-            String upit = "SELECT SUM(dp.cena) "
-                    + "FROM detaljiprijemnice as dp "
-                    + "INNER JOIN prijemnica as p ON dp.prijemnica_id=p.prijemnica_id "
-                    + uslov;
-
-            ResultSet rs = DBUtil.prikupiPodatke(conn, upit);
-
-            if ((rs != null) && (rs.next())) {
-                try {
-                    suma += rs.getDouble(1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } 
-            }
-        }
-        return suma;
-    }
-
-    private void kreirajTabelu(TableView tabela) {
-        //zabrana menjanja velicine da bi se zadale sirine kolona
-        tabela.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        //dodavanje nove kolone odgovarajuceg naziva
-        TableColumn kolonaSifra = new TableColumn("Sifra");
-        //definisanje valueFactory-a za celije kolone
-        kolonaSifra.setCellValueFactory(new PropertyValueFactory<IzvestajPOJO, Integer>("id"));
-        //definisanje procentualne sirine kolone
-        kolonaSifra.setMaxWidth(1f * Integer.MAX_VALUE * 5); // 5% width
-        kolonaSifra.setStyle( "-fx-alignment: CENTER;");
-        
-        TableColumn kolonaOpis = new TableColumn("Naziv dobavljaca");
-        kolonaOpis.setCellValueFactory(new PropertyValueFactory<IzvestajPOJO, String>("naziv"));
-        kolonaOpis.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10% width
-        kolonaOpis.setStyle( "-fx-alignment: CENTER;");
-        
-        TableColumn kolonaCena = new TableColumn("Cena");
-        kolonaCena.setCellValueFactory(new PropertyValueFactory<IzvestajPOJO, Double>("cena"));
-        kolonaCena.setMaxWidth(1f * Integer.MAX_VALUE * 9); // 9% width
-        kolonaCena.setStyle("-fx-alignment: CENTER-RIGHT");
-        kolonaCena.setCellFactory(tc -> new TableCell<IzvestajPOJO, Number>() {
-            @Override
-            protected void updateItem(Number value, boolean empty) {
-                super.updateItem(value, empty) ;
-                if (empty) {
-                    setText(null);
-                } else {
-                    setText(String.format("%,.2f", value.doubleValue()));
-                }
-            }
-        });
-        
-        
-        
-        TableColumn<IzvestajPOJO, LocalDate> kolonaDatum = new TableColumn("Datum");
-
-        
     
-        kolonaDatum.setCellValueFactory(new PropertyValueFactory<IzvestajPOJO, LocalDate>("datum"));
-        kolonaDatum.setMaxWidth(1f * Integer.MAX_VALUE * 10); // 10 width
-        kolonaDatum.setStyle( "-fx-alignment: CENTER;");
-        //dodavanje kolona u tabelu
-        tabela.getColumns().addAll(kolonaSifra, kolonaOpis, kolonaCena, kolonaDatum);
-    }
-
 }

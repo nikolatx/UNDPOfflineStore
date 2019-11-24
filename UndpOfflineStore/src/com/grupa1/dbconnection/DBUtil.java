@@ -1,7 +1,9 @@
 package com.grupa1.dbconnection;
 
+import com.grupa1.model.KomponentaSaSlikom;
 import com.grupa1.model.KomponentaSvaPolja;
 import com.grupa1.model.Osoba;
+import com.grupa1.model.Slika;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,7 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import undp.Nabavka;
+import javafx.collections.ObservableList;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import pomocne.Pomocne;
 
 public class DBUtil {
 
@@ -21,14 +27,13 @@ public class DBUtil {
     private static final String userName = "root";
     private static final String password = "";
 
-    public static Connection napraviKonekciju() {
+    public static Connection napraviKonekciju()  {
         Connection conn=null;
         try {
             conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
             System.out.println("Uspešna konekcija");
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
         return conn;
     }
@@ -41,7 +46,7 @@ public class DBUtil {
             rs = conn.createStatement().executeQuery(upit);
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         return rs;
     }
@@ -85,7 +90,7 @@ public class DBUtil {
             promenjeno = conn.createStatement().executeUpdate(upit);
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -114,7 +119,7 @@ public class DBUtil {
                 result=rs.getInt(1);
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -140,12 +145,12 @@ public class DBUtil {
             ps1.setInt(3, tipId);
             ps1.setInt(4, komponenta.getKolicina());
             ps1.setDouble(5, komponenta.getCena());
-            ps1.setString(6, komponenta.getSlika());
+            ps1.setString(6, ((Slika)komponenta.getSlika()).getNaziv());  //komponenta.getSlika());
             ps1.setBoolean(7, komponenta.getAktuelna());
             upisano=ps1.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -155,6 +160,38 @@ public class DBUtil {
             }
         }
         return upisano;
+    }
+    
+    //update komponente u bazi podataka
+    public static int izmeniKomponentu(KomponentaSvaPolja komponenta, int proizvodjacId, int tipId) {
+        Connection conn=null;
+        int izmenjeno=0;
+        try {
+            conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
+            System.out.println("Uspešna konekcija");
+            PreparedStatement ps1=conn.prepareStatement("UPDATE komponenta SET naziv=?, proizvodjac_id=?, tip_id=?, "
+                    + "kolicina=?, cena=?, slika=?, aktuelna=? WHERE komponenta_id=?");
+            ps1.setString(1, komponenta.getNaziv());
+            ps1.setInt(2, proizvodjacId);
+            ps1.setInt(3, tipId);
+            ps1.setInt(4, komponenta.getKolicina());
+            ps1.setDouble(5, komponenta.getCena());
+            ps1.setString(6, ((Slika)komponenta.getSlika()).getNaziv());
+            ps1.setBoolean(7, komponenta.getAktuelna());
+            ps1.setInt(8, komponenta.getId());
+            izmenjeno=ps1.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("Neuspešna konekcija");
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
+        }
+        finally {
+            try {
+                if (conn!=null) conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return izmenjeno;
     }
 
     //insert novog dobavljaca u bazu podataka
@@ -176,7 +213,7 @@ public class DBUtil {
             upisano=ps1.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -207,7 +244,7 @@ public class DBUtil {
             upisano=ps1.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -237,7 +274,7 @@ public class DBUtil {
             
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -270,7 +307,7 @@ public class DBUtil {
                 postoji=rs.getInt(1);
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -303,7 +340,7 @@ public class DBUtil {
                 postoji=rs.getInt(1);
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -331,7 +368,7 @@ public class DBUtil {
             upisano=ps1.executeUpdate();
         } catch (SQLException ex) {
             System.out.println("Neuspešna konekcija");
-            Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
         }
         finally {
             try {
@@ -342,4 +379,55 @@ public class DBUtil {
         }
         return upisano;
     }
+    
+    //preuzimanje podataka iz baze podataka za popunu tabela
+    public static void preuzmiPodatke(ComboBox tipCB, ComboBox proizvodjacCB, TextField deoNaziva, CheckBox aktuelneCB, 
+            ObservableList<KomponentaSaSlikom> podaciFiltrirano) throws SQLException {
+        Connection conn=DBUtil.napraviKonekciju();
+        if (conn!=null) {
+            //uzimanje podataka iz combobox-eva i polja za unos teksta
+            String tip=(String)tipCB.getSelectionModel().getSelectedItem();
+            String proizvodjac=(String)proizvodjacCB.getSelectionModel().getSelectedItem();
+            String komponenta=deoNaziva.getText();
+            //formiranje SQL upita koji treba da vrati komponente koje zadovoljavaju
+            //sve unete parametre (combobox-evi i uneti tekst za pretragu)
+            if (tip==null) tip="";
+            if (proizvodjac==null) proizvodjac="";
+            String uslovAktuelne="";
+            if (aktuelneCB.isSelected())
+                uslovAktuelne=" AND k.aktuelna=1";
+            String uslov="";
+            if (tip.equals("") && proizvodjac.equals(""))
+                uslov="WHERE k.naziv like '%" + komponenta + "%'";
+            else if (tip.equals(""))
+                uslov="WHERE p.naziv='" + proizvodjac + "' AND k.naziv like '%"+ komponenta + "%'";
+            else if (proizvodjac.equals(""))
+                uslov="WHERE t.naziv='" + tip + "' AND k.naziv like '%"+ komponenta + "%'";
+            else
+                uslov="WHERE t.naziv='" + tip + "' AND p.naziv='" + proizvodjac + "' AND k.naziv like '%"+ komponenta + "%'";
+
+            String upit="SELECT k.komponenta_id, k.naziv, p.naziv, t.naziv, k.kolicina, k.cena, k.slika " +
+                        "FROM komponenta as k " +
+                        "INNER JOIN tip as t ON k.tip_id=t.tip_id " +
+                        "INNER JOIN proizvodjac as p ON k.proizvodjac_id=p.proizvodjac_id " + uslov + uslovAktuelne;
+            //postavljanje upita nad bazom podataka
+            ResultSet rs=DBUtil.prikupiPodatke(conn, upit);
+            //obrada rezultata upita
+            if (rs!=null) {
+                //ubacivanje podataka u listu
+                while (rs.next()) {
+                    //kreiranje komponente na osnovu podataka ocitanih iz baze
+                    KomponentaSaSlikom kompon=new KomponentaSaSlikom(rs.getInt(1), rs.getString(2),
+                                                        rs.getString(3), rs.getString(4), 
+                                                        rs.getInt(5), rs.getDouble(6), new Slika(rs.getString(7)) );
+                    //dodavanje komponente u listu
+                    podaciFiltrirano.add(kompon);
+                }
+            }
+        } else
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
+        if (conn!=null) conn.close();
+    }
+    
+    
 }

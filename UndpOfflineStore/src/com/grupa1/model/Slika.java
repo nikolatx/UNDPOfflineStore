@@ -1,24 +1,23 @@
 
 package com.grupa1.model;
 
-import javafx.scene.image.ImageView;
 
 
 
 public class Slika {
 
-    private ImageView slika;
+    private String naziv;
 
-    public Slika(ImageView slika) {
-        this.slika = slika;
+    public Slika(String slika) {
+        naziv = slika;
     }
 
-    public ImageView getSlika() {
-        return slika;
+    public String getNaziv() {
+        return naziv;
     }
 
-    public void setSlika(ImageView slika) {
-        this.slika = slika;
+    public void setNaziv(String slika) {
+        naziv = slika;
     }
 
     

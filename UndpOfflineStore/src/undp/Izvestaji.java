@@ -1,12 +1,11 @@
 package undp;
 
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -14,14 +13,20 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import kontroleri.IzvestajKontroler;
+import pomocne.Pomocne;
 
 
 public class Izvestaji extends Application {
     //Kreiranje HBox  i VBox - eva
     HBox headerHBox = new HBox();
     HBox footerHBox = new HBox();
-    VBox rightBox = new VBox();
-    VBox leftBox = new VBox();
+    BorderPane rightBox = new BorderPane();
+    VBox gornjiBox = new VBox();
+    VBox donjiBox = new VBox();
+    VBox srednjiBox = new VBox();
+    HBox srednjiDonjiHB = new HBox();
+    
     //Kreiranje tastera sa za pojedine funkcije
     Button prodajaButton = new Button("Prodaja");
     Button nabavkaButton = new Button("Nabavka");
@@ -31,6 +36,8 @@ public class Izvestaji extends Application {
     Label nabavkaLabel = new Label("Izveštaji nabavke");
     Label nazivLabel = new Label("Izveštaji");
     Font font = new Font(25);
+    IzvestajKontroler kontroler=new IzvestajKontroler();
+    
     
     @Override
     public void start(Stage primaryStage) {
@@ -38,46 +45,69 @@ public class Izvestaji extends Application {
         prodajaLabel.setVisible(false);
         nabavkaLabel.setVisible(false);
         //podesavanje izgleda i velicine headerBox-a i dodavanje nodova
-        headerHBox.setMinSize(800, 120);
-        headerHBox.setStyle("-fx-background-position:center;");
+        
         nazivLabel.setId("headerLabel");       
+        nazivLabel.setFont(font);
+        headerHBox.setMinSize(1000, 100);
         headerHBox.setId("headerBackground");    //Css - Style: podesavanje izgleda
         headerHBox.setAlignment(Pos.CENTER);
-        nazivLabel.setFont(font);
-        HBox.setMargin(nazivLabel, new Insets(0, 0, 20, 0));
-        headerHBox.getChildren().add(nazivLabel);;
+        headerHBox.getChildren().add(nazivLabel);
+        
+        
         //podesavanje izgleda i velicine rightBox-a i dodavanje nodova
-        rightBox.setMinSize(510, 430);
-        rightBox.setAlignment(Pos.CENTER_LEFT);
-        rightBox.setSpacing(80);
-        rightBox.setId("bottomStyle");
-        prodajaLabel.setFont(font);
-        nabavkaLabel.setFont(font);
-        rightBox.getChildren().addAll(prodajaLabel,nabavkaLabel);
-        //podesavanje izgleda i velicine leftBox-a i dodavanje nodova
-        leftBox.setMinSize(510, 430);
-        leftBox.setAlignment(Pos.CENTER);
-        leftBox.setId("bottomStyle");
+        //rightBox.setMinSize(120, 550);
+        //rightBox.setAlignment(Pos.CENTER);
+        gornjiBox.setAlignment(Pos.CENTER);
+        gornjiBox.setSpacing(20);
+        gornjiBox.setPadding(new Insets(10));
+        //gornjiBox.setId("bottomStyle");
         prodajaButton.setId("buttonStyleNabavka");
         nabavkaButton.setId("buttonStyleNabavka");
-        prodajaButton.setMinSize(150, 70);
-        nabavkaButton.setMinSize(150,70); 
-        leftBox.setSpacing(50);
-        leftBox.getChildren().addAll(prodajaButton,nabavkaButton);
-        //podesavanje izgleda i velicine footerHBox-a i dodavanje nodova
-        footerHBox.setMinSize(1000, 100);
-        footerHBox.setId("bottomStyle");
+        gornjiBox.getChildren().addAll(nabavkaButton, prodajaButton);
+        
+        
+        donjiBox.setAlignment(Pos.CENTER);
+        donjiBox.setPadding(new Insets(10));
+        donjiBox.setId("bottomStyle");
         nazadButton.setId("buttonStyleNabavka");
-        nazadButton.setMinSize(100, 25);
-        footerHBox.setAlignment(Pos.BASELINE_RIGHT);
-        HBox.setMargin(nazadButton, new Insets(50, 20, 0, 0));
-        footerHBox.getChildren().add(nazadButton);
+        donjiBox.setAlignment(Pos.BOTTOM_CENTER);
+        //HBox.setMargin(nazadButton, new Insets(50, 20, 0, 0));
+        donjiBox.getChildren().add(nazadButton);
+        rightBox.setTop(gornjiBox);
+        rightBox.setBottom(donjiBox);
+        rightBox.setMinWidth(190);
+        //rightBox.getChildren().addAll(gornjiBox, donjiBox);
+        
+        //podesavanje izgleda i velicine srednjeg box-a i dodavanje nodova
+        srednjiBox.setMinWidth(790);
+        srednjiBox.setAlignment(Pos.CENTER);
+        srednjiBox.setId("bottomStyle");
+        srednjiBox.setSpacing(20);
+        srednjiBox.getChildren().add(kontroler.napraviGrafik());
+        BarChart<Number, String> grafikNajisplativijih=kontroler.napraviGrafikNajisplativije();
+        BarChart<Number, String> grafikNajprodavanijih=kontroler.napraviGrafikNajprodavanije();
+        
+        srednjiDonjiHB.getChildren().addAll(grafikNajisplativijih, grafikNajprodavanijih);
+        srednjiDonjiHB.setSpacing(30);
+        srednjiDonjiHB.setAlignment(Pos.CENTER);
+        srednjiBox.getChildren().add(srednjiDonjiHB);
+        
+        
         //Kreiranje borderpane-a za raspored po stage-a
         BorderPane root = new BorderPane();
         root.setTop(headerHBox);
         root.setRight(rightBox);
-        root.setLeft(leftBox);
+        root.setCenter(srednjiBox);
         root.setBottom(footerHBox);
+        
+        //Kreiranje scene ,velicine i povezivanje sa CSS-om
+        Scene scene = new Scene(root, 1000, 650);
+        primaryStage.setMinWidth(1010);
+        primaryStage.setMinHeight(650);
+        primaryStage.setTitle("Izveštaji - UndpOfflineStore");
+        scene.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
+        primaryStage.setScene(scene);
+        primaryStage.show();
         
         //Vidljivost labela prilikom prelaska misa na taster prodaja i nabavka
         prodajaButton.setOnMouseEntered(e ->{
@@ -97,7 +127,7 @@ public class Izvestaji extends Application {
                 primaryStage.close();
                 new IzvestajProdaje().start(primaryStage);
             } catch (SQLException ex) {
-                Logger.getLogger(Izvestaji.class.getName()).log(Level.SEVERE, null, ex);
+                Pomocne.poruka(ex.getMessage());
             }
         });
         
@@ -107,28 +137,17 @@ public class Izvestaji extends Application {
                 primaryStage.close();
                 new IzvestajNabavke().start(primaryStage);
             } catch (SQLException ex) {
-                Logger.getLogger(Izvestaji.class.getName()).log(Level.SEVERE, null, ex);
+                Pomocne.poruka(ex.getMessage());
             }
         });
         
         //Funkcija tastera za povratak na pocetak alikacije
         nazadButton.setOnAction(e ->{
-        primaryStage.close();
-        new UndpOfflineStore().start(primaryStage);
-    });
+            primaryStage.close();
+            new UndpOfflineStore().start(primaryStage);
+        });
         
-        //Kreiranje scene ,velicine i povezivanje sa CSS-om
-        Scene scene = new Scene(root, 1000, 650);
-        primaryStage.setTitle("Izveštaji - UndpOfflineStore");
-        scene.getStylesheets().addAll(this.getClass().getResource("styles.css").toExternalForm());
-        primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-   
-    public static void main(String[] args) {
-        launch(args);
+        
     }
     
 }

@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -16,14 +17,14 @@ import javafx.stage.StageStyle;
 
 public class SpinnerDialog {
     
-    private static int result=-1;
+    private int result=-1;
     
-    public static int display(String title, String message, int maksKolicina, int pocetnaKolicina) {
+    public int display(String title, String message, int maksKolicina, int pocetnaKolicina) {
         
         Stage noviProzor = new Stage();
         noviProzor.initModality(Modality.APPLICATION_MODAL);
         noviProzor.setTitle(title);
-        noviProzor.setWidth(300);
+        noviProzor.setWidth(350);
         noviProzor.setHeight(175);
         noviProzor.initStyle(StageStyle.UTILITY);
         Label label = new Label(message);
@@ -38,14 +39,17 @@ public class SpinnerDialog {
         HBox gornjiHBox=new HBox();
         HBox donjiHBox=new HBox();
         Label labela1=new Label("Unesi željenu količinu:");
-        labela1.setFont(Font.font("Verdana", FontWeight.BOLD, 12));
+        labela1.setFont(Font.font("Verdana", FontWeight.BOLD, 11));
         //spinner-om se vrsi odabir kolicine komponente koja se dodaje
         Spinner spinner=new Spinner();   
         spinner.setId("buttonStyleNabavka");
 
         //podesavanje granicnih vrednosti spinnera i podesene vrednosti
         spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, maksKolicina, pocetnaKolicina));
-
+        spinner.setEditable(true);
+        spinner.getEditor().setStyle("-fx-alignment: CENTER_RIGHT;");
+        spinner.getEditor().selectAll();
+        
         //dodavanje u gornji red labele i spinnera
         gornjiHBox.getChildren().addAll(labela1, spinner);
         gornjiHBox.setAlignment(Pos.CENTER);
@@ -58,8 +62,8 @@ public class SpinnerDialog {
         Scene scena = new Scene(rootBox, 350, 130);
         noviProzor.setScene(scena);
         
-        //scena.getStylesheets().addAll(getClass().getResource("styles.css").toExternalForm());
-        scena.getStylesheets().add("styles.css");
+        scena.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
+        noviProzor.getIcons().add(new Image("/resources/logo.jpg"));
         //dugme potvrdi - promena kolicine komponente i ubacivanje u listu odabranih
         dugmePotvrdi.setOnAction( e -> {
             result=(Integer)spinner.getValue();
@@ -70,6 +74,13 @@ public class SpinnerDialog {
         dugmeOdustani.setOnAction( e -> { 
             result=-1; 
             noviProzor.close();
+        });
+        
+        //da bi prosledio vrednost iako se ne pritisne enter
+        spinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+            spinner.increment(0);
+            }
         });
         
         noviProzor.showAndWait();
