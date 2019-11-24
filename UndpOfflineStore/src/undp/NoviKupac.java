@@ -17,6 +17,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -92,7 +93,7 @@ public class NoviKupac {
         noviProzor.setTitle("Dodavanje novog kupaca");
         
         scena.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
-        
+        noviProzor.getIcons().add(new Image("/resources/logo.jpg"));
         noviProzor.setScene(scena);
         noviProzor.initModality(Modality.APPLICATION_MODAL);
         //aktiviranje i prikaz novog prozora

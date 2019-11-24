@@ -166,7 +166,8 @@ public class ProdajaKontroler {
                         }
                         Platform.runLater(() -> {
                             alert1.showAndWait();
-                            nazadDugme.fire();
+                            podaciOdabrano.clear();
+                            //nazadDugme.fire();
                         });
                     } else {
                         alert.close();

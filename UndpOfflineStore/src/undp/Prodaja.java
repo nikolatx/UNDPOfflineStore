@@ -79,7 +79,7 @@ public class Prodaja extends Application {
     HBox headerHB = new HBox();
     HBox footerHB = new HBox();
 
-    VBox desniVB = new VBox();
+    //VBox desniVB = new VBox();
     VBox boxZaTabele = new VBox();
     VBox filterVB = new VBox();
     VBox donjiVB = new VBox();
@@ -117,7 +117,7 @@ public class Prodaja extends Application {
         proizvodjacCB.setPromptText("Izaberi proizvodjača");
         proizvodjacCB.setMinSize(150, 25);
         kupacCB.setPromptText("Izaberi kupca");
-        kupacCB.setMinSize(150, 25);
+        kupacCB.setMaxSize(150, 25);
 
         //checkbox za aktuelne komponente
         aktuelneCB.setSelected(true);
@@ -125,6 +125,7 @@ public class Prodaja extends Application {
         
         //polje za unos reci za pretragu
         deoNaziva.setPromptText("Pretraga");
+        deoNaziva.setMaxSize(150, 25);
         
         //podesavanja za dugme za pretragu
         pretragaDugme.setId("buttonStyleNabavka");

@@ -12,7 +12,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -32,109 +31,186 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import com.grupa1.dbconnection.PomocneDAO;
 import com.grupa1.model.Slika;
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import javafx.geometry.Insets;
 import javafx.scene.image.Image;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.stage.FileChooser;
+import konstante.Konst;
 
-public class NovaKomponenta {
+public class AzuriranjeKomponente {
     
     static Font font = new Font(25);
-    //Kreiranje TextFiedla za novu komponentu i novog dobavljaca
-    TextField novaKomponentaNaziv = new TextField();
+    
     //Liste za pracenje combobox-a
     ObservableList opcijeTip = FXCollections.observableArrayList();
     ObservableList opcijeProizvodjac = FXCollections.observableArrayList();
     ComboBox tipCB = new ComboBox(opcijeTip);
     ComboBox proizvodjacCB = new ComboBox(opcijeProizvodjac);
 
-
-    TextField novaKomponentaKolicina = new TextField();
-    TextField novaKomponentaCena = new TextField();
-    TextField novaKomponentaSlika= new TextField();
-    RadioButton novaKomponentaAktuelno = new RadioButton();
-    Label novaKomponentaLabel = new Label("Dodavanje komponente");
-    Button novaKomponentaPotvrda = new Button("Potvrdi");
-    Button novaKomponentaNazad = new Button("Nazad");
+    //Kreiranje TextFieldova
+    TextField id = new TextField();
+    TextField naziv = new TextField();
+    TextField kolicina = new TextField();
+    TextField cena = new TextField();
+    TextField slika= new TextField();
+    RadioButton aktuelno = new RadioButton();
+    Label naslovForme = new Label("Ažuriranje komponente");
+    Button potvrdiDugme = new Button("Potvrdi");
+    Button nazadDugme = new Button("Nazad");
+    Button slikaDugme = new Button("...");
     
-    public void pokreni(KomponentaSvaPolja komponenta) {
-        HBox headerDodajBox = new HBox();
-        headerDodajBox.setId("headerBackground");
-        headerDodajBox.setAlignment(Pos.CENTER);
-        novaKomponentaAktuelno.setText("Aktuelna?");
-        novaKomponentaAktuelno.setSelected(true);
-        novaKomponentaLabel.setFont(font);
-        novaKomponentaLabel.setId("headerLabel");
-        headerDodajBox.getChildren().add(novaKomponentaLabel);
-        headerDodajBox.setMinSize(500, 80);
-        HBox centerDodajBox = new HBox();
-        centerDodajBox.setId("bottomStyle");
-        centerDodajBox.setAlignment(Pos.CENTER);
+    Label labId = new Label("Šifra:");
+    Label labNaziv = new Label("Naziv:");
+    Label labTip = new Label("Tip:");
+    Label labProizvodjac = new Label("Proizvođač:");
+    Label labKolicina = new Label("Količina:");
+    Label labCena = new Label("Cena:");
+    Label labSlika = new Label("Slika:");
+    Label labAktuelna = new Label("Aktuelna:");
+    
+    public void pokreni(KomponentaSvaPolja komponenta, ObservableList<KomponentaSvaPolja> podaci) {
+        //podesavanje header-a i dodavanje naslova
+        HBox headerHB = new HBox();
+        headerHB.setId("headerBackground");
+        headerHB.setAlignment(Pos.CENTER);
+        headerHB.setMinSize(600, 80);
+        naslovForme.setId("headerLabel");
+        naslovForme.setFont(font);
+        headerHB.getChildren().add(naslovForme);
+        
+        //imamo posebnu labelu pa nam ne treba tekst uz kontrolu
+        aktuelno.setText("");
+        
+        
+        HBox srednjiHB = new HBox();
+        srednjiHB.setAlignment(Pos.CENTER);
+        
         GridPane grid = new GridPane();
-        grid.setAlignment(Pos.TOP_CENTER);
-        grid.setVgap(20);
-        grid.setHgap(20);
-        //Podesavanje velicine,izgleda i dodavanje nodova na scenu za Nova Komponenta
-        novaKomponentaPotvrda.setId("buttonStyle");
-        novaKomponentaNazad.setId("buttonStyle");
-        novaKomponentaPotvrda.setMinSize(100, 25);
-        novaKomponentaNazad.setMinSize(100, 25);
-        HBox.setMargin(grid, new Insets(40, 0, 0, 0));
-        novaKomponentaNaziv.setPromptText("Naziv");
+        grid.setAlignment(Pos.CENTER);
+        grid.setVgap(10);
+        grid.setHgap(10);
+        
+        //Podesavanje velicine,izgleda i dodavanje nodova na scenu
+        potvrdiDugme.setId("buttonStyle");
+        potvrdiDugme.setMinSize(100, 25);
+        nazadDugme.setId("buttonStyle");
+        nazadDugme.setMinSize(100, 25);
+        
+        //setovanje kontrola na vrednosti svojstava komponente
+        id.setText(String.valueOf(komponenta.getId()));
+        id.setEditable(false);
+        naziv.setText(komponenta.getNaziv());
         tipCB.setMinSize(150, 25);
-        tipCB.setPromptText("Tip");
         PomocneDAO.ispuniComboBoxZaTip(opcijeTip, true);
+        tipCB.getSelectionModel().select(komponenta.getTip());
         proizvodjacCB.setMinSize(150, 25);
         proizvodjacCB.setPromptText("Proizvođač");
         PomocneDAO.ispuniComboBoxZaProizvodjaca(opcijeProizvodjac, true);
-        novaKomponentaKolicina.setPromptText("Količina");
-        novaKomponentaCena.setPromptText("Cena");
-        novaKomponentaSlika.setPromptText("Naziv fajla slike");
-        grid.add(novaKomponentaNaziv, 0, 0);
-        grid.add(proizvodjacCB, 0, 1);
-        grid.add(tipCB, 0, 2);
-        grid.add(novaKomponentaKolicina, 1, 0);
-        grid.add(novaKomponentaCena, 1, 1);
-        grid.add(novaKomponentaSlika, 1, 2);
-        grid.add(novaKomponentaAktuelno, 1, 3);
-        grid.add(novaKomponentaPotvrda, 2, 2);
-        grid.add(novaKomponentaNazad, 2, 3);
-        centerDodajBox.getChildren().addAll(grid);
-        HBox footerDodajBox = new HBox();
-        BorderPane dodajBox = new BorderPane();
-        dodajBox.setTop(headerDodajBox);
-        dodajBox.setCenter(centerDodajBox);
-        dodajBox.setBottom(footerDodajBox);
+        proizvodjacCB.getSelectionModel().select(komponenta.getProizvodjac());
+        kolicina.setText(String.valueOf(komponenta.getKolicina()));
+        String str2=String.format("%,.2f", komponenta.getCena());
+        cena.setText(str2);
+        slika.setText(((Slika)komponenta.getSlika()).getNaziv());
+        aktuelno.setSelected(komponenta.getAktuelna());
+        
+        //ubacivanje kontrola u gridpane
+        grid.add(labId, 0, 0);
+        grid.add(id, 1, 0);
+        grid.add(labNaziv, 0, 1);
+        grid.add(naziv, 1, 1);
+        grid.add(labProizvodjac, 0, 2);
+        grid.add(proizvodjacCB, 1, 2);
+        grid.add(labTip, 0, 3);
+        grid.add(tipCB, 1, 3);
+        grid.add(labKolicina, 0, 4);
+        grid.add(kolicina, 1, 4);
+        grid.add(labCena, 0, 5);
+        grid.add(cena, 1, 5);
+        grid.add(labSlika, 0, 6);
+        grid.add(slika, 1, 6);
+        grid.add(slikaDugme, 2, 6);
+        grid.add(labAktuelna, 0, 7);
+        grid.add(aktuelno, 1, 7);
+        
+        //podesavanje sirine kolona grida
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(20);
+        col1.setMinWidth(100);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(80);
+        grid.getColumnConstraints().addAll(col1,col2);
+        grid.setPadding(new Insets(10));
+        srednjiHB.getChildren().add(grid);
+        
+        //podesavanje futera i dodavanje dugmica
+        HBox footerHB = new HBox();
+        footerHB.setAlignment(Pos.CENTER);
+        footerHB.setSpacing(40);
+        footerHB.setPadding(new Insets(10));
+        footerHB.getChildren().addAll(potvrdiDugme, nazadDugme);
+        footerHB.setMinWidth(600);
+        
+        //dodavanje kontrola u desni deo prozora
+        BorderPane izmeniBP = new BorderPane();
+        izmeniBP.setTop(headerHB);
+        izmeniBP.setCenter(srednjiHB);
+        izmeniBP.setBottom(footerHB);
         podesiFormatUnosa();
         
-        //Kreiranje scene za novu komponentu
-        Scene scena = new Scene(dodajBox, 500, 350);
+        //Kreiranje scene
+        Scene scena = new Scene(izmeniBP, 600, 430);
         scena.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         Stage noviProzor=new Stage();
         noviProzor.getIcons().add(new Image("/resources/logo.jpg"));
         noviProzor.setResizable(false);
-        noviProzor.setTitle("Dodavanje Komponente");
+        noviProzor.setTitle("Dodavanje komponente");
         noviProzor.setScene(scena);
         noviProzor.initModality(Modality.APPLICATION_MODAL);
         //aktiviranje i prikaz novog prozora
         noviProzor.show();
         
+        //dugme za izbor slike
+        slikaDugme.setOnAction(ev->{
+            final FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(new File(Konst.SLIKE_PATH));
+            File file = fileChooser.showOpenDialog(noviProzor);
+            if (file != null)
+                slika.setText(file.getName());
+        });
+        
         //klik na dugme Potvrda
-        novaKomponentaPotvrda.setOnAction(ev->{
+        potvrdiDugme.setOnAction(ev->{
             try {
                 //ukoliko je neko od obaveznih polja nepopunjeno izbaci upozorenje
-                if (novaKomponentaNaziv.getText().equals("") || novaKomponentaKolicina.getText().equals("") ||
-                        novaKomponentaCena.getText().equals("") || proizvodjacCB.getSelectionModel().getSelectedIndex()<0 ||
+                if (naziv.getText().trim().equals("") || kolicina.getText().trim().equals("") ||
+                        cena.getText().trim().equals("") || proizvodjacCB.getSelectionModel().getSelectedIndex()<0 ||
                         tipCB.getSelectionModel().getSelectedIndex()<0) 
                     throw new Exception();
                     
                 //kreiranje nove komponente
-                komponenta.setNaziv(novaKomponentaNaziv.getText());
+                komponenta.setNaziv(naziv.getText().trim());
                 komponenta.setTip((String)tipCB.getSelectionModel().getSelectedItem());
                 komponenta.setProizvodjac((String)proizvodjacCB.getSelectionModel().getSelectedItem());
-                komponenta.setKolicina(Integer.valueOf(novaKomponentaKolicina.getText()));
-                komponenta.setCena(Double.valueOf(novaKomponentaCena.getText()));
-                //komponenta.setSlika(novaKomponentaSlika.getText());
-                komponenta.setSlika(new Slika(novaKomponentaSlika.getText()));
-                komponenta.setAktuelna(novaKomponentaAktuelno.isSelected());
-
+                int kolicinaInt=Integer.valueOf(kolicina.getText());
+                komponenta.setKolicina(kolicinaInt);
+                
+                DecimalFormat format=(DecimalFormat) DecimalFormat.getInstance();
+                DecimalFormatSymbols symbols=format.getDecimalFormatSymbols();
+                String decSep=String.valueOf(symbols.getDecimalSeparator());
+                String thousandSep=(decSep.equals(".")?",":".");
+                String cena1=cena.getText().replaceAll(thousandSep, "");
+                cena.setText(cena1);
+                komponenta.setCena(Double.valueOf(cena.getText()));
+                komponenta.setSlika(new Slika(slika.getText().trim()));
+                komponenta.setAktuelna(aktuelno.isSelected());
+                komponenta.setId(Integer.valueOf(id.getText()));
+                
+                int indeks=podaci.indexOf(komponenta);
+                podaci.set(indeks, komponenta);
+                
                 //ocitavanje proizvodjacID polja iz baze
                 List<Integer> tempList=new ArrayList<>();
                 String upit1="SELECT proizvodjac_id FROM proizvodjac WHERE naziv=?";
@@ -154,25 +230,24 @@ public class NovaKomponenta {
                 alert2.setTitle("Obaveštenje");
                 alert2.setHeaderText(null);
 
-                int ubaceno=0;
-                if (duplikat==0) {
-                    //ubaci komponentu u bazu podataka
-                    ubaceno=DBUtil.ubaciKomponentu(komponenta, proizvodjacId, tipId);
-                    if (ubaceno>0) {
-                        alert2.setContentText("Komponenta uspešno uneta u bazu podataka!");
-                        //povratak na formu Nabavka
-                        novaKomponentaNazad.fire();
+                int promenjeno=0;
+                if (duplikat<=1) {
+                    //promeni komponentu u bazi podataka
+                    promenjeno=DBUtil.izmeniKomponentu(komponenta, proizvodjacId, tipId);
+                    if (promenjeno>0) {
+                        alert2.setContentText("Promena uspešno izvršena!");
+                        
+                        //povratak na formu Azuriranje
+                        nazadDugme.fire();
                     }
                 } 
-                if (duplikat>0)
-                    alert2.setContentText("Komponenta sa istim nazivom, proizvodjacem i tipom vec postoji u bazi podataka!");
-                else if (ubaceno==0)
+                else if (duplikat>1)
+                    alert2.setContentText("Komponenta sa istim nazivom, proizvođačem i tipom već postoji u bazi podataka!");
+                else if (promenjeno==0)
                     alert2.setContentText("Došlo je do greške pri upisu u bazu podataka!");
                 Platform.runLater( () -> {
                     alert2.showAndWait();
                 });
-                    
-                    
                     
             } catch (Exception ex) {
                 Alert alert1 = new Alert(AlertType.INFORMATION);
@@ -183,7 +258,6 @@ public class NovaKomponenta {
                     alert1.showAndWait();
                 });
             }
-            
         });
         
         //dodavanje novog tipa
@@ -300,12 +374,12 @@ public class NovaKomponenta {
             }
         });
         
-        
-        //povratak na nabavku sa forme za unosenje nove komponente
-        novaKomponentaNazad.setOnAction(ev ->{
+        //povratak na glavnu formu za azuriranje
+        nazadDugme.setOnAction(ev ->{
             noviProzor.close();
         });
     }
+    
     //podesava format unosa za cenu i kolicinu
     public void podesiFormatUnosa() {
         //cena se formatira kao double: cifre, decimalni zarez, 2 decimale
@@ -313,13 +387,13 @@ public class NovaKomponenta {
         TextFormatter formatterDouble = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {
             return patternDouble.matcher(change.getControlNewText()).matches() ? change : null;
         });
-        novaKomponentaCena.setTextFormatter(formatterDouble);
+        cena.setTextFormatter(formatterDouble);
         
         //kolicina se formatira kao int: samo cifre
         Pattern patternInt = Pattern.compile("[0-9]*");
         TextFormatter formatterInt = new TextFormatter((UnaryOperator<TextFormatter.Change>) change -> {
             return patternInt.matcher(change.getControlNewText()).matches() ? change : null;
         });
-        novaKomponentaKolicina.setTextFormatter(formatterInt);
+        kolicina.setTextFormatter(formatterInt);
     }
 }

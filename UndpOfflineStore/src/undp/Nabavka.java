@@ -118,6 +118,7 @@ public class Nabavka extends Application {
         
         //polje za unos reci za pretragu
         deoNaziva.setPromptText("Pretraga");
+        deoNaziva.setMaxSize(150, 25);
         
         //podesavanja za dugme za pretragu
         pretragaDugme.setId("buttonStyleNabavka");
@@ -136,6 +137,7 @@ public class Nabavka extends Application {
         dodavanjeDugme.setId("buttonStyleNabavka");
         //combobox za odabir dobavljaca
         dobavljacCB.setPromptText("Izaberi dobavljača");
+        dobavljacCB.setMaxSize(150, 25);
         //dugme za dodavanje novog dobavljaca
         dobavljacDugme.setId("buttonStyleNabavka");
         

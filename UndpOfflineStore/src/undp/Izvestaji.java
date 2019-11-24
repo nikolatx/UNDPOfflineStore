@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -24,6 +25,7 @@ public class Izvestaji extends Application {
     VBox gornjiBox = new VBox();
     VBox donjiBox = new VBox();
     VBox srednjiBox = new VBox();
+    HBox srednjiDonjiHB = new HBox();
     
     //Kreiranje tastera sa za pojedine funkcije
     Button prodajaButton = new Button("Prodaja");
@@ -73,14 +75,22 @@ public class Izvestaji extends Application {
         donjiBox.getChildren().add(nazadButton);
         rightBox.setTop(gornjiBox);
         rightBox.setBottom(donjiBox);
+        rightBox.setMinWidth(190);
         //rightBox.getChildren().addAll(gornjiBox, donjiBox);
         
         //podesavanje izgleda i velicine srednjeg box-a i dodavanje nodova
-        srednjiBox.setMinWidth(800);
+        srednjiBox.setMinWidth(790);
         srednjiBox.setAlignment(Pos.CENTER);
         srednjiBox.setId("bottomStyle");
-        //srednjiBox.getChildren().addAll();
-        srednjiBox.getChildren().add(IzvestajKontroler.napraviGrafik());
+        srednjiBox.setSpacing(20);
+        srednjiBox.getChildren().add(kontroler.napraviGrafik());
+        BarChart<Number, String> grafikNajisplativijih=kontroler.napraviGrafikNajisplativije();
+        BarChart<Number, String> grafikNajprodavanijih=kontroler.napraviGrafikNajprodavanije();
+        
+        srednjiDonjiHB.getChildren().addAll(grafikNajisplativijih, grafikNajprodavanijih);
+        srednjiDonjiHB.setSpacing(30);
+        srednjiDonjiHB.setAlignment(Pos.CENTER);
+        srednjiBox.getChildren().add(srednjiDonjiHB);
         
         
         //Kreiranje borderpane-a za raspored po stage-a
@@ -92,6 +102,8 @@ public class Izvestaji extends Application {
         
         //Kreiranje scene ,velicine i povezivanje sa CSS-om
         Scene scene = new Scene(root, 1000, 650);
+        primaryStage.setMinWidth(1010);
+        primaryStage.setMinHeight(650);
         primaryStage.setTitle("Izveštaji - UndpOfflineStore");
         scene.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         primaryStage.setScene(scene);

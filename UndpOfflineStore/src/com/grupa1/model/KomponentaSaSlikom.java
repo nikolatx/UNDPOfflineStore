@@ -21,7 +21,7 @@ public class KomponentaSaSlikom extends Komponenta {
     
     public Object getSlika() {
         return slikaProperty.get();
-  }
+    }
     
     public void setSlika(Slika value) {
         slikaProperty.set(value);

@@ -17,6 +17,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -89,6 +90,7 @@ public class NoviDobavljac {
         Scene scena = new Scene(dodajBox, 500, 350); 
         scena.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
         Stage noviProzor=new Stage();
+        noviProzor.getIcons().add(new Image("/resources/logo.jpg"));
         noviProzor.setResizable(false);
         noviProzor.setTitle("Dodavanje novog dobavljaca");
         

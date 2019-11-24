@@ -35,8 +35,6 @@ public class Pretraga extends Application {
     //Kreiranje 3 ComboBox-a na formi
     ComboBox tipCB = new ComboBox(opcijeTip);
     ComboBox proizvodjacCB = new ComboBox(opcijeProizvodjac);
-
-    
     CheckBox aktuelneCB = new CheckBox();
     
     //Liste za pracenje informacija u tabelama
@@ -53,11 +51,9 @@ public class Pretraga extends Application {
     Button ponistiDugme = new Button("Poništi");
     Button nazadDugme = new Button("Nazad");
     
-    
     //Kreiranje opisa koji ce da stoje na formi
     Label naslovForme = new Label("Pretraga");
     Label labelFiltriraneKomponente = new Label("Rezultat pretrage");
-
     
     //Kreiranje horizontalnih (HBox) i Vertikalnih (VBox) panela
     HBox opisiCB = new HBox();

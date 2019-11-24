@@ -2,7 +2,6 @@
 package com.grupa1.model;
 
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 
 public class KomponentaSvaPolja extends KomponentaSaSlikom {
     

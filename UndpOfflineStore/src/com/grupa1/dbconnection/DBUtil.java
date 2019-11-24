@@ -161,6 +161,38 @@ public class DBUtil {
         }
         return upisano;
     }
+    
+    //update komponente u bazi podataka
+    public static int izmeniKomponentu(KomponentaSvaPolja komponenta, int proizvodjacId, int tipId) {
+        Connection conn=null;
+        int izmenjeno=0;
+        try {
+            conn = DriverManager.getConnection(dbUrl + dbName, userName, password);
+            System.out.println("Uspešna konekcija");
+            PreparedStatement ps1=conn.prepareStatement("UPDATE komponenta SET naziv=?, proizvodjac_id=?, tip_id=?, "
+                    + "kolicina=?, cena=?, slika=?, aktuelna=? WHERE komponenta_id=?");
+            ps1.setString(1, komponenta.getNaziv());
+            ps1.setInt(2, proizvodjacId);
+            ps1.setInt(3, tipId);
+            ps1.setInt(4, komponenta.getKolicina());
+            ps1.setDouble(5, komponenta.getCena());
+            ps1.setString(6, ((Slika)komponenta.getSlika()).getNaziv());
+            ps1.setBoolean(7, komponenta.getAktuelna());
+            ps1.setInt(8, komponenta.getId());
+            izmenjeno=ps1.executeUpdate();
+        } catch (SQLException ex) {
+            System.out.println("Neuspešna konekcija");
+            Pomocne.poruka("Proverite da li je pokrenut MySQL server!");
+        }
+        finally {
+            try {
+                if (conn!=null) conn.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DBUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return izmenjeno;
+    }
 
     //insert novog dobavljaca u bazu podataka
     public static int ubaciDobavljaca(Osoba dobavljac) {

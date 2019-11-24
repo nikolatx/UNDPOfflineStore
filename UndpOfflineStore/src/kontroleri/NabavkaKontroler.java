@@ -170,7 +170,8 @@ public class NabavkaKontroler {
                             alert1.setContentText("Došlo je do greške pri upisu u bazu podataka!");
                         Platform.runLater( () -> {
                             alert1.showAndWait();
-                            nazadDugme.fire();
+                            podaciOdabrano.clear();
+                            //nazadDugme.fire();
                         });
                     } else {
                         alert.close();

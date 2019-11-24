@@ -16,6 +16,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
@@ -46,18 +47,6 @@ public class UndpOfflineStore extends Application {
         
     @Override
     public void start(Stage primaryStage) {
-        
-        Podesavanja podesavanja=new Podesavanja();
-        podesavanja=PodesavanjaDAO.ucitaj();
-        if (podesavanja!=null)
-            Konst.podesiParametre(podesavanja);
-        else {
-            podesavanja=new Podesavanja();
-            PodesavanjaDAO.sacuvaj(true, podesavanja);
-        }
-            
-        
-        
         
         //Podesavanje velicine , izgleda i dodavanje nodova na Hbox
         hb1.setMinSize(800, 120);
@@ -208,12 +197,20 @@ public class UndpOfflineStore extends Application {
             }
         });
         
-        
+        Podesavanja podesavanja=new Podesavanja();
+        podesavanja=PodesavanjaDAO.ucitaj();
+        if (podesavanja!=null)
+            Konst.podesiParametre(podesavanja);
+        else {
+            podesavanja=new Podesavanja();
+            PodesavanjaDAO.sacuvaj(true, podesavanja);
+        }
         //Kreiranje scene,velicine,naziva i povezivanje sa css-om
         Scene scene = new Scene(root, 1000, 650);
         //primaryStage.setResizable(false);
         primaryStage.setTitle("UNDP Offline Store");
         scene.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
+        primaryStage.getIcons().add(new Image("/resources/logo.jpg"));
         primaryStage.setScene(scene);
         primaryStage.show();
     }

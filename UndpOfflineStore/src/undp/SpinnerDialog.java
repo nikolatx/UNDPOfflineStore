@@ -6,6 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -45,7 +46,10 @@ public class SpinnerDialog {
 
         //podesavanje granicnih vrednosti spinnera i podesene vrednosti
         spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, maksKolicina, pocetnaKolicina));
-
+        spinner.setEditable(true);
+        spinner.getEditor().setStyle("-fx-alignment: CENTER_RIGHT;");
+        spinner.getEditor().selectAll();
+        
         //dodavanje u gornji red labele i spinnera
         gornjiHBox.getChildren().addAll(labela1, spinner);
         gornjiHBox.setAlignment(Pos.CENTER);
@@ -59,6 +63,7 @@ public class SpinnerDialog {
         noviProzor.setScene(scena);
         
         scena.getStylesheets().addAll(this.getClass().getResource("/resources/styles.css").toExternalForm());
+        noviProzor.getIcons().add(new Image("/resources/logo.jpg"));
         //dugme potvrdi - promena kolicine komponente i ubacivanje u listu odabranih
         dugmePotvrdi.setOnAction( e -> {
             result=(Integer)spinner.getValue();
@@ -69,6 +74,13 @@ public class SpinnerDialog {
         dugmeOdustani.setOnAction( e -> { 
             result=-1; 
             noviProzor.close();
+        });
+        
+        //da bi prosledio vrednost iako se ne pritisne enter
+        spinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+            spinner.increment(0);
+            }
         });
         
         noviProzor.showAndWait();
