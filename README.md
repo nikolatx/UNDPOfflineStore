@@ -1,11 +1,11 @@
 # UNDP Offline Store
 
-Windows aplikacija koja predstavlja softver (informacioni sistem) koji se koristi u prodavnici računarskih komponenti.
+Windows aplikacija koja predstavlja pojednostavljeni softver (informacioni sistem) koji se koristi u prodavnici računarskih komponenata.
 
 
 ## Instalacija
 
-Klonirajte projekat putem HTTPS metoda:
+Klonirajte projekat putem HTTPS:
 
 ```bash
 https://github.com/nikolatx/UNDPOfflineStore.git
@@ -32,7 +32,7 @@ MySql za rad sa bazom podataka.
 
 ## Učesnici u projektu
 
-Članovi GRUPE 1, po projektnoj ideji Inovateca i UNDP kao organizatora.
+Članovi GRUPE 1, po projektnom zadatku Inovatec-a i UNDP-a kao organizatora obuke.
 
 
 ## Licenca
